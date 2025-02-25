@@ -1,61 +1,44 @@
 #include "figure.hpp"
 
-struct figure {
+class Figure {
+private:
 	List points;
-};
 
-Figure newEmptyFigure() {
-	Figure f = (Figure)malloc(sizeof(struct figure));
-	if (f != NULL) {
-		f->points = newEmptyList();
-	}
-	return f;
-}
-
-Figure newFigure(List points) {
-	Figure f = (Figure)malloc(sizeof(struct figure));
-	if (f != NULL) {
-		for (long i = 0; i < size(points); i++) {
-			addPoint(f, (Point)get(points, i));
+public:
+	void addPoint(Point p) {
+		if (p != NULL) {
+			points.add(p);
 		}
 	}
-	return f;
-}
 
-void addPoint(Figure f, Point p) {
-	if (f != NULL) {
-		add(f->points, p);
+	List getPoints() {
+		return points;
 	}
-}
 
-List getPoints(Figure f) {
-	if (f) {
-		return f->points;
+	void figureToFile(char* path) {
+		if (points.size() == 0) {
+			printf("Figure is NULL\n");
+			return;
+		}
+		FILE* file = fopen(path, "w");
+		if (!file) {
+			printf("Error opening file\n");
+			return;
+		}
+		fprintf(file, "%ld\n", points.size());
+		for (long i = 0; i < points.size(); i++) {
+			Point p = (Point)points.get(i);
+			fprintf(file, "%g,%g,%g\n", getX(p), getY(p), getZ(p));
+		}
+		fclose(file);
 	}
-	return NULL;
-}
 
-void figureToFile(Figure f, char* path) {
-	if (!f) {
-		printf("Figure is NULL\n");
-		return;
-	}
-	FILE* file = fopen(path, "w");
-	if (!file) {
-		printf("Error opening file\n");
-		return;
-	}
-	for (long i = 0; i < size(f->points); i++) {
-		Point p = (Point)get(f->points, i);
-		fprintf(file, "%g,%g,%g\n", getX(p), getY(p), getZ(p);
-	}
-	fclose(file);
-}
-
-Figure figureFromFile(char* path) {
-	Figure f = newEmptyFigure();
-	FILE* file = fopen(path, "r");
-	if (f && file) {
+	Figure figureFromFile(char* path) {
+		FILE* file = fopen(path, "r");
+		if (!file) {
+			printf("Error opening file\n");
+			return NULL;
+		}
 		char buffer[1024];
 		fgets(buffer, 1023, file);
 		int vertexs = atoi(buffer);
@@ -67,19 +50,15 @@ Figure figureFromFile(char* path) {
 			double y = atof(token);
 			token = strtok(NULL, ",");
 			double z = atof(token);
-			addPoint(f, newPoint(x, y, z));
+			addPoint(newPoint(x, y, z));
 		}
 		fclose(file);
+		return this;
 	}
-	return f;
-}
 
-void deleteFigure(void* figure) {
-	if (f != NULL) {
-		for (long i = 0; i < size(((Figure)f)->points); i++) {
-			deletePoint(get((Figure)f)->points, i);
+	void deleteFigure() {
+		if (points.size() > 0) {
+			points.deepDeleteList();
 		}
-		deleteList(f->points);
-		free(f);
 	}
-}
+};
