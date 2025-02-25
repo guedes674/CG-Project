@@ -8,13 +8,13 @@
 
 <div align="center">
 
-| Nome           | Número  |
-| -------------- | ------- |
-| Tiago Carneiro | A93207  |
-| Nome | Número |
-| Tiago Guedes   | A97369  |
+| Nome             | Número  |
+| ---------------- | ------- |
+| Adélio Fernandes | A78778  |
+| Tiago Carneiro   | A93207  |
+| Tiago Guedes     | A97369  |
 
 </div>
-# CG2425-Grupo-??
+# CG2425-Grupo-33
 
 Nota : ??
