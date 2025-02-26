@@ -6,6 +6,18 @@ private:
 	long size;
 	long capacity;
 public:
+	List() {
+		size = 0;
+		capacity = STDSIZE;
+		array = (void**)malloc(capacity * sizeof(void*));
+	}
+
+	List(array, long size, long capacity) {
+		this.array = array;
+		this.size = size;
+		this.capacity = capacity;
+	}
+
 	void get(long index) {
 		if (index >= 0 && index < size) {
 			return array[index];

@@ -5,6 +5,14 @@ private:
 	List points;
 
 public:
+	Figure() {
+		points = newList();
+	}
+
+	Figure(List points) {
+		this.points = points;
+	}
+
 	void addPoint(Point p) {
 		if (p != NULL) {
 			points.add(p);
