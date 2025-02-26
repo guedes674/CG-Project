@@ -1,35 +1,29 @@
-#include "point.hpp"
+#include <cmath>
 
 class Point {
 private:
-	float x;
-	float y;
-	float z;
+    float x, y, z;
+
 public:
-	float getX() {
-		return x;
-	}
+    Point() : x(0), y(0), z(0) {}
 
-	float getY() {
-		return y;
-	}
+    Point(float x, float y, float z) : x(x), y(y), z(z) {}
 
-	float getZ() {
-		return z;
-	}
+    float getX() const { return x; }
+    float getY() const { return y; }
+    float getZ() const { return z; }
 
-	float getDistanceToOrigin() {
-		return sqrt(x * x + y * y + z * z);
-	}
+    float getDistanceToOrigin() const {
+        return sqrt(x * x + y * y + z * z);
+    }
 
-	float getDistance(Point p) {
-		float dx = x - p.getX();
-		float dy = y - p.getY();
-		float dz = z - p.getZ();
-		return sqrt(dx * dx + dy * dy + dz * dz);
-	}
+    float getDistance(const Point& p) const {
+        float dx = x - p.getX();
+        float dy = y - p.getY();
+        float dz = z - p.getZ();
+        return sqrt(dx * dx + dy * dy + dz * dz);
+    }
 
-	void deletePoint() {
-		free(this);
-	}
+    ~Point() {
+    }
 };

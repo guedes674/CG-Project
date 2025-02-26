@@ -1,61 +1,74 @@
 #include "list.hpp"
+#include <cstdlib>
 
 class List {
 private:
-	void** array;
-	long size;
-	long capacity;
+    void** array;
+    long _size;
+    long capacity;
+
 public:
-	void get(long index) {
-		if (index >= 0 && index < size) {
-			return array[index];
-		}
-		return NULL;
-	}
+    List() {
+        _size = 0;
+        capacity = STDSIZE;
+        array = (void**)malloc(capacity * sizeof(void*));
+    }
 
-	void set(long index, void* element) {
-		if (index >= 0 && index < size) {
-			array[index] = element;
-		}
-	}
+    void* get(long index) {
+        if (index >= 0 && index < _size) {
+            return array[index];
+        }
+        return NULL;
+    }
 
-	int listIsFull() {
-		return size == capacity;
-	}
+    void set(long index, void* element) {
+        if (index >= 0 && index < _size) {
+            array[index] = element;
+        }
+    }
 
-	void add(void* element) {
-		if (listIsFull()) {
-			size += STDSIZE;
-			array = (void**)realloc(array, size * sizeof(void*));
-		}
-		array[size++] = element;
-	}
+    bool listIsFull() {
+        return _size == capacity;
+    }
 
-	long size() {
-		return size;
-	}
+    void add(void* element) {
+        if (listIsFull()) {
+            capacity += STDSIZE;
+            array = (void**)realloc(array, capacity * sizeof(void*));
+        }
+        array[_size++] = element;
+    }
 
-	void remove(long index) {
-		if (index >= 0 && index < size) {
-			for (long i = index; i < size - 1; i++) {
-				array[i] = array[i + 1];
-			}
-			size--;
-		}
-	}
+    long size() {
+        return _size;
+    }
 
-	void deleteList() {
-		if (array) {
-			free(array);
-		}
-	}
+    void remove(long index) {
+        if (index >= 0 && index < _size) {
+            for (long i = index; i < _size - 1; i++) {
+                array[i] = array[i + 1];
+            }
+            _size--;
+        }
+    }
 
-	void deepDeleteList() {
-		if (array) {
-			for (long i = 0; i < size; i++) {
-				free(array[i]);
-			}
-			deleteList();
-		}
-	}
+    void deleteList() {
+        if (array) {
+            free(array);
+            array = NULL;
+        }
+    }
+
+    void deepDeleteList() {
+        if (array) {
+            for (long i = 0; i < _size; i++) {
+                free(array[i]);
+            }
+            deleteList();
+        }
+    }
+
+    ~List() {
+        deleteList();
+    }
 };

@@ -1,64 +1,87 @@
 #include "figure.hpp"
 
-class Figure {
-private:
-	List points;
+void Figure::addPoint(Point p) {
+    points.add(new Point(p));
+}
 
-public:
-	void addPoint(Point p) {
-		if (p != NULL) {
-			points.add(p);
-		}
-	}
+List Figure::getPoints() {
+    return points;
+}
 
-	List getPoints() {
-		return points;
-	}
+void Figure::addVertex(Point p) {
+    vertices.add(new Point(p));
+}
 
-	void figureToFile(char* path) {
-		if (points.size() == 0) {
-			printf("Figure is NULL\n");
-			return;
-		}
-		FILE* file = fopen(path, "w");
-		if (!file) {
-			printf("Error opening file\n");
-			return;
-		}
-		fprintf(file, "%ld\n", points.size());
-		for (long i = 0; i < points.size(); i++) {
-			Point p = (Point)points.get(i);
-			fprintf(file, "%g,%g,%g\n", getX(p), getY(p), getZ(p));
-		}
-		fclose(file);
-	}
+void Figure::addNormal(Point p) {
+    normals.add(new Point(p));
+}
 
-	Figure figureFromFile(char* path) {
-		FILE* file = fopen(path, "r");
-		if (!file) {
-			printf("Error opening file\n");
-			return NULL;
-		}
-		char buffer[1024];
-		fgets(buffer, 1023, file);
-		int vertexs = atoi(buffer);
-		for (int i = 0; i < vertexs; i++) {
-			fgets(buffer, 1023, file);
-			char* token = strtok(buffer, ",");
-			double x = atof(token);
-			token = strtok(NULL, ",");
-			double y = atof(token);
-			token = strtok(NULL, ",");
-			double z = atof(token);
-			addPoint(newPoint(x, y, z));
-		}
-		fclose(file);
-		return this;
-	}
+void Figure::addTexture(float u, float v) {
+    float* tex = new float[2]{ u, v };
+    textures.add(tex);
+}
 
-	void deleteFigure() {
-		if (points.size() > 0) {
-			points.deepDeleteList();
-		}
-	}
-};
+void Figure::addTriangle(int v1, int v2, int v3) {
+    int* tri = new int[3]{ v1, v2, v3 };
+    triangles.add(tri);
+}
+
+List Figure::getVertices() {
+    return vertices;
+}
+
+List Figure::getNormals() {
+    return normals;
+}
+
+List Figure::getTextures() {
+    return textures;
+}
+
+List Figure::getTriangles() {
+    return triangles;
+}
+
+void Figure::figureToFile(const char* path) {
+    FILE* file = fopen(path, "w");
+    if (!file) {
+        printf("Error opening file\n");
+        return;
+    }
+
+    fprintf(file, "%ld\n", vertices.size());
+    for (long i = 0; i < vertices.size(); i++) {
+        Point* p = (Point*)vertices.get(i);
+        fprintf(file, "%f,%f,%f\n", p->getX(), p->getY(), p->getZ());
+    }
+
+    fclose(file);
+}
+
+Figure Figure::figureFromFile(const char* path) {
+    FILE* file = fopen(path, "r");
+    if (!file) {
+        printf("Error opening file\n");
+        return Figure();
+    }
+
+    Figure fig;
+    int count;
+    fscanf(file, "%d", &count);
+    for (int i = 0; i < count; i++) {
+        float x, y, z;
+        fscanf(file, "%f,%f,%f", &x, &y, &z);
+        fig.addVertex(Point(x, y, z));
+    }
+
+    fclose(file);
+    return fig;
+}
+
+void Figure::deleteFigure() {
+    points.deepDeleteList();
+    vertices.deepDeleteList();
+    normals.deepDeleteList();
+    textures.deepDeleteList();
+    triangles.deepDeleteList();
+}
