@@ -1,10 +1,4 @@
-#include <GL/glut.h>
-#include <cmath>
-#include <iostream>
-#include <vector>
-#include <string>
-#include "tinyxml2.h"
-#include "classes/figure.hpp"
+#include "engine.hpp"
 
 using namespace std;
 using namespace tinyxml2;
@@ -15,6 +9,7 @@ float pos_x = 5.0, pos_y = 5.0, pos_z = 5.0;    // posição da câmera
 float look_x = 0, look_y = 0, look_z = 0;       // orientação da câmera
 float up_x = 0, up_y = 1.0, up_z = 0;           // eixo vertical da câmera
 float fov = 45, near = 1, far = 1000;           // perspectiva da câmera
+float zoomx = 1.0, zoomy = 1.0, zoomz = 1.0;    // zoom da câmera
 float cradius = 7.0f;                           // raio da câmera
 int mode = GL_LINE, face = GL_FRONT_AND_BACK;   // modo de visualização
 vector<Figure> models;                          // modelos carregados a partir do XML
@@ -150,14 +145,49 @@ void changeSize(int w, int h) {
 
 void processKeys(unsigned char key, int xx, int yy) {
 
-    // acrescentar (letras w,s,a,d,+,-,...)
+	switch (key) {
+	case 'w':
+		pos_z -= 0.1;
+		break;
+	case 's':
+		pos_z += 0.1;
+		break;
+	case 'a':
+		pos_x -= 0.1;
+		break;
+	case 'd':
+		pos_x += 0.1;
+		break;
+    case '+':
+		zoomx += 0.1;
+		zoomy += 0.1;
+		zoomz += 0.1;
+		break;
+	case '-':
+		zoomx -= 0.1;
+		zoomy -= 0.1;
+		zoomz -= 0.1;
+		break;
 
     glutPostRedisplay();
 }
 
 void processSpecialKeys(int key, int xx, int yy) {
 
-    // acrescentar (setas)
+	switch (key) {
+	case GLUT_KEY_RIGHT:
+		look_x += 0.1;
+		break;
+	case GLUT_KEY_LEFT:
+		look_x -= 0.1;
+		break;
+	case GLUT_KEY_UP:
+		look_y += 0.1;
+		break;
+	case GLUT_KEY_DOWN:
+		look_y -= 0.1;
+		break;
+	}
 
     glutPostRedisplay();
 }
@@ -188,6 +218,7 @@ void renderScene(void) {
     // define a câmera
     glLoadIdentity();
     gluLookAt(pos_x, pos_y, pos_z, look_x, look_y, look_z, up_x, up_y, up_z);
+	glScalef(zoomx, zoomy, zoomz);
 
     // define modo de polígonos
     glPolygonMode(GL_FRONT_AND_BACK, mode);
@@ -219,6 +250,7 @@ int main(int argc, char** argv) {
     // Registrar callbacks
     glutDisplayFunc(renderScene);
     glutReshapeFunc(changeSize);
+	glutIdleFunc(renderScene);
     glutKeyboardFunc(processKeys);
     glutSpecialFunc(processSpecialKeys);
 
