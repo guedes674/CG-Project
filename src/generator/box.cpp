@@ -22,7 +22,7 @@ Figure box(float length, int divisions) {
                     z2 = half;
                     fig.addNormal(0, 0, 1);
                     break;
-                case 1: // atrás
+                case 1: // atras
                     x1 = -half + (i + 1) * step;
                     x2 = -half + i * step;
                     y1 = -half + j * step;
@@ -85,7 +85,4 @@ Figure box(float length, int divisions) {
             }
         }
     }
-
-    fig.figureToFile("box.3d");
-    return fig;
 }
