@@ -17,6 +17,10 @@ int main(int argc, char* argv[]) {
             fig = box(length, divisions);
         }
         else if (strcmp(argv[1], "sphere") == 0) {
+            float radius = atof(argv[2]);
+            int slices = atoi(argv[3]);
+            int stacks = atoi(argv[4]);
+            fig = generateSphere(radius, slices, stacks);
         }
         else if (strcmp(argv[1], "cone") == 0) {
         }
