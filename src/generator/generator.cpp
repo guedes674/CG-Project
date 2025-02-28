@@ -8,6 +8,7 @@ int main(int argc, char* argv[]) {
         if (strcmp(argv[1], "plane") == 0) {
             int length = atoi(argv[2]);
             int divisions = atoi(argv[3]);
+			file_path = argv[4];
             fig = plane(length, divisions);
         }
         else if (strcmp(argv[1], "box") == 0) {

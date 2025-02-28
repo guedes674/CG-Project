@@ -16,18 +16,18 @@ Figure generatePlane(float length, int divisions) {
 				float z2 = z1 + step;
 
 				float x3 = x1 + step;
-				float z3 = z1 + step;
+				float z3 = z1;
 
 				float x4 = x1 + step;
-				float z4 = z1;
+				float z4 = z1 + step;
 
-				plane.addVertex(Point(x1, 0, z1));
-				plane.addVertex(Point(x2, 0, z2));
-				plane.addVertex(Point(x3, 0, z3));
-				plane.addVertex(Point(x4, 0, z4));
-
-				List vertices = plane.getVertices();
-				int size = vertices.size();
+				plane.addPoint(Point(x1, 0, z1));
+				plane.addPoint(Point(x2, 0, z2));
+				plane.addPoint(Point(x3, 0, z3));
+				
+				plane.addPoint(Point(x2, 0, z2));
+				plane.addPoint(Point(x4, 0, z4));
+				plane.addPoint(Point(x3, 0, z3));
 
 			}
 		}
