@@ -1,9 +1,11 @@
-#ifndef FIGURE_HPP
-#define FIGURE_HPP
+#ifndef FIGURE
+#define FIGURE
 
 #include "list.hpp"
 #include "point.hpp"
 #include <cstdio>
+#include <fstream>
+#include <iostream>
 
 class Figure {
 private:
@@ -14,7 +16,9 @@ private:
     List triangles;
 
 public:
-    Figure() = default;
+    Figure();
+
+	~Figure();
 
     void addPoint(Point p);
 
@@ -34,13 +38,13 @@ public:
 
     void addTriangle(int v1, int v2, int v3);
 
-    List getVertices();
+    List getVertices() const;
 
     List getNormals();
 
     List getTextures();
 
-    List getTriangles();
+    List getTriangles() const;
 };
 
 #endif

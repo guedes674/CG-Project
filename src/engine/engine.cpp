@@ -1,8 +1,5 @@
 #include "engine.hpp"
 
-using namespace std;
-using namespace tinyxml2;
-
 // variáveis globais
 int w_width, w_height;                          // Tamanho da janela lido do XML
 float pos_x = 5.0, pos_y = 5.0, pos_z = 5.0;    // posição da câmera
@@ -145,31 +142,32 @@ void changeSize(int w, int h) {
 
 void processKeys(unsigned char key, int xx, int yy) {
 
-	switch (key) {
-	case 'w':
-		pos_z -= 0.1;
-		break;
-	case 's':
-		pos_z += 0.1;
-		break;
-	case 'a':
-		pos_x -= 0.1;
-		break;
-	case 'd':
-		pos_x += 0.1;
-		break;
+    switch (key) {
+    case 'w':
+        pos_z -= 0.1;
+        break;
+    case 's':
+        pos_z += 0.1;
+        break;
+    case 'a':
+        pos_x -= 0.1;
+        break;
+    case 'd':
+        pos_x += 0.1;
+        break;
     case '+':
-		zoomx += 0.1;
-		zoomy += 0.1;
-		zoomz += 0.1;
-		break;
-	case '-':
-		zoomx -= 0.1;
-		zoomy -= 0.1;
-		zoomz -= 0.1;
-		break;
+        zoomx += 0.1;
+        zoomy += 0.1;
+        zoomz += 0.1;
+        break;
+    case '-':
+        zoomx -= 0.1;
+        zoomy -= 0.1;
+        zoomz -= 0.1;
+        break;
 
-    glutPostRedisplay();
+        glutPostRedisplay();
+    }
 }
 
 void processSpecialKeys(int key, int xx, int yy) {
@@ -195,10 +193,12 @@ void processSpecialKeys(int key, int xx, int yy) {
 // Função para desenhar os modelos 3D carregados
 void drawScene() {
     for (const auto& model : models) {
-        for (const auto& triangle : model.getTriangles()) {
+        List triangles = model.getTriangles();
+        for (long i = 0; i < triangles.size(); ++i) {
+            int* triangle = (int*)triangles.get(i);
             glBegin(GL_TRIANGLES);
-            for (int i = 0; i < 3; ++i) {
-                Point* p = (Point*)model.getVertices().get(triangle[i]);
+            for (int j = 0; j < 3; ++j) {
+                const Point* p = (Point*)model.getVertices().get(triangle[j]);
                 glVertex3f(p->getX(), p->getY(), p->getZ());
             }
             glEnd();

@@ -1,5 +1,17 @@
 #include "figure.hpp"
 
+Figure::Figure() {
+	points = List();
+	vertices = List();
+	normals = List();
+	textures = List();
+	triangles = List();
+}
+
+Figure::~Figure() {
+    deleteFigure();
+}
+
 void Figure::addPoint(Point p) {
     points.add(new Point(p));
 }
@@ -26,7 +38,7 @@ void Figure::addTriangle(int v1, int v2, int v3) {
     triangles.add(tri);
 }
 
-List Figure::getVertices() {
+List Figure::getVertices() const{
     return vertices;
 }
 
@@ -38,47 +50,44 @@ List Figure::getTextures() {
     return textures;
 }
 
-List Figure::getTriangles() {
+List Figure::getTriangles() const{
     return triangles;
 }
 
 void Figure::figureToFile(const char* path) {
-    FILE* file = fopen(path, "w");
-    if (!file) {
-        printf("Error opening file\n");
+    std::ofstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo " << path << std::endl;
         return;
     }
 
-    fprintf(file, "%ld\n", vertices.size());
-    for (long i = 0; i < vertices.size(); i++) {
-        Point* p = (Point*)vertices.get(i);
-        fprintf(file, "%f,%f,%f\n", p->getX(), p->getY(), p->getZ());
+    for (long i = 0; i < points.size(); ++i) {
+        Point* p = (Point*)points.get(i);
+        file << p->getX() << " " << p->getY() << " " << p->getZ() << std::endl;
     }
 
-    fclose(file);
+    file.close();
 }
 
 Figure Figure::figureFromFile(const char* path) {
-    FILE* file = fopen(path, "r");
-    if (!file) {
-        printf("Error opening file\n");
-        return Figure();
-    }
-
     Figure fig;
-    int count;
-    fscanf(file, "%d", &count);
-    for (int i = 0; i < count; i++) {
-        float x, y, z;
-        fscanf(file, "%f,%f,%f", &x, &y, &z);
-        fig.addVertex(Point(x, y, z));
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo " << path << std::endl;
+        return fig;
     }
 
-    fclose(file);
+    float x, y, z;
+    while (file >> x >> y >> z) {
+        fig.addPoint(Point(x, y, z));
+    }
+
+    file.close();
     return fig;
 }
 
 void Figure::deleteFigure() {
+    if (!points.size()) return;
     points.deepDeleteList();
     vertices.deepDeleteList();
     normals.deepDeleteList();

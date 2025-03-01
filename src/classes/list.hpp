@@ -1,5 +1,5 @@
-#ifndef LIST_HPP
-#define LIST_HPP
+#ifndef LIST
+#define LIST
 
 #include <cstdlib>
 

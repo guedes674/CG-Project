@@ -1,6 +1,6 @@
 #include "box.hpp"
 
-Figure box(float length, int divisions) {
+Figure generateBox(float length, int divisions) {
     Figure fig;
     fig = Figure();
 
@@ -20,7 +20,7 @@ Figure box(float length, int divisions) {
                     y2 = -half + (j + 1) * step;
                     z1 = half;
                     z2 = half;
-                    fig.addNormal(0, 0, 1);
+                    fig.addNormal(Point(0, 0, 1));
                     break;
                 case 1: // atras
                     x1 = -half + (i + 1) * step;
@@ -29,7 +29,7 @@ Figure box(float length, int divisions) {
                     y2 = -half + (j + 1) * step;
                     z1 = -half;
                     z2 = -half;
-                    fig.addNormal(0, 0, -1);
+                    fig.addNormal(Point(0, 0, -1));
                     break;
                 case 2: // esquerda
                     x1 = -half;
@@ -38,7 +38,7 @@ Figure box(float length, int divisions) {
                     y2 = -half + (j + 1) * step;
                     z1 = -half + i * step;
                     z2 = -half + (i + 1) * step;
-                    fig.addNormal(-1, 0, 0);
+                    fig.addNormal(Point(-1, 0, 0));
                     break;
                 case 3: // direita
                     x1 = half;
@@ -47,7 +47,7 @@ Figure box(float length, int divisions) {
                     y2 = -half + (j + 1) * step;
                     z1 = -half + (i + 1) * step;
                     z2 = -half + i * step;
-                    fig.addNormal(1, 0, 0);
+                    fig.addNormal(Point(1, 0, 0));
                     break;
                 case 4: // cima
                     x1 = -half + i * step;
@@ -56,7 +56,7 @@ Figure box(float length, int divisions) {
                     y2 = half;
                     z1 = -half + j * step;
                     z2 = -half + (j + 1) * step;
-                    fig.addNormal(0, 1, 0);
+                    fig.addNormal(Point(0, 1, 0));
                     break;
                 case 5: // baixo
                     x1 = -half + i * step;
@@ -65,14 +65,14 @@ Figure box(float length, int divisions) {
                     y2 = -half;
                     z1 = -half + (j + 1) * step;
                     z2 = -half + j * step;
-                    fig.addNormal(0, -1, 0);
+                    fig.addNormal(Point(0, -1, 0));
                     break;
                 }
 
-                fig.addVertex(x1, y1, z1);
-                fig.addVertex(x2, y1, z1);
-                fig.addVertex(x1, y2, z2);
-                fig.addVertex(x2, y2, z2);
+                fig.addVertex(Point(x1, y1, z1));
+                fig.addVertex(Point(x2, y1, z1));
+                fig.addVertex(Point(x1, y2, z2));
+                fig.addVertex(Point(x2, y2, z2));
 
                 fig.addTexture(0, 0);
                 fig.addTexture(1, 0);
@@ -85,4 +85,6 @@ Figure box(float length, int divisions) {
             }
         }
     }
+
+    return fig;
 }

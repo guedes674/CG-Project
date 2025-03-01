@@ -1,5 +1,5 @@
-#ifndef POINT_HPP
-#define POINT_HPP
+#ifndef POINT
+#define POINT
 
 #include <cmath>
 
@@ -10,11 +10,11 @@ private:
 public:
     Point();
     Point(float x, float y, float z);
+    ~Point();
 
     float getX() const;
     float getY() const;
     float getZ() const;
-    
     float getDistanceToOrigin() const;
     float getDistance(const Point& p) const;
 };
