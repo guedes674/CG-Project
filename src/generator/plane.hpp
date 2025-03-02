@@ -7,6 +7,9 @@
 #include "../classes/figure.hpp"
 
 // Função que gera um plano de acordo com o tamanho e divisões passadas
-Figure generatePlane(float length, int divisions);
+Figure generatePlaneXZ(float length, int divisions, int height);
 
+Figure generatePlaneXY(float length, int divisions, int height);
+
+Figure generatePlaneYZ(float length, int divisions, int height);
 #endif

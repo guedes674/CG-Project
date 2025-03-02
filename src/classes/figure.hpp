@@ -8,11 +8,11 @@
 
 class Figure {
 private:
-    List<Point> points;
-    List<Point> vertices;
-    List<Point> normals;
-    List<float> textures;
-    List<int> triangles;
+    List points;
+    List vertices;
+    List normals;
+    List textures;
+    List triangles;
 
 public:
     Figure();
@@ -26,17 +26,17 @@ public:
     Figure(Figure&& other) noexcept;
     Figure& operator=(Figure&& other) noexcept;
 
-    void addPoint(const Point& p);
-    void addVertex(const Point& p);
-    void addNormal(const Point& p);
+    void addPoint(Point p);
+    void addVertex(Point p);
+    void addNormal(Point p);
     void addTexture(float u, float v);
     void addTriangle(int v1, int v2, int v3);
 
-    List<Point>& getPoints();
-    List<Point>& getVertices();
-    List<Point>& getNormals();
-    List<float>& getTextures();
-    List<int>& getTriangles();
+    List getPoints() const;
+    List getVertices() const;
+    List getNormals() const;
+    List getTextures() const;
+    List getTriangles() const;
 
     void figureToFile(const char* path);
     static Figure figureFromFile(const char* path);
@@ -44,4 +44,4 @@ public:
     void deleteFigure();
 };
 
-#endif
+#endif // FIGURE_HPP

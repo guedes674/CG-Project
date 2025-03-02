@@ -4,27 +4,20 @@
 #include <iostream>
 #include "point.hpp"
 
-template <typename T>
-class List {
-private:
-    T** array;
-    long _size;
-    long capacity;
+typedef struct list* List;
 
-    void expandCapacity();
+List newL();
 
-public:
-    List(int initial_capacity = 10);
-    ~List();
+void addValueList(List lista, void* data);
 
-    void add(T* element);
-    void set(long index, T* element);
-    T* get(long index);
-    void remove(long index);
-    long size() const;
+void* getData(List node);
 
-    void deleteList();
-    void deepDeleteList();
-};
+List getNext(List node);
+
+void* getDataByIndex(List lista, unsigned long index);
+
+unsigned long size(List lista);
+
+void freeL(List lista);
 
 #endif

@@ -3,20 +3,20 @@
 
 #include <cmath>
 
-class Point {
-private:
-    float x, y, z;
+typedef struct point* Point;
 
-public:
-    Point();
-    Point(float x, float y, float z);
-    ~Point();
+Point point(float x, float y, float z);
 
-    float getX() const;
-    float getY() const;
-    float getZ() const;
-    float getDistanceToOrigin() const;
-    float getDistance(const Point& p) const;
-};
+float getX(Point point);
+
+float getY(Point point);
+
+float getZ(Point point);
+
+void freeP(Point point);
+
+float calculateDistance(Point point1, Point point2);
+
+Point newPontoSph(float a, float b, float radius);
 
 #endif

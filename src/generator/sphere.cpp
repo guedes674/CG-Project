@@ -4,8 +4,7 @@
 #define PI 3.14159265359
 
 Figure generateSphere(float radius, int slices, int stacks) {
-    Figure fig;
-    fig = Figure();
+	Figure fig = Figure();
 
     float stackStep = PI / stacks;
     float sliceStep = 2 * PI / slices;
@@ -35,13 +34,13 @@ Figure generateSphere(float radius, int slices, int stacks) {
             float z4 = radius * cos(phi2) * sin(theta2);
 
             if (i != 0) {
-                fig.addVertex(Point(x1, y1, z1));
-                fig.addVertex(Point(x3, y3, z3));
-                fig.addVertex(Point(x4, y4, z4));
+                fig.addPoint(point(x1, y1, z1));
+                fig.addPoint(point(x3, y3, z3));
+                fig.addPoint(point(x4, y4, z4));
 
-                fig.addNormal(Point(x1 / radius, y1 / radius, z1 / radius));
-                fig.addNormal(Point(x3 / radius, y3 / radius, z3 / radius));
-                fig.addNormal(Point(x4 / radius, y4 / radius, z4 / radius));
+                fig.addNormal(point(x1 / radius, y1 / radius, z1 / radius));
+                fig.addNormal(point(x3 / radius, y3 / radius, z3 / radius));
+                fig.addNormal(point(x4 / radius, y4 / radius, z4 / radius));
 
                 fig.addTexture((float)j / slices, (float)i / stacks);
                 fig.addTexture((float)j / slices, (float)(i + 1) / stacks);
@@ -52,13 +51,13 @@ Figure generateSphere(float radius, int slices, int stacks) {
             }
 
             if (i != stacks - 1) {
-                fig.addVertex(Point(x1, y1, z1));
-                fig.addVertex(Point(x4, y4, z4));
-                fig.addVertex(Point(x2, y2, z2));
+                fig.addPoint(point(x1, y1, z1));
+                fig.addPoint(point(x4, y4, z4));
+                fig.addPoint(point(x2, y2, z2));
 
-                fig.addNormal(Point(x1 / radius, y1 / radius, z1 / radius));
-                fig.addNormal(Point(x4 / radius, y4 / radius, z4 / radius));
-                fig.addNormal(Point(x2 / radius, y2 / radius, z2 / radius));
+                fig.addNormal(point(x1 / radius, y1 / radius, z1 / radius));
+                fig.addNormal(point(x4 / radius, y4 / radius, z4 / radius));
+                fig.addNormal(point(x2 / radius, y2 / radius, z2 / radius));
 
                 fig.addTexture((float)j / slices, (float)i / stacks);
                 fig.addTexture((float)(j + 1) / slices, (float)(i + 1) / stacks);

@@ -1,89 +1,73 @@
 #include "box.hpp"
+#include "plane.hpp"
 
 Figure generateBox(float length, int divisions) {
-    Figure fig;
-
-    float step = length / divisions;
+    Figure box = Figure();
     float half = length / 2.0f;
+    float step = length / divisions;
 
-    for (int face = 0; face < 6; face++) {
-        for (int i = 0; i < divisions; i++) {
-            for (int j = 0; j < divisions; j++) {
-                float x1, y1, z1, x2, y2, z2;
+    for (int i = 0; i < divisions; i++) {
+        for (int j = 0; j < divisions; j++) {
+            float x1 = -half + i * step;
+            float x2 = -half + (i + 1) * step;
+            float y1 = -half + j * step;
+            float y2 = -half + (j + 1) * step;
 
-                switch (face) {
-                case 0: // frente
-                    x1 = -half + i * step;
-                    x2 = -half + (i + 1) * step;
-                    y1 = -half + j * step;
-                    y2 = -half + (j + 1) * step;
-                    z1 = half;
-                    z2 = half;
-                    fig.addNormal(Point(0, 0, 1));
-                    break;
-                case 1: // atras
-                    x1 = -half + (i + 1) * step;
-                    x2 = -half + i * step;
-                    y1 = -half + j * step;
-                    y2 = -half + (j + 1) * step;
-                    z1 = -half;
-                    z2 = -half;
-                    fig.addNormal(Point(0, 0, -1));
-                    break;
-                case 2: // esquerda
-                    x1 = -half;
-                    x2 = -half;
-                    y1 = -half + j * step;
-                    y2 = -half + (j + 1) * step;
-                    z1 = -half + i * step;
-                    z2 = -half + (i + 1) * step;
-                    fig.addNormal(Point(-1, 0, 0));
-                    break;
-                case 3: // direita
-                    x1 = half;
-                    x2 = half;
-                    y1 = -half + j * step;
-                    y2 = -half + (j + 1) * step;
-                    z1 = -half + (i + 1) * step;
-                    z2 = -half + i * step;
-                    fig.addNormal(Point(1, 0, 0));
-                    break;
-                case 4: // cima
-                    x1 = -half + i * step;
-                    x2 = -half + (i + 1) * step;
-                    y1 = half;
-                    y2 = half;
-                    z1 = -half + j * step;
-                    z2 = -half + (j + 1) * step;
-                    fig.addNormal(Point(0, 1, 0));
-                    break;
-                case 5: // baixo
-                    x1 = -half + i * step;
-                    x2 = -half + (i + 1) * step;
-                    y1 = -half;
-                    y2 = -half;
-                    z1 = -half + (j + 1) * step;
-                    z2 = -half + j * step;
-                    fig.addNormal(Point(0, -1, 0));
-                    break;
-                }
+            // Front face (z = half)
+            box.addPoint(point(x1, y1, half));
+            box.addPoint(point(x2, y1, half));
+            box.addPoint(point(x1, y2, half));
 
-                fig.addVertex(Point(x1, y1, z1));
-                fig.addVertex(Point(x2, y1, z1));
-                fig.addVertex(Point(x1, y2, z2));
-                fig.addVertex(Point(x2, y2, z2));
+            box.addPoint(point(x1, y2, half));
+            box.addPoint(point(x2, y1, half));
+            box.addPoint(point(x2, y2, half));
 
-                fig.addTexture(0, 0);
-                fig.addTexture(1, 0);
-                fig.addTexture(0, 1);
-                fig.addTexture(1, 1);
+            // Back face (z = -half)
+            box.addPoint(point(x1, y1, -half));
+            box.addPoint(point(x1, y2, -half));
+            box.addPoint(point(x2, y1, -half));
 
-                int index = (face * divisions * divisions + i * divisions + j) * 4;
-                fig.addTriangle(index, index + 1, index + 2);
-                fig.addTriangle(index + 1, index + 3, index + 2);
-            }
+            box.addPoint(point(x1, y2, -half));
+            box.addPoint(point(x2, y2, -half));
+            box.addPoint(point(x2, y1, -half));
+
+            // Left face (x = -half)
+            box.addPoint(point(-half, y1, x1));
+            box.addPoint(point(-half, y2, x1));
+            box.addPoint(point(-half, y1, x2));
+
+            box.addPoint(point(-half, y2, x1));
+            box.addPoint(point(-half, y2, x2));
+            box.addPoint(point(-half, y1, x2));
+
+            // Right face (x = half)
+            box.addPoint(point(half, y1, x1));
+            box.addPoint(point(half, y1, x2));
+            box.addPoint(point(half, y2, x1));
+
+            box.addPoint(point(half, y2, x1));
+            box.addPoint(point(half, y1, x2));
+            box.addPoint(point(half, y2, x2));
+
+            // Top face (y = half)
+            box.addPoint(point(x1, half, y1));
+            box.addPoint(point(x1, half, y2));
+            box.addPoint(point(x2, half, y1));
+
+            box.addPoint(point(x1, half, y2));
+            box.addPoint(point(x2, half, y2));
+            box.addPoint(point(x2, half, y1));
+
+            // Bottom face (y = -half)
+            box.addPoint(point(x1, -half, y1));
+            box.addPoint(point(x2, -half, y1));
+            box.addPoint(point(x1, -half, y2));
+
+            box.addPoint(point(x1, -half, y2));
+            box.addPoint(point(x2, -half, y1));
+            box.addPoint(point(x2, -half, y2));
         }
     }
 
-    return std::move(fig);
+    return box;
 }

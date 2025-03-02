@@ -1,22 +1,68 @@
 #include "point.hpp"
 
-Point::Point() : x(0), y(0), z(0) {}
+struct point
+{
+    float x;
+    float y;
+    float z;
+};
 
-Point::Point(float x, float y, float z) : x(x), y(y), z(z) {}
-
-float Point::getX() const { return x; }
-float Point::getY() const { return y; }
-float Point::getZ() const { return z; }
-
-float Point::getDistanceToOrigin() const {
-    return sqrt(x * x + y * y + z * z);
+//construtor
+Point point(float x, float y, float z) {
+    Point newP = (Point)malloc(sizeof(Point));
+    newP->x = x;
+    newP->y = y;
+    newP->z = z;
+    return newP;
 }
 
-float Point::getDistance(const Point& p) const {
-    float dx = x - p.getX();
-    float dy = y - p.getY();
-    float dz = z - p.getZ();
-    return sqrt(dx * dx + dy * dy + dz * dz);
+//gets
+float getX(Point point) {
+    if (point) {
+        return point->x;
+    }
+    return 0.0f;
 }
 
-Point::~Point() {}
+float getY(Point point) {
+    if (point) {
+        return point->y;
+    }
+    return 0.0f;
+}
+
+float getZ(Point point) {
+    if (point) {
+        return point->z;
+    }
+    return 0.0f;
+}
+
+//free
+void freeP(Point point) {
+    free(point);
+}
+
+//distance
+float calculateDistance(Point point1, Point point2) {
+    return sqrt(
+        pow((point1->x - point2->x), 2) +
+        pow((point1->y - point2->y), 2) +
+        pow((point1->z - point2->z), 2)
+    );
+}
+
+
+//spherical to sartesian coordinate converter
+Point newPontoSph(float a, float b, float radius) {
+    if (radius < 0.0f) {
+        radius = 0.0f;
+    }
+
+    float z = radius * cos(b) * cos(a);
+    float x = radius * cos(b) * sin(a);
+    float y = radius * sin(b);
+
+
+    return point(x, y, z);
+}

@@ -11,6 +11,15 @@ float cradius = 7.0f;                           // raio da câmera
 int mode = GL_LINE, face = GL_FRONT_AND_BACK;   // modo de visualização
 vector<Figure> models;                          // modelos carregados a partir do XML
 
+struct ponto
+{
+    float x;
+    float y;
+    float z;
+};
+
+vector<ponto> points;                           // pontos carregados a partir do XML
+
 // Função auxiliar para ler um valor float a partir de um atributo
 float getFloatAttribute(XMLElement* element, const char* attributeName, float defaultValue) {
     const char* value = element->Attribute(attributeName);
@@ -71,16 +80,31 @@ void loadWindowConfiguration(XMLElement* pWindow) {
 
 // Função auxiliar para carregar os modelos 3D a partir do XML
 void loadModels(XMLElement* pModels) {
+    if (!pModels) {
+        printf("Erro: pModels é nulo\n");
+        return;
+    }
+
     XMLElement* pModel = pModels->FirstChildElement("model");
 
     while (pModel) {
         Figure model_instance;
         const char* modelFile = pModel->Attribute("file");
-        if (modelFile) {
-            model_instance = Figure::figureFromFile(modelFile);
-            models.push_back(model_instance);
+        if (!modelFile) {
+            printf("Erro: modelFile é nulo\n");
+            pModel = pModel->NextSiblingElement("model");
+            continue;
         }
+
+        printf("Carregando modelo %s...\n", modelFile);
+        model_instance = Figure::figureFromFile(modelFile);
+        models.push_back(std::move(model_instance));
+        printf("Modelo carregado com sucesso!\n");
+
         pModel = pModel->NextSiblingElement("model");
+        if (pModel) {
+            printf("Carregando próximo modelo...\n");
+        }
     }
 }
 
@@ -102,15 +126,35 @@ void xml_parser(const char* filename) {
 
     // Carrega as configurações da janela
     XMLElement* pWindow = pRoot->FirstChildElement("window");
+	if (!pWindow) {
+		cout << "Erro ao carregar o nó 'window' do XML!" << endl;
+		return;
+	}
     loadWindowConfiguration(pWindow);
+	printf("Tamanho da janela: %d x %d\n", w_width, w_height);
 
     // Carrega a configuração da câmera
     XMLElement* pCamera = pRoot->FirstChildElement("camera");
+	if (!pCamera) {
+		cout << "Erro ao carregar o nó 'camera' do XML!" << endl;
+		return;
+	}
     loadCameraConfiguration(pCamera);
+	printf("Posição da câmera: (%.2f, %.2f, %.2f)\n", pos_x, pos_y, pos_z);
 
     // Carrega os modelos 3D
     XMLElement* pGroup = pRoot->FirstChildElement("group");
+	printf("Carregando grupos ...\n");
+	if (!pGroup) {
+		cout << "Erro ao carregar o nó 'group' do XML!" << endl;
+		return;
+	}
     XMLElement* pModels = pGroup ? pGroup->FirstChildElement("models") : nullptr;
+	printf("Carregando modelos 3D...\n");
+	if (!pModels) {
+		cout << "Erro ao carregar o nó 'models' do XML!" << endl;
+		return;
+	}
     if (pModels) {
         loadModels(pModels);
     }
@@ -193,16 +237,27 @@ void processSpecialKeys(int key, int xx, int yy) {
 // Função para desenhar os modelos 3D carregados
 void drawScene() {
     for (const auto& model : models) {
-        List triangles = model.getTriangles();
-        for (long i = 0; i < triangles.size(); ++i) {
-            int* triangle = (int*)triangles.get(i);
-            glBegin(GL_TRIANGLES);
-            for (int j = 0; j < 3; ++j) {
-                const Point* p = (Point*)model.getVertices().get(triangle[j]);
-                glVertex3f(p->getX(), p->getY(), p->getZ());
-            }
-            glEnd();
+        List vertexes = model.getPoints();
+        if (vertexes == nullptr) {
+            printf("Erro: Lista de vértices é nula\n");
+            continue;
         }
+        glBegin(GL_TRIANGLES);
+        for (unsigned long i = 0; i < size(vertexes); i += 3) {
+            void* data1 = getDataByIndex(vertexes, i);
+            void* data2 = getDataByIndex(vertexes, i + 1);
+            void* data3 = getDataByIndex(vertexes, i + 2);
+            if (data1 == nullptr || data2 == nullptr || data3 == nullptr) {
+                continue;
+            }
+            ponto p1 = *(ponto*)data1;
+            ponto p2 = *(ponto*)data2;
+            ponto p3 = *(ponto*)data3;
+            glVertex3f(p1.x, p1.y, p1.z);
+            glVertex3f(p2.x, p2.y, p2.z);
+            glVertex3f(p3.x, p3.y, p3.z);
+        }
+        glEnd();
     }
 }
 
@@ -239,27 +294,41 @@ int main(int argc, char** argv) {
 
     // Carregar o arquivo XML
     xml_parser(argv[1]);
+	printf("Arquivo XML carregado com sucesso!\n");
 
     // Inicializar o GLUT
     glutInit(&argc, argv);
+	printf("GLUT inicializado\n");
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	printf("Modo de exibição definido\n");
     glutInitWindowPosition(100, 100);
+	printf("Posição da janela definida\n");
     glutInitWindowSize(w_width, w_height);
+	printf("Tamanho da janela definido\n");
     glutCreateWindow("CG");
+	printf("Janela criada\n");
 
     // Registrar callbacks
     glutDisplayFunc(renderScene);
+	printf("Função de exibição registrada\n");
     glutReshapeFunc(changeSize);
+	printf("Função de redimensionamento registrada\n");
 	glutIdleFunc(renderScene);
+	printf("Função de renderização registrada\n");
     glutKeyboardFunc(processKeys);
+	printf("Função de processamento de teclas normais registrada\n");
     glutSpecialFunc(processSpecialKeys);
+	printf("Função de processamento de teclas especiais registrada\n");
 
     // Configurações do OpenGL
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+	printf("Profundidade ativada\n");
+    //glEnable(GL_CULL_FACE);
+	printf("Faces ocultas ativadas\n");
 
     // Entrar no loop principal do GLUT
     glutMainLoop();
+	printf("Loop principal iniciado\n");
 
     return 0;
 }
