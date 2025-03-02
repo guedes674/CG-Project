@@ -2,7 +2,6 @@
 
 Figure generateBox(float length, int divisions) {
     Figure fig;
-    fig = Figure();
 
     float step = length / divisions;
     float half = length / 2.0f;
@@ -86,5 +85,5 @@ Figure generateBox(float length, int divisions) {
         }
     }
 
-    return fig;
+    return std::move(fig);
 }

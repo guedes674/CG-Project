@@ -1,26 +1,28 @@
-#ifndef LIST
-#define LIST
+#ifndef LIST_HPP
+#define LIST_HPP
 
-#include <cstdlib>
+#include <iostream>
+#include "point.hpp"
 
-#define STDSIZE 100
-
+template <typename T>
 class List {
 private:
-    void** array;
+    T** array;
     long _size;
     long capacity;
 
+    void expandCapacity();
+
 public:
-    List();
+    List(int initial_capacity = 10);
     ~List();
 
-    void* get(long index);
-    void set(long index, void* element);
-    bool listIsFull();
-    void add(void* element);
-    long size();
+    void add(T* element);
+    void set(long index, T* element);
+    T* get(long index);
     void remove(long index);
+    long size() const;
+
     void deleteList();
     void deepDeleteList();
 };

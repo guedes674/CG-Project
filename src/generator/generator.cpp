@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utility>  // Adicionar para usar std::move
 #include "../classes/figure.hpp"
 #include "plane.hpp"
 #include "box.hpp"
@@ -8,26 +9,25 @@
 
 int main(int argc, char* argv[]) {
     if (argc >= 5) {
-        Figure fig;
         char* file_path = argv[4];
+
+        Figure fig; // Criamos o objeto vazio
 
         if (strcmp(argv[1], "plane") == 0) {
             int length = atoi(argv[2]);
             int divisions = atoi(argv[3]);
-			file_path = argv[4];
-            fig = generatePlane(length, divisions);
-			fig.~Figure();
+            Figure fig = generatePlane(length, divisions);
         }
         else if (strcmp(argv[1], "box") == 0) {
             float length = atof(argv[2]);
             int divisions = atoi(argv[3]);
-            fig = generateBox(length, divisions);
+            Figure fig = generateBox(length, divisions);
         }
         else if (strcmp(argv[1], "sphere") == 0) {
             float radius = atof(argv[2]);
             int slices = atoi(argv[3]);
             int stacks = atoi(argv[4]);
-            fig = generateSphere(radius, slices, stacks);
+            Figure fig = generateSphere(radius, slices, stacks);
         }
         else if (strcmp(argv[1], "cone") == 0) {
         }
