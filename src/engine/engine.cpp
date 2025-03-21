@@ -11,15 +11,6 @@ float cradius = 7.0f;                           // raio da câmera
 int mode = GL_LINE, face = GL_FRONT_AND_BACK;   // modo de visualização
 vector<Figure> models;                          // modelos carregados a partir do XML
 
-struct ponto
-{
-    float x;
-    float y;
-    float z;
-};
-
-vector<ponto> points;                           // pontos carregados a partir do XML
-
 // Função auxiliar para ler um valor float a partir de um atributo
 float getFloatAttribute(XMLElement* element, const char* attributeName, float defaultValue) {
     const char* value = element->Attribute(attributeName);
@@ -161,31 +152,25 @@ void xml_parser(const char* filename) {
 }
 
 void changeSize(int w, int h) {
-    // Prevent a divide by zero, when window is too short
-    // (you cant make a window with zero width).
-    if(h == 0)
-        h = 1;
+    if(h == 0) h = 1;
 
-    // compute window's aspect ratio
+    // computa a razão da janela
     float ratio = w * 1.0 / h;
 
     // Set the projection matrix as current
     glMatrixMode(GL_PROJECTION);
-    // Load Identity Matrix
     glLoadIdentity();
 
-    // Set the viewport to be the entire window
+    // Set viewport
     glViewport(0, 0, w, h);
 
-    // Set perspective
+    // Set perspectiva
     gluPerspective(fov, ratio, near, far);
 
-    // return to the model view matrix mode
     glMatrixMode(GL_MODELVIEW);
 }
 
 void processKeys(unsigned char key, int xx, int yy) {
-
     switch (key) {
     case 'w':
         pos_z -= 0.1;
@@ -209,27 +194,25 @@ void processKeys(unsigned char key, int xx, int yy) {
         zoomy -= 0.1;
         zoomz -= 0.1;
         break;
-
-        glutPostRedisplay();
     }
+    glutPostRedisplay();
 }
 
 void processSpecialKeys(int key, int xx, int yy) {
-
-	switch (key) {
-	case GLUT_KEY_RIGHT:
-		look_x += 0.1;
-		break;
-	case GLUT_KEY_LEFT:
-		look_x -= 0.1;
-		break;
-	case GLUT_KEY_UP:
-		look_y += 0.1;
-		break;
-	case GLUT_KEY_DOWN:
-		look_y -= 0.1;
-		break;
-	}
+    switch (key) {
+    case GLUT_KEY_RIGHT:
+        look_x += 0.1;
+        break;
+    case GLUT_KEY_LEFT:
+        look_x -= 0.1;
+        break;
+    case GLUT_KEY_UP:
+        look_y += 0.1;
+        break;
+    case GLUT_KEY_DOWN:
+        look_y -= 0.1;
+        break;
+    }
 
     glutPostRedisplay();
 }
@@ -237,22 +220,18 @@ void processSpecialKeys(int key, int xx, int yy) {
 // Função para desenhar os modelos 3D carregados
 void drawScene() {
     for (const auto& model : models) {
-        List vertexes = model.getPoints();
-        if (vertexes == nullptr) {
-            printf("Erro: Lista de vértices é nula\n");
+        std::vector<Point> vertexes = model.getPoints();
+
+        if (vertexes.empty()) {
+            printf("Erro: Lista de vértices é vazia\n");
             continue;
         }
+
         glBegin(GL_TRIANGLES);
-        for (unsigned long i = 0; i < size(vertexes); i += 3) {
-            void* data1 = getDataByIndex(vertexes, i);
-            void* data2 = getDataByIndex(vertexes, i + 1);
-            void* data3 = getDataByIndex(vertexes, i + 2);
-            if (data1 == nullptr || data2 == nullptr || data3 == nullptr) {
-                continue;
-            }
-            ponto p1 = *(ponto*)data1;
-            ponto p2 = *(ponto*)data2;
-            ponto p3 = *(ponto*)data3;
+        for (size_t i = 0; i < vertexes.size(); i += 3) {
+            Point p1 = vertexes[i];
+            Point p2 = vertexes[i + 1];
+            Point p3 = vertexes[i + 2];
             glVertex3f(p1.x, p1.y, p1.z);
             glVertex3f(p2.x, p2.y, p2.z);
             glVertex3f(p3.x, p3.y, p3.z);
@@ -267,13 +246,13 @@ void renderScene(void) {
 
     // atualiza a posição da câmera
     pos_x = cradius * cos(look_y) * sin(look_x);
-    pos_y = cradius * sin(look_y); 
+    pos_y = cradius * sin(look_y);
     pos_z = cradius * cos(look_y) * cos(look_x);
 
     // define a câmera
     glLoadIdentity();
     gluLookAt(pos_x, pos_y, pos_z, look_x, look_y, look_z, up_x, up_y, up_z);
-	glScalef(zoomx, zoomy, zoomz);
+    glScalef(zoomx, zoomy, zoomz);
 
     // define modo de polígonos
     glPolygonMode(GL_FRONT_AND_BACK, mode);
@@ -281,7 +260,7 @@ void renderScene(void) {
     // desenha os modelos
     drawScene();
 
-    // trroca buffers
+    // troca buffers
     glutSwapBuffers();
 }
 
@@ -294,41 +273,39 @@ int main(int argc, char** argv) {
 
     // Carregar o arquivo XML
     xml_parser(argv[1]);
-	printf("Arquivo XML carregado com sucesso!\n");
+    printf("Arquivo XML carregado com sucesso!\n");
 
     // Inicializar o GLUT
     glutInit(&argc, argv);
-	printf("GLUT inicializado\n");
+    printf("GLUT inicializado\n");
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	printf("Modo de exibição definido\n");
+    printf("Modo de exibição definido\n");
     glutInitWindowPosition(100, 100);
-	printf("Posição da janela definida\n");
+    printf("Posição da janela definida\n");
     glutInitWindowSize(w_width, w_height);
-	printf("Tamanho da janela definido\n");
+    printf("Tamanho da janela definido\n");
     glutCreateWindow("CG");
-	printf("Janela criada\n");
+    printf("Janela criada\n");
 
     // Registrar callbacks
     glutDisplayFunc(renderScene);
-	printf("Função de exibição registrada\n");
+    printf("Função de exibição registrada\n");
     glutReshapeFunc(changeSize);
-	printf("Função de redimensionamento registrada\n");
-	glutIdleFunc(renderScene);
-	printf("Função de renderização registrada\n");
+    printf("Função de redimensionamento registrada\n");
+    glutIdleFunc(renderScene);
+    printf("Função de renderização registrada\n");
     glutKeyboardFunc(processKeys);
-	printf("Função de processamento de teclas normais registrada\n");
+    printf("Função de processamento de teclas normais registrada\n");
     glutSpecialFunc(processSpecialKeys);
-	printf("Função de processamento de teclas especiais registrada\n");
+    printf("Função de processamento de teclas especiais registrada\n");
 
     // Configurações do OpenGL
     glEnable(GL_DEPTH_TEST);
-	printf("Profundidade ativada\n");
-    //glEnable(GL_CULL_FACE);
-	printf("Faces ocultas ativadas\n");
+    printf("Profundidade ativada\n");
 
     // Entrar no loop principal do GLUT
     glutMainLoop();
-	printf("Loop principal iniciado\n");
+    printf("Loop principal iniciado\n");
 
     return 0;
 }

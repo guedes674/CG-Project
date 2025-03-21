@@ -1,4 +1,7 @@
 CXX = g++
+CXXFLAGS = -Wall -Wextra -g -fsanitize=address -O0
+LDFLAGS = -fsanitize=address -lGL -lGLU -lglut
+
 SRC_DIR = src/classes src/generator
 SRC_FILES = $(wildcard $(addsuffix /*.cpp, $(SRC_DIR)))
 OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
@@ -14,13 +17,13 @@ ENGINE_EXECUTABLE = engine
 all: $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE)
 
 $(GENERATOR_EXECUTABLE): $(GENERATOR_OBJ_FILES) src/classes/figure.o src/classes/list.o src/classes/point.o
-	$(CXX) $^ -o $@ -lGL -lGLU -lglut
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(ENGINE_EXECUTABLE): $(ENGINE_OBJ_FILES) src/classes/figure.o src/classes/list.o src/classes/point.o
-	$(CXX) $^ -o $@ -lGL -lGLU -lglut
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 %.o: %.cpp
-	$(CXX) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ_FILES) $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE) *.3d
+	rm -f $(OBJ_FILES) $(GENERATOR_OBJ_FILES) $(ENGINE_OBJ_FILES) $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE) *.3d

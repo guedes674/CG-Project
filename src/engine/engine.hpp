@@ -11,52 +11,53 @@
 #include "tinyxml2.h"
 #include "../classes/figure.hpp"
 #include "../classes/point.hpp"
+#include "../classes/list.hpp"
 
 using namespace std;
 using namespace tinyxml2;
 
-// variáveis globais
+// variï¿½veis globais
 extern int w_width, w_height;                          // Tamanho da janela lido do XML
-extern float pos_x, pos_y, pos_z;                       // posição da câmera
-extern float look_x, look_y, look_z;                    // orientação da câmera
-extern float up_x, up_y, up_z;                          // eixo vertical da câmera
-extern float fov, near, far;                            // perspectiva da câmera
-extern float zoomx, zoomy, zoomz;                       // zoom da câmera
-extern float cradius;                                  // raio da câmera
-extern int mode, face;                                 // modo de visualização
+extern float pos_x, pos_y, pos_z;                       // posiï¿½ï¿½o da cï¿½mera
+extern float look_x, look_y, look_z;                    // orientaï¿½ï¿½o da cï¿½mera
+extern float up_x, up_y, up_z;                          // eixo vertical da cï¿½mera
+extern float fov, near, far;                            // perspectiva da cï¿½mera
+extern float zoomx, zoomy, zoomz;                       // zoom da cï¿½mera
+extern float cradius;                                  // raio da cï¿½mera
+extern int mode, face;                                 // modo de visualizaï¿½ï¿½o
 extern vector<Figure> models;                          // modelos carregados a partir do XML
 
-// Função auxiliar para ler um valor float a partir de um atributo
+// Funï¿½ï¿½o auxiliar para ler um valor float a partir de um atributo
 float getFloatAttribute(XMLElement* element, const char* attributeName, float defaultValue);
 
-// Função auxiliar para ler um valor inteiro a partir de um atributo
+// Funï¿½ï¿½o auxiliar para ler um valor inteiro a partir de um atributo
 int getIntAttribute(XMLElement* element, const char* attributeName, int defaultValue);
 
-// Função auxiliar para carregar a configuração da câmera
+// Funï¿½ï¿½o auxiliar para carregar a configuraï¿½ï¿½o da cï¿½mera
 void loadCameraConfiguration(XMLElement* pCamera);
 
-// Função auxiliar para carregar as configurações da janela a partir do XML
+// Funï¿½ï¿½o auxiliar para carregar as configuraï¿½ï¿½es da janela a partir do XML
 void loadWindowConfiguration(XMLElement* pWindow);
 
-// Função auxiliar para carregar os modelos 3D a partir do XML
+// Funï¿½ï¿½o auxiliar para carregar os modelos 3D a partir do XML
 void loadModels(XMLElement* pModels);
 
-// Função para processar o arquivo XML
+// Funï¿½ï¿½o para processar o arquivo XML
 void xml_parser(const char* filename);
 
-// Função para mudar o tamanho da janela
+// Funï¿½ï¿½o para mudar o tamanho da janela
 void changeSize(int w, int h);
 
-// Função para processar as teclas normais
+// Funï¿½ï¿½o para processar as teclas normais
 void processKeys(unsigned char key, int xx, int yy);
 
-// Função para processar as teclas especiais
+// Funï¿½ï¿½o para processar as teclas especiais
 void processSpecialKeys(int key, int xx, int yy);
 
-// Função para desenhar os modelos 3D carregados
+// Funï¿½ï¿½o para desenhar os modelos 3D carregados
 void drawScene();
 
-// Função de renderização principal
+// Funï¿½ï¿½o de renderizaï¿½ï¿½o principal
 void renderScene(void);
 
 #endif

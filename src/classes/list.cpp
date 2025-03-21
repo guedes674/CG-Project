@@ -1,79 +1,28 @@
 #include "list.hpp"
 
-struct list {
-    void* data;
-    struct list* next;
-};
-
-List newL() {
-    return (List)malloc(sizeof(struct list));
+template <typename T>
+void List<T>::addValue(const T& value) {
+    data.push_back(value);
 }
 
-void addValueList(List lista, void* data) {
-    if (lista) {
-        List temp = lista;
-        while (temp->next != NULL) {
-            temp = temp->next;
-        }
-
-        List newNode = newL();
-        if (newNode) {
-            newNode->data = data;
-            newNode->next = NULL;
-            temp->next = newNode;
-        }
+template <typename T>
+T List<T>::getDataByIndex(size_t index) const {
+    if (index >= data.size()) {
+        throw std::out_of_range("Index out of bounds");
     }
+    return data[index];
 }
 
-void* getData(List node) {
-    if (node) {
-        return node->data;
-    }
-    return NULL;
+template <typename T>
+size_t List<T>::size() const {
+    return data.size();
 }
 
-List getNext(List node) {
-    if (node) {
-        return node->next;
-    }
-    return NULL;
+template <typename T>
+void List<T>::clear() {
+    data.clear();
 }
 
-void* getDataByIndex(List lista, unsigned long index) {
-    if (lista) {
-        List temp = lista;
-        unsigned long i = 0;
-
-        while (i != index && temp != NULL) {
-            temp = temp->next;
-            i++;
-        }
-
-        if (temp != NULL) {
-            return temp->data;
-        }
-    }
-
-    return NULL;
-}
-
-unsigned long size(List lista) {
-    unsigned long count = 0;
-    if (lista) {
-        List temp = lista;
-        while (temp) {
-            count++;
-            temp = temp->next;
-        }
-    }
-    return count;
-}
-
-void freeL(List lista) {
-    while (lista != NULL) {
-        List temp = lista;
-        lista = lista->next;
-        free(temp->data);
-        free(temp);
-    }
-}
+template class List<int>;
+template class List<float>;
+template class List<std::string>;

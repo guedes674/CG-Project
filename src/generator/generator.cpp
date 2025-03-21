@@ -8,8 +8,8 @@
 #include "sphere.hpp"
 
 int main(int argc, char* argv[]) {
-    if (argc >= 5) {
-        char* file_path = argv[4];
+    if (argc >= 6) {
+        char* file_path = argv[5];
 
         if (strcmp(argv[1], "plane") == 0) {
             int length = atoi(argv[2]);

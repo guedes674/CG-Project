@@ -1,70 +1,67 @@
 #include "figure.hpp"
 
 // Construtor
-Figure::Figure()
-    : points(newL()), vertices(newL()), normals(newL()), textures(newL()), triangles(newL()) {
-}
+Figure::Figure() {}
 
 // Destrutor
 Figure::~Figure() {
     deleteFigure();
 }
 
-// Adiciona um ponto ‡ lista de pontos
+// Adiciona um ponto √† lista de pontos
 void Figure::addPoint(Point p) {
-    addValueList(points, p); // Aloca no heap
+    points.push_back(p);
 }
 
-// Adiciona um vÈrtice
+// Adiciona um v√©rtice √† lista de v√©rtices
 void Figure::addVertex(Point p) {
-    addValueList(vertices, p);
+    vertices.push_back(p);
 }
 
-// Adiciona uma normal
+// Adiciona uma normal √† lista de normais
 void Figure::addNormal(Point p) {
-    addValueList(normals, p);
+    normals.push_back(p);
 }
 
-// Adiciona coordenadas de textura
+// Adiciona coordenadas de uma textura √† lista de texturas
 void Figure::addTexture(float u, float v) {
-    float* tex = new float[2] { u, v };
-    addValueList(textures, tex);
+    textures.push_back({u, v});
 }
 
-// Adiciona um tri‚ngulo (Ìndices dos vÈrtices)
+// Adiciona um tri√¢ngulo √† lista de tri√¢ngulos
 void Figure::addTriangle(int v1, int v2, int v3) {
-    int* tri = new int[3] { v1, v2, v3 };
-    addValueList(triangles, tri);
+    triangles.push_back({v1, v2, v3});
 }
 
 // Retorna a lista de pontos
-List Figure::getPoints() const {
+const std::vector<Point>& Figure::getPoints() const {
     return points;
 }
 
-// Retorna a lista de vÈrtices
-List Figure::getVertices() const {
+// Retorna a lista de v√©rtices
+const std::vector<Point>& Figure::getVertices() const {
     return vertices;
 }
 
 // Retorna a lista de normais
-List Figure::getNormals() const {
+const std::vector<Point>& Figure::getNormals() const {
     return normals;
 }
 
 // Retorna a lista de texturas
-List Figure::getTextures() const {
+const std::vector<std::array<float, 2>>& Figure::getTextures() const {
     return textures;
 }
 
-// Retorna a lista de tri‚ngulos
-List Figure::getTriangles() const {
+// Retorna a lista de tri√¢ngulos
+const std::vector<std::array<int, 3>>& Figure::getTriangles() const {
     return triangles;
 }
 
+// Guarda a figura no arquivo
 void Figure::figureToFile(const char* path) {
-    if (!this || !this->points || !path) {
-        printf("Impossivel criar ficheiro devido a argumentos inv·lidos\n");
+    if (path == nullptr) {
+        printf("Imposs√≠vel criar ficheiro devido a argumentos inv√°lidos\n");
         return;
     }
 
@@ -74,97 +71,67 @@ void Figure::figureToFile(const char* path) {
         return;
     }
 
-    fprintf(file, "%lu\n", size(this->points));
+    fprintf(file, "%lu\n", points.size());
 
-    List temp = this->points;
-    while (temp) {
-        Point p = (Point)getData(temp);
-        if (p) {
-            fprintf(file, "%.3f,%.3f,%.3f\n", getX(p), getY(p), getZ(p));
-        }
-        temp = getNext(temp);
+    for (const auto& p : points) {
+        fprintf(file, "%.3f,%.3f,%.3f\n", p.x, p.y, p.z);
     }
-
     fclose(file);
 }
 
-// Carrega uma figura de um arquivo
+// Carrega a figura de um arquivo
 Figure Figure::figureFromFile(const char* path) {
     Figure fig;
-	FILE* file = fopen(path, "r");
-    
-	if (!file) {
-		printf("ImpossÌvel carregar figura devido a argumentos inv·lidos\n");
-		return fig;
-	}
+    FILE* file = fopen(path, "r");
 
-    int vertexs;
-	if (fscanf(file, "%d", &vertexs) != 1) {
-		printf("Erro ao ler o n˙mero de vÈrtices\n");
-		fclose(file);
-		return fig;
-	}
+    if (!file) {
+        printf("Imposs√≠vel carregar figura devido a argumentos inv√°lidos\n");
+        return fig;
+    }
 
-	float x, y, z;
-	for (int i = 0; i < vertexs; i++) {
-		if (fscanf(file, "%f,%f,%f", &x, &y, &z) == 3) {
-			addValueList(fig.points, point(x, y, z));
+    int vertexCount;
+    if (fscanf(file, "%d", &vertexCount) != 1) {
+        printf("Erro ao ler o n√∫mero de v√©rtices\n");
+        fclose(file);
+        return fig;
+    }
+
+    float x, y, z;
+    for (int i = 0; i < vertexCount; i++) {
+        if (fscanf(file, "%f,%f,%f", &x, &y, &z) == 3) {
+            fig.addPoint(Point(x, y, z));
+        } else {
+            printf("Erro ao ler o v√©rtice %d\n", i);
         }
-        else {
-			printf("Erro ao ler o vÈrtice %d\n", i);
-        }
-	}
-	fclose(file);
-	return fig;
+    }
+    fclose(file);
+    return fig;
 }
 
+// Construtor de movimento
 Figure::Figure(Figure&& other) noexcept
-    : points(other.points), vertices(other.vertices), normals(other.normals), textures(other.textures), triangles(other.triangles) {
-    other.points = nullptr;
-    other.vertices = nullptr;
-    other.normals = nullptr;
-    other.textures = nullptr;
-    other.triangles = nullptr;
+    : points(std::move(other.points)),
+      vertices(std::move(other.vertices)),
+      normals(std::move(other.normals)),
+      textures(std::move(other.textures)),
+      triangles(std::move(other.triangles)) {
 }
 
+// Operador de atribui√ß√£o de movimento
 Figure& Figure::operator=(Figure&& other) noexcept {
     if (this != &other) {
         deleteFigure();
-        points = other.points;
-        vertices = other.vertices;
-        normals = other.normals;
-        textures = other.textures;
-        triangles = other.triangles;
-        other.points = nullptr;
-        other.vertices = nullptr;
-        other.normals = nullptr;
-        other.textures = nullptr;
-        other.triangles = nullptr;
+
+        points = std::move(other.points);
+        vertices = std::move(other.vertices);
+        normals = std::move(other.normals);
+        textures = std::move(other.textures);
+        triangles = std::move(other.triangles);
     }
     return *this;
 }
 
-// Deleta a memÛria usada pela figura
+// Elimina a mem√≥ria usada pela figura
 void Figure::deleteFigure() {
     printf("Deletando figura\n");
-    if (points) {
-        printf("Deletando pontos\n");
-        freeL(points);
-    }
-    if (vertices) {
-        printf("Deletando vÈrtices\n");
-        freeL(vertices);
-    }
-    if (normals) {
-        printf("Deletando normais\n");
-        freeL(normals);
-    }
-    if (textures) {
-        printf("Deletando texturas\n");
-        freeL(textures);
-    }
-    if (triangles) {
-        printf("Deletando tri‚ngulos\n");
-        freeL(triangles);
-    }
 }

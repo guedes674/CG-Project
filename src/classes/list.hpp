@@ -1,23 +1,27 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-#include <iostream>
-#include "point.hpp"
+#include <vector>
+#include <stdexcept>
 
-typedef struct list* List;
+template <typename T>
+class List {
+private:
+    std::vector<T> data;
+public:
+    List() = default;
 
-List newL();
+    // Adiciona um novo valor na lista
+    void addValue(const T& value);
 
-void addValueList(List lista, void* data);
+    // Obtém o dado de um índice específico
+    T getDataByIndex(size_t index) const;
 
-void* getData(List node);
+    // Retorna o tamanho da lista
+    size_t size() const;
 
-List getNext(List node);
-
-void* getDataByIndex(List lista, unsigned long index);
-
-unsigned long size(List lista);
-
-void freeL(List lista);
+    // Limpa a lista
+    void clear();
+};
 
 #endif

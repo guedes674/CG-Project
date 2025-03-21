@@ -1,68 +1,29 @@
 #include "point.hpp"
 
-struct point
-{
-    float x;
-    float y;
-    float z;
-};
+// Construtor padrão
+Point::Point() : x(0.0f), y(0.0f), z(0.0f) {}
 
-//construtor
-Point point(float x, float y, float z) {
-    Point newP = (Point)malloc(sizeof(Point));
-    newP->x = x;
-    newP->y = y;
-    newP->z = z;
-    return newP;
-}
+// Construtor com parâmetros
+Point::Point(float x, float y, float z) : x(x), y(y), z(z) {}
 
-//gets
-float getX(Point point) {
-    if (point) {
-        return point->x;
-    }
-    return 0.0f;
-}
-
-float getY(Point point) {
-    if (point) {
-        return point->y;
-    }
-    return 0.0f;
-}
-
-float getZ(Point point) {
-    if (point) {
-        return point->z;
-    }
-    return 0.0f;
-}
-
-//free
-void freeP(Point point) {
-    free(point);
-}
-
-//distance
-float calculateDistance(Point point1, Point point2) {
-    return sqrt(
-        pow((point1->x - point2->x), 2) +
-        pow((point1->y - point2->y), 2) +
-        pow((point1->z - point2->z), 2)
+// Calcula a distância para outro ponto
+float Point::distanceTo(const Point& other) const {
+    return std::sqrt(
+        (x - other.x) * (x - other.x) +
+        (y - other.y) * (y - other.y) +
+        (z - other.z) * (z - other.z)
     );
 }
 
-
-//spherical to sartesian coordinate converter
-Point newPontoSph(float a, float b, float radius) {
+// Converte coordenadas esféricas para cartesianas
+Point Point::fromSpherical(float a, float b, float radius) {
     if (radius < 0.0f) {
         radius = 0.0f;
     }
 
-    float z = radius * cos(b) * cos(a);
-    float x = radius * cos(b) * sin(a);
-    float y = radius * sin(b);
+    float z = radius * std::cos(b) * std::cos(a);
+    float x = radius * std::cos(b) * std::sin(a);
+    float y = radius * std::sin(b);
 
-
-    return point(x, y, z);
+    return Point(x, y, z);
 }

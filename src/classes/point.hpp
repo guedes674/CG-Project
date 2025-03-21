@@ -1,22 +1,23 @@
-#ifndef POINT
-#define POINT
+#ifndef POINT_HPP
+#define POINT_HPP
 
 #include <cmath>
 
-typedef struct point* Point;
+class Point {
+public:
+    float x, y, z;
 
-Point point(float x, float y, float z);
+    // Construtor padrão
+    Point();
 
-float getX(Point point);
+    // Construtor com parâmetros
+    Point(float x, float y, float z);
 
-float getY(Point point);
+    // Calcula a distância para outro ponto
+    float distanceTo(const Point& other) const;
 
-float getZ(Point point);
-
-void freeP(Point point);
-
-float calculateDistance(Point point1, Point point2);
-
-Point newPontoSph(float a, float b, float radius);
+    // Converte coordenadas esféricas para cartesianas
+    static Point fromSpherical(float a, float b, float radius);
+};
 
 #endif
