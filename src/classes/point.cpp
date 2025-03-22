@@ -27,3 +27,11 @@ Point Point::fromSpherical(float a, float b, float radius) {
 
     return Point(x, y, z);
 }
+
+Point Point::newPointSph(float a, float b, float radius){
+    float z = radius * cos(b) * cos(a);
+    float x = radius * cos(b) * sin(a);
+    float y = radius * sin(b);
+
+    return Point(x, y, z);
+}

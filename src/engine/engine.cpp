@@ -5,10 +5,18 @@ int w_width, w_height;                          // Tamanho da janela lido do XML
 float pos_x = 5.0, pos_y = 5.0, pos_z = 5.0;    // posição da câmera
 float look_x = 0, look_y = 0, look_z = 0;       // orientação da câmera
 float up_x = 0, up_y = 1.0, up_z = 0;           // eixo vertical da câmera
+float beta_ = 0.0 , alpha = 0.0 ;               // camera movement
 float fov = 45, near = 1, far = 1000;           // perspectiva da câmera
 float zoomx = 1.0, zoomy = 1.0, zoomz = 1.0;    // zoom da câmera
 float cradius = 7.0f;                           // raio da câmera
 int mode = GL_LINE, face = GL_FRONT_AND_BACK;   // modo de visualização
+
+// Camera parameters
+float radius = 5.0f;  // Distance from origin
+float theta = 0.0f;   // Horizontal angle
+float phi = 0.0f;     // Vertical angle
+float sensitivity = 0.05f;
+
 vector<Figure> models;                          // modelos carregados a partir do XML
 
 // Função auxiliar para ler um valor float a partir de um atributo
@@ -170,33 +178,6 @@ void changeSize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void processKeys(unsigned char key, int xx, int yy) {
-    switch (key) {
-    case 'w':
-        pos_z -= 0.1;
-        break;
-    case 's':
-        pos_z += 0.1;
-        break;
-    case 'a':
-        pos_x -= 0.1;
-        break;
-    case 'd':
-        pos_x += 0.1;
-        break;
-    case '+':
-        zoomx += 0.1;
-        zoomy += 0.1;
-        zoomz += 0.1;
-        break;
-    case '-':
-        zoomx -= 0.1;
-        zoomy -= 0.1;
-        zoomz -= 0.1;
-        break;
-    }
-    glutPostRedisplay();
-}
 
 void processSpecialKeys(int key, int xx, int yy) {
     switch (key) {
@@ -216,6 +197,46 @@ void processSpecialKeys(int key, int xx, int yy) {
 
     glutPostRedisplay();
 }
+
+void updateCamera() {
+    // Convert spherical coordinates to Cartesian
+    float camX = radius * cos(phi) * sin(theta);
+    float camY = radius * sin(phi);
+    float camZ = radius * cos(phi) * cos(theta);
+
+    // Calculate dynamic up vector (to avoid flipping issues)
+    float upX = 0.0f;
+    float upY = (phi > 1.5f || phi < -1.5f) ? -1.0f : 1.0f; // Flip up if needed
+    float upZ = 0.0f;
+
+    // Apply camera transformation
+    gluLookAt(camX, camY, camZ,  // Camera position
+              0, 0, 0,            // Look at the origin
+              upX, upY, upZ);     // Up vector
+}
+
+
+
+void keyboard(unsigned char key, int x, int y) {
+    switch (key) {
+        case 'w': beta_ += beta_ <= 1.48f ? 0.1f : 0.0f; break;  // Look up
+        case 's': beta_ -= beta_ >= -1.48f ? 0.1f : 0.0f; break;  // Look down
+        case 'a': alpha -= 0.1f; break; // Rotate left
+        case 'd': alpha += 0.1f; break; // Rotate right
+        case '+': radius -= 0.5f; break;  // Zoom in
+        case '-': radius += 0.5f; break;  // Zoom out
+        case 'f': mode = GL_FILL; break;
+        case 'l': mode = GL_LINE; break;
+        case 'j': mode = GL_POINT; break;
+    }
+
+    // Clamp radius to avoid getting too close or too far
+    if (radius < 1.0f) radius = 1.0f;
+    if (radius > 20.0f) radius = 20.0f;
+
+    glutPostRedisplay();
+}
+
 
 // Função para desenhar os modelos 3D carregados
 void drawScene() {
@@ -251,8 +272,11 @@ void renderScene(void) {
 
     // define a câmera
     glLoadIdentity();
-    gluLookAt(pos_x, pos_y, pos_z, look_x, look_y, look_z, up_x, up_y, up_z);
+    gluLookAt(radius*cos(beta_)*sin(alpha), radius*sin(beta_), radius*cos(beta_)*cos(alpha),
+          look_x,look_y,look_z,
+          up_x,up_y,up_z);
     glScalef(zoomx, zoomy, zoomz);
+    //glRotatef(angle, rotate_x, rotate_y, rotate_z);
 
     // define modo de polígonos
     glPolygonMode(GL_FRONT_AND_BACK, mode);
@@ -294,7 +318,7 @@ int main(int argc, char** argv) {
     printf("Função de redimensionamento registrada\n");
     glutIdleFunc(renderScene);
     printf("Função de renderização registrada\n");
-    glutKeyboardFunc(processKeys);
+    glutKeyboardFunc(keyboard);
     printf("Função de processamento de teclas normais registrada\n");
     glutSpecialFunc(processSpecialKeys);
     printf("Função de processamento de teclas especiais registrada\n");

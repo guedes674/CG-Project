@@ -18,6 +18,9 @@ public:
 
     // Converte coordenadas esféricas para cartesianas
     static Point fromSpherical(float a, float b, float radius);
+
+    // Cria um ponto baseado em coordenadas esfericas
+    static Point newPointSph(float a, float b, float radius);
 };
 
 #endif
