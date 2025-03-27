@@ -8,7 +8,7 @@ OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
 
 GENERATOR_SRC_FILES = src/generator/generator.cpp src/generator/box.cpp src/generator/plane.cpp src/generator/sphere.cpp src/generator/ring.cpp
 GENERATOR_OBJ_FILES = $(patsubst %.cpp, %.o, $(GENERATOR_SRC_FILES))
-ENGINE_SRC_FILES = src/engine/engine.cpp src/engine/tinyxml2.cpp
+ENGINE_SRC_FILES = src/engine/engine.cpp src/engine/tinyxml2.cpp src/engine/transform.cpp src/engine/camera.cpp src/engine/group.cpp src/engine/xml_parser.cpp
 ENGINE_OBJ_FILES = $(patsubst %.cpp, %.o, $(ENGINE_SRC_FILES))
 
 GENERATOR_EXECUTABLE = generator

@@ -31,6 +31,27 @@ public:
     void figureToFile(const char* path);
     static Figure figureFromFile(const char* path);
 
+    // Construtor de cópia
+    Figure(const Figure& other)
+        : points(other.points),
+          vertices(other.vertices),
+          normals(other.normals),
+          textures(other.textures),
+          triangles(other.triangles) {
+    }
+
+    // Operador de atribuição de cópia
+    Figure& operator=(const Figure& other) {
+        if (this != &other) { // Evita autoatribuição
+            points = other.points;
+            vertices = other.vertices;
+            normals = other.normals;
+            textures = other.textures;
+            triangles = other.triangles;
+        }
+        return *this;
+    }
+
     // Construtor de movimento
     Figure(Figure&& other) noexcept;
     Figure& operator=(Figure&& other) noexcept;

@@ -12,6 +12,7 @@
 #include "../classes/figure.hpp"
 #include "../classes/point.hpp"
 #include "../classes/list.hpp"
+#include "xml_parser.hpp"
 
 using namespace std;
 using namespace tinyxml2;
@@ -26,24 +27,6 @@ extern float zoomx, zoomy, zoomz;                       // zoom da c�mera
 extern float cradius;                                  // raio da c�mera
 extern int mode, face;                                 // modo de visualiza��o
 extern vector<Figure> models;                          // modelos carregados a partir do XML
-
-// Fun��o auxiliar para ler um valor float a partir de um atributo
-float getFloatAttribute(XMLElement* element, const char* attributeName, float defaultValue);
-
-// Fun��o auxiliar para ler um valor inteiro a partir de um atributo
-int getIntAttribute(XMLElement* element, const char* attributeName, int defaultValue);
-
-// Fun��o auxiliar para carregar a configura��o da c�mera
-void loadCameraConfiguration(XMLElement* pCamera);
-
-// Fun��o auxiliar para carregar as configura��es da janela a partir do XML
-void loadWindowConfiguration(XMLElement* pWindow);
-
-// Fun��o auxiliar para carregar os modelos 3D a partir do XML
-void loadModels(XMLElement* pModels);
-
-// Fun��o para processar o arquivo XML
-void xml_parser(const char* filename);
 
 // Fun��o para mudar o tamanho da janela
 void changeSize(int w, int h);
