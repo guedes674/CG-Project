@@ -4,7 +4,6 @@
 #include "camera.hpp"
 #include "transform.hpp"
 #include "../classes/figure.hpp"
-#include "../classes/list.hpp"
 #include "tinyxml2.h"
 
 using namespace std;

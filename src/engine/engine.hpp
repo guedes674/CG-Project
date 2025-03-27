@@ -11,7 +11,6 @@
 #include "tinyxml2.h"
 #include "../classes/figure.hpp"
 #include "../classes/point.hpp"
-#include "../classes/list.hpp"
 #include "xml_parser.hpp"
 
 using namespace std;

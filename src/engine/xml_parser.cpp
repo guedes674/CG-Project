@@ -131,6 +131,14 @@ void xml_parser::xml_parser_function(const char* filename) {
 		cout << "Erro ao carregar o nó 'group' do XML!" << endl;
 		return;
 	}
+    /*
+    XMLElement* pTransform = pGroup->FirstChildElement("transform");
+    printf("Carregando transform ...\n");
+    if (!pTransform) {
+      cout << "Erro ao carregar o no 'transform' do XML!" << endl;
+      return;
+    }
+*/
     XMLElement* pModels = pGroup ? pGroup->FirstChildElement("models") : nullptr;
 	printf("Carregando modelos 3D...\n");
 	if (!pModels) {

@@ -10,7 +10,6 @@
 #include "tinyxml2.h"
 #include "../classes/figure.hpp"
 #include "../classes/point.hpp"
-#include "../classes/list.hpp"
 
 using namespace std;
 using namespace tinyxml2;

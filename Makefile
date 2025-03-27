@@ -16,10 +16,10 @@ ENGINE_EXECUTABLE = engine
 
 all: $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE)
 
-$(GENERATOR_EXECUTABLE): $(GENERATOR_OBJ_FILES) src/classes/figure.o src/classes/list.o src/classes/point.o
+$(GENERATOR_EXECUTABLE): $(GENERATOR_OBJ_FILES) src/classes/figure.o src/classes/point.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-$(ENGINE_EXECUTABLE): $(ENGINE_OBJ_FILES) src/classes/figure.o src/classes/list.o src/classes/point.o
+$(ENGINE_EXECUTABLE): $(ENGINE_OBJ_FILES) src/classes/figure.o src/classes/point.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 %.o: %.cpp
