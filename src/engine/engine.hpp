@@ -11,6 +11,7 @@
 #include "tinyxml2.h"
 #include "../classes/figure.hpp"
 #include "../classes/point.hpp"
+#include "group.hpp"
 #include "xml_parser.hpp"
 
 using namespace std;
@@ -35,6 +36,10 @@ void processKeys(unsigned char key, int xx, int yy);
 
 // Fun��o para processar as teclas especiais
 void processSpecialKeys(int key, int xx, int yy);
+
+void transforms(group grupo);
+
+void renderModels(group grupo);
 
 // Fun��o para desenhar os modelos 3D carregados
 void drawScene();

@@ -9,6 +9,7 @@ float fov = 45, near = 1, far = 1000;           // perspectiva da câmera
 float zoomx = 1.0, zoomy = 1.0, zoomz = 1.0;    // zoom da câmera
 float cradius = 7.0f;                           // raio da câmera
 int mode = GL_LINE, face = GL_FRONT_AND_BACK;   // modo de visualização
+xml_parser parser;
 
 void changeSize(int w, int h) {
     if(h == 0) h = 1;
@@ -76,6 +77,38 @@ void processSpecialKeys(int key, int xx, int yy) {
     glutPostRedisplay();
 }
 
+void transforms(group grupo){
+    vector<Rotate> rotates = grupo.getRotate();
+    if(!rotates.empty())
+        for(Rotate rotate : rotates)
+            glRotatef(rotate.get_angle(), rotate.get_x(), rotate.get_y(), rotate.get_z());
+
+    vector<Translate> translates = grupo.getTranslate();
+    if(!translates.empty())
+        for(Translate translate : translates)
+            glTranslatef(translate.get_x(), translate.get_y(), translate.get_z());
+
+    vector<Scale> scales = grupo.getScale();
+    if(!scales.empty())
+        for(Scale scale : scales)
+            glScalef(scale.get_x(), scale.get_y(), scale.get_z());
+}
+
+void renderModels(group grupo) {
+    glPushMatrix();
+
+    transforms(grupo);
+
+    vector<Figure> models = grupo.getModels();
+
+    vector<group> subGroups = grupo.getGroups();
+    if (!subGroups.empty()) {
+        for (group g: subGroups)
+            renderModels(g);
+    }
+    glPopMatrix();
+}
+
 // Função para desenhar os modelos 3D carregados
 void drawScene() {
     for (const auto& model : models) {
@@ -113,6 +146,8 @@ void renderScene(void) {
     gluLookAt(pos_x, pos_y, pos_z, look_x, look_y, look_z, up_x, up_y, up_z);
     glScalef(zoomx, zoomy, zoomz);
 
+    renderModels(*parser.getGroup());
+
     // define modo de polígonos
     glPolygonMode(GL_FRONT_AND_BACK, mode);
 
@@ -133,6 +168,7 @@ int main(int argc, char** argv) {
     // Carregar o arquivo XML
     xml_parser parser;
     parser.xml_parser_function(argv[1]);
+
     printf("Arquivo XML carregado com sucesso!\n");
 
     // Inicializar o GLUT

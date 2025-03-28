@@ -90,6 +90,104 @@ void xml_parser::loadModels(XMLElement* pModels) {
     }
 }
 
+camera xml_parser::getCamera() {
+    return cam;
+}
+
+group* xml_parser::getGroup() {
+    return grupo;
+}
+
+void xml_parser::addModel(Figure model) {
+    grupo->addModel(model);
+}
+
+void xml_parser::parseCamera(XMLElement * elem) {
+    float posX, posY, posZ;
+    XMLElement * positionElem = elem->FirstChildElement("position");
+    positionElem->QueryFloatAttribute("x", &posX);
+    positionElem->QueryFloatAttribute("y", &posY);
+    positionElem->QueryFloatAttribute("z", &posZ);
+    cam.set_position(new Point(posX, posY, posZ));
+
+    float lookAtX, lookAtY, lookAtZ;
+    XMLElement * lookAtElem = elem->FirstChildElement("lookAt");
+    lookAtElem->QueryFloatAttribute("x", &lookAtX);
+    lookAtElem->QueryFloatAttribute("y", &lookAtY);
+    lookAtElem->QueryFloatAttribute("z", &lookAtZ);
+    cam.set_lookAt(new Point(lookAtX, lookAtY, lookAtZ));
+
+    float upX, upY, upZ;
+    XMLElement * upElem = elem->FirstChildElement("up");
+    upElem->QueryFloatAttribute("x", &upX);
+    upElem->QueryFloatAttribute("y", &upY);
+    upElem->QueryFloatAttribute("z", &upZ);
+    cam.set_up(new Point(upX, upY, upZ));
+
+    float fov, near, far;
+    XMLElement * projectionElem = elem->FirstChildElement("projection");
+    projectionElem->QueryFloatAttribute("fov", &fov);
+    projectionElem->QueryFloatAttribute("near", &near);
+    projectionElem->QueryFloatAttribute("far", &far);
+    cam.set_fov(fov);
+    cam.set_near(near);
+    cam.set_far(far);
+}
+
+void xml_parser::parseGroup(string path, XMLElement * elem, group *g) {
+    for(XMLElement * child = elem->FirstChildElement(); child != NULL; child = child->NextSiblingElement()){
+
+        if(strcmp(child->Value(),"models") == 0){// Load models
+            parseModels(path, child, g);
+        }
+        if(strcmp(child->Value(),"group") == 0) {
+            group *subGroup = (new group());
+            parseGroup(path, child, subGroup);
+            g->addGroup(*subGroup);
+        }
+        if(strcmp(child->Value(),"transform") == 0)
+            parseTransform(child, g);
+    }
+
+}
+
+void xml_parser::parseModels(string path, XMLElement * elem, group * g) {
+    for(XMLElement * child = elem->FirstChildElement(); child != NULL; child = child->NextSiblingElement()){
+        if(strcmp(child->Value(),"model") == 0) {
+            string filename = child->Attribute("file");
+            Figure model;
+            cout << path << filename << " model loaded." << endl;
+            model.figureFromFile((path + filename).c_str());
+            g->addModel(model);
+        }
+    }
+}
+
+void xml_parser::parseTransform(XMLElement * elem, group *g) {
+    for(XMLElement * child = elem->FirstChildElement(); child != NULL; child = child->NextSiblingElement()){
+        if(strcmp(child->Value(), "rotate") == 0) {
+            float angle, x, y, z;
+            child->QueryFloatAttribute("angle", &angle);
+            child->QueryFloatAttribute("x", &x);
+            child->QueryFloatAttribute("y", &y);
+            child->QueryFloatAttribute("z", &z);
+            g->addRotate(*(new Rotate(angle, x, y, z)));
+        } else if(strcmp(child->Value(), "translate") == 0) {
+            float x, y, z;
+            child->QueryFloatAttribute("x", &x);
+            child->QueryFloatAttribute("y", &y);
+            child->QueryFloatAttribute("z", &z);
+            g->addTranslate(*(new Translate(x, y, z)));
+        } else if(strcmp(child->Value(), "scale") == 0) {
+            float x, y, z;
+            child->QueryFloatAttribute("x", &x);
+            child->QueryFloatAttribute("y", &y);
+            child->QueryFloatAttribute("z", &z);
+            g->addScale(*(new Scale(x, y, z)));
+        }
+    }
+}
+
 // Função para processar o arquivo XML
 void xml_parser::xml_parser_function(const char* filename) {
     XMLDocument doc;
@@ -131,14 +229,11 @@ void xml_parser::xml_parser_function(const char* filename) {
 		cout << "Erro ao carregar o nó 'group' do XML!" << endl;
 		return;
 	}
-    /*
-    XMLElement* pTransform = pGroup->FirstChildElement("transform");
+
+    XMLElement* pTransform = pGroup ? pGroup->FirstChildElement("transform") : nullptr;
     printf("Carregando transform ...\n");
-    if (!pTransform) {
-      cout << "Erro ao carregar o no 'transform' do XML!" << endl;
-      return;
-    }
-*/
+
+
     XMLElement* pModels = pGroup ? pGroup->FirstChildElement("models") : nullptr;
 	printf("Carregando modelos 3D...\n");
 	if (!pModels) {

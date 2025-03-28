@@ -7,6 +7,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+
+#include "camera.hpp"
+#include "group.hpp"
 #include "tinyxml2.h"
 #include "../classes/figure.hpp"
 #include "../classes/point.hpp"
@@ -26,7 +29,11 @@ extern int mode, face;                                 // modo de visualizaï¿½ï¿
 extern vector<Figure> models;                          // modelos carregados a partir do XML
 
 class xml_parser {
+  private:
+    camera cam;
+    group* grupo;
   public:
+
     // Funï¿½ï¿½o auxiliar para ler um valor float a partir de um atributo
     float getFloatAttribute(XMLElement* element, const char* attributeName, float defaultValue);
 
@@ -41,6 +48,20 @@ class xml_parser {
 
     // Funï¿½ï¿½o auxiliar para carregar os modelos 3D a partir do XML
     void loadModels(XMLElement* pModels);
+
+    camera getCamera();
+
+    group* getGroup();
+
+    void addModel(Figure model);
+
+    void parseCamera(XMLElement * elem);
+
+    void parseGroup(string path, XMLElement * elem, group *g);
+
+    void parseModels(string path, XMLElement * elem, group * g);
+
+    void parseTransform(XMLElement * elem, group *g);
 
     // Funï¿½ï¿½o para processar o arquivo XML
     void xml_parser_function(const char* filename);
