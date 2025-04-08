@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -g -fsanitize=address -O0
-LDFLAGS = -fsanitize=address -lGL -lGLU -lglut
+LDFLAGS = -fsanitize=address -framework OpenGL -framework GLUT
 
 SRC_DIR = src/classes src/generator
 SRC_FILES = $(wildcard $(addsuffix /*.cpp, $(SRC_DIR)))
