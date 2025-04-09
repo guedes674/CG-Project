@@ -237,6 +237,6 @@ _deps
 Win32/*
 .idea/
 *.3d
-engine
-generator
 .vscode
+/generator
+/engine
