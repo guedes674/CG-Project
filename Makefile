@@ -21,12 +21,12 @@ OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
 # Generator files
 GENERATOR_SRC_FILES = src/generator/generator.cpp src/generator/model.cpp src/aux/aux.cpp src/generator/plane.cpp
 GENERATOR_OBJ_FILES = $(patsubst %.cpp, %.o, $(GENERATOR_SRC_FILES))
-GENERATOR_EXECUTABLE = generator
+GENERATOR_EXECUTABLE = .generator
 
 # Engine files (define these if you need them)
 ENGINE_SRC_FILES = src/engine/engine.cpp src/generator/model.cpp src/aux/aux.cpp
 ENGINE_OBJ_FILES = $(patsubst %.cpp, %.o, $(ENGINE_SRC_FILES))
-ENGINE_EXECUTABLE = engine
+ENGINE_EXECUTABLE = .engine
 
 # Default target
 all: $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE) cleanup

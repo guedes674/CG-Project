@@ -238,5 +238,5 @@ Win32/*
 .idea/
 *.3d
 .vscode
-/generator
-/engine
+*.generator 
+*.engine
