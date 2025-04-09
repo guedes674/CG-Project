@@ -239,3 +239,4 @@ Win32/*
 *.3d
 engine
 generator
+.vscode
