@@ -24,7 +24,7 @@ GENERATOR_OBJ_FILES = $(patsubst %.cpp, %.o, $(GENERATOR_SRC_FILES))
 GENERATOR_EXECUTABLE = .generator
 
 # Engine files (define these if you need them)
-ENGINE_SRC_FILES = src/engine/engine.cpp src/generator/model.cpp src/aux/aux.cpp
+ENGINE_SRC_FILES = src/engine/engine.cpp src/generator/model.cpp src/aux/aux.cpp src/xml/xml_parser.cpp src/xml/tinyxml2.cpp
 ENGINE_OBJ_FILES = $(patsubst %.cpp, %.o, $(ENGINE_SRC_FILES))
 ENGINE_EXECUTABLE = .engine
 

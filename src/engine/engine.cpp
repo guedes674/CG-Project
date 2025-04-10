@@ -14,6 +14,7 @@
 #include <climits>
 #include "../generator/model.h"
 #include "../aux/aux.h"
+#include "../xml/xml_parser.h"
 using namespace std;
 
 float angle_y = 0.0f;
@@ -21,6 +22,9 @@ float angle_x = 0.0f;
 float angle_z = 0.0f;
 float scale = 1.0f;
 float xx = 0.0f, zz = 0.0f;
+
+xml_parser parser;
+
 void changeSize(int w, int h) {
 
 	// Prevent a divide by zero, when window is too short
@@ -40,7 +44,7 @@ void changeSize(int w, int h) {
 	glViewport(0, 0, w, h);
 
 	// Set perspective
-	gluPerspective(45.0f, ratio, 1.0f, 1000.0f);
+	gluPerspective(parser.cam.fov, ratio, parser.cam.near, parser.cam.far);
 
 	// return to the model view matrix mode
 	glMatrixMode(GL_MODELVIEW);
@@ -51,14 +55,19 @@ void renderScene(void) {
 	// clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	// Draw the object
+	vector<float> vertices;
+	vector<unsigned int> indices;
+
+	//read_model(parser.groups[0].models[0].file_name, vertices, indices);
+	read_model(parser.groups[0].models[0].file_name, vertices, indices);
 
 	// set the camera
 	glLoadIdentity();
 
-
-	gluLookAt(5.0, 5.0, 5.0,
-		0.0, 0.0, 0.0,
-		0.0f, 1.0f, 0.0f);
+	gluLookAt(parser.cam.px, parser.cam.py, parser.cam.pz,
+		parser.cam.lx, parser.cam.ly, parser.cam.lz,
+		parser.cam.ux, parser.cam.uy, parser.cam.uz);
 
 	glBegin(GL_LINES);
 	// X axis in red
@@ -84,15 +93,7 @@ void renderScene(void) {
 	glTranslatef(xx, 0.0f, zz);
 	glScalef(scale, scale, scale);
 
-	// Draw the object
-	vector<float> vertices;
-	vector<unsigned int> indices;
 
-	// Read the model file
-	string file_name = "cone_1_2_4_3.3d";
-
-	read_model(file_name, vertices, indices);
-	
 	for (int i = 0; static_cast<unsigned long>(i) < indices.size(); i += 3) {
 		glBegin(GL_TRIANGLES);
 		glColor3f(0.5f, 0.5f, 0.5f);
@@ -174,7 +175,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-	
+	parser = read_xml_file(argv[1]);
 
 	// init GLUT and the window
 	glutInit(&argc, argv);

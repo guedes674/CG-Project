@@ -15,8 +15,8 @@ string get_string_attribute(XMLElement* element, const char* attributeName, stri
     return value ? string(value) : defaultValue;
 }
 
-xmlparser read_xml_file(string file_name){
-    xmlparser parser;
+xml_parser read_xml_file(string file_name){
+    xml_parser parser;
     XMLDocument doc;
     XMLError eResult = doc.LoadFile(file_name.c_str());
 
@@ -47,7 +47,7 @@ xmlparser read_xml_file(string file_name){
 		cout << "Erro ao carregar o nó 'camera' do XML!" << endl;
 		return parser;
 	}
-
+    cout << "Camera detected!" << endl;
     // Carrega a posição da câmera
     XMLElement* pos = cam->FirstChildElement("position");
     if (pos) {
@@ -83,13 +83,16 @@ xmlparser read_xml_file(string file_name){
     // Load Models from groups
     XMLElement* group = world->FirstChildElement("group");
     if (group) {
-        groupxml newGroup; // Create a new group
+        cout << "Group detected!" << endl;
+        group_xml newGroup; // Create a new group
         
         // Process models in this group
-        XMLElement* modelElement = group->FirstChildElement("model");
-        while (modelElement) {
-            modelxml model;
+        XMLElement* modelsElement = group->FirstChildElement("models");
+        if (modelsElement) {
+            XMLElement* modelElement = modelsElement->FirstChildElement("model");
+            model_xml model;
             model.file_name = get_string_attribute(modelElement, "file", "default.3d");
+            cout << "File detected: " << model.file_name << endl;
             newGroup.models.push_back(model);
             modelElement = modelElement->NextSiblingElement("model");
         }

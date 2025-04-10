@@ -23,27 +23,27 @@ class camera {
         float far, near, fov; // far, near and fov
 };
 
-class modelxml {
+class model_xml {
     public: 
         string file_name; // Changed from char* to std::string
 };
 
-class groupxml {
+class group_xml {
     public:
-        std::vector<modelxml> models; // Removed reference
+        std::vector<model_xml> models; // Removed reference
 };
 
-class xmlparser {
+class xml_parser {
     public:
         window win;
         camera cam;
-        std::vector<groupxml> groups; // Removed reference
+        std::vector<group_xml> groups; // Removed reference
 };
 
 // Function prototypes
 float get_float_attribute(XMLElement* element, const char* attributeName, float defaultValue);
 int get_int_attribute(XMLElement* element, const char* attributeName, int defaultValue);
 string get_string_attribute(XMLElement* element, const char* attributeName, string defaultValue); // Return string instead of char*
-xmlparser read_xml_file(string file_name);
+xml_parser read_xml_file(string file_name);
 
 #endif // XML_PARSER_H
