@@ -2,6 +2,7 @@
 #include <cstring> // Add this for strcmp
 #include "plane.h"
 #include "box.h"
+#include "sphere.h"
 #include "model.h"
 #include "../aux/aux.h" // Add this to ensure aux.h is included
 
@@ -40,6 +41,20 @@ int main(int argc, char** argv){
                 file_name = argv[4];
                 box(length, divisions, vertices, indices);
                 cout << "Box generated with length: " << length << " and divisions: " << divisions << std::endl;
+            }
+            else {
+                std::cerr << "Invalid command. Use 'generator help' for usage instructions." << std::endl;
+                return 1;
+            }
+            break;
+        case 6:
+            if (strcmp(argv[1],"sphere")==0){
+                float radius = atof(argv[2]);
+                int slices = atoi(argv[3]);
+                int stacks = atoi(argv[4]);
+                file_name = argv[5];
+                sphere(radius, slices, stacks, vertices, indices);
+                cout << "Sphere generated with radius: " << radius << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
             }
             else {
                 std::cerr << "Invalid command. Use 'generator help' for usage instructions." << std::endl;

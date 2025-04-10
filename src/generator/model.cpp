@@ -47,6 +47,10 @@ int generate_model(string file_name, vector<float>& vertices, vector<unsigned in
 /**
  * @brief Reads a 3D model's vertex and index data from a file.
  *
+ * The file format contains two lines:
+ * 1. First line: All vertex coordinates as semicolon-separated values (x1;y1;z1;x2;y2;z2;...)
+ * 2. Second line: All triangle indices as semicolon-separated values (i1;i2;i3;i4;i5;i6;...)
+ *
  * @param file_name Name of the file to read from.
  * @param vertices  Vector to store the read vertex data (x, y, z).
  * @param indexes   Vector to store the read triangle indices.
@@ -66,29 +70,28 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         string line;             // String to hold each line read from file
         string delimiter = ";";  // Delimiter used to split values
 
-        // ==========================
-        // Read vertices (first line)
-        // ==========================
+        // --- First Lines ---
         getline(file, line);                           // Read the first line
         vector<string> v = parseLine(line, delimiter); // Split line into float strings
-        vertices.reserve(v.size());                    // Reserve memory in vector
+        vertices.reserve(v.size());                    // Reserve memory in vector for efficiency
 
+        // Process each value and add it to the vertices vector
         for (int i = 0; static_cast<unsigned long>(i) < v.size(); i++) {
             value = stof(v[i]);           // Convert string to float
             vertices.push_back(value);    // Store value in vertex vector
-            index = (index + 1) % 3;      // Update index cycle (optional use)
+            index = (index + 1) % 3;      // Update index cycle (tracking x,y,z components)
         }
 
-        // ==========================
-        // Read indices (second line)
-        // ==========================
+        // --- Second Line ---
         getline(file, line);                            // Read second line
-        vector<string> iv = parseLine(line, delimiter); // Split line into unsigned ints
+        vector<string> iv = parseLine(line, delimiter); // Split line into unsigned int strings
         indexes.reserve(iv.size());                     // Reserve memory in index vector
 
+        // Process each value and add it to the indices vector
         for (int i = 0; static_cast<unsigned long>(i) < iv.size(); i++)
-            indexes.push_back(stoul(iv[i]));            // Convert and store index
+            indexes.push_back(stoul(iv[i]));            // Convert string to unsigned long and store as index
 
-        return 0; // Success
+        file.close();   // Close the file when done
+        return 0;       // Success - file was read correctly
     }
 }

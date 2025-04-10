@@ -89,7 +89,7 @@ void renderScene(void) {
 	vector<unsigned int> indices;
 
 	// Read the model file
-	string file_name = "box_2_3.3d";
+	string file_name = "sphere_1_10_10.3d";
 
 	read_model(file_name, vertices, indices);
 	
@@ -145,7 +145,7 @@ void defaultKeyFunc(unsigned char key, int x, int y) {
 void specialKeyFunc(int key_code, int x, int y) {
 	(void)x;  // Explicitly mark as unused
     (void)y;  // Explicitly mark as unused
-	
+
 	if (key_code == GLUT_KEY_UP) {
 		zz -= 0.1f;
 		glutPostRedisplay();
