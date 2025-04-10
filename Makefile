@@ -2,15 +2,15 @@ UNAME_S := $(shell uname -s)
 
 CXX = g++
 CXXFLAGS = -Wall -Wextra -g -fsanitize=address -O0 -I$(PWD)/src
-LDFLAGS = -fsanitize=address
 
 # OS-specific flags
 ifeq ($(UNAME_S), Darwin) # macOS
-	LDFLAGS += -framework OpenGL -framework GLUT
+	CXXFLAGS += -DGL_SILENCE_DEPRECATION
+	LDFLAGS = -fsanitize=address -framework OpenGL -framework GLUT
 else ifeq ($(UNAME_S), Linux) # Linux
-	LDFLAGS += -lGL -lGLU -lglut
+	LDFLAGS = -fsanitize=address -lGL -lGLU -lglut
 else ifeq ($(findstring MINGW,$(UNAME_S)),MINGW) # Windows MinGW
-	LDFLAGS += -lopengl32 -lglu32 -lfreeglut
+	LDFLAGS = -fsanitize=address -lopengl32 -lglu32 -lfreeglut
 endif
 
 # Directory structure
@@ -19,7 +19,7 @@ SRC_FILES = $(wildcard $(addsuffix /*.cpp, $(SRC_DIR)))
 OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
 
 # Generator files
-GENERATOR_SRC_FILES = src/generator/generator.cpp src/generator/model.cpp src/aux/aux.cpp src/generator/plane.cpp
+GENERATOR_SRC_FILES = src/generator/generator.cpp src/generator/model.cpp src/aux/aux.cpp src/generator/plane.cpp src/generator/box.cpp
 GENERATOR_OBJ_FILES = $(patsubst %.cpp, %.o, $(GENERATOR_SRC_FILES))
 GENERATOR_EXECUTABLE = .generator
 

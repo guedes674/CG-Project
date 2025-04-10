@@ -89,11 +89,11 @@ void renderScene(void) {
 	vector<unsigned int> indices;
 
 	// Read the model file
-	string file_name = "plane_2_3.3d";
+	string file_name = "box_2_3.3d";
 
 	read_model(file_name, vertices, indices);
 	
-	for (int i = 0; i < indices.size(); i += 3) {
+	for (int i = 0; static_cast<unsigned long>(i) < indices.size(); i += 3) {
 		glBegin(GL_TRIANGLES);
 		glColor3f(0.5f, 0.5f, 0.5f);
 		glVertex3f(vertices[indices[i] * 3], vertices[indices[i] * 3 + 1], vertices[indices[i] * 3 + 2]);
@@ -111,6 +111,9 @@ void renderScene(void) {
 // write function to process keyboard events
 
 void defaultKeyFunc(unsigned char key, int x, int y) {
+	(void)x;  // Explicitly mark as unused
+    (void)y;  // Explicitly mark as unused
+
 	if (key == 'a' || key == 'A') {
 		angle_y = angle_y + 5;
 		glutPostRedisplay();
@@ -140,6 +143,9 @@ void defaultKeyFunc(unsigned char key, int x, int y) {
 }
 
 void specialKeyFunc(int key_code, int x, int y) {
+	(void)x;  // Explicitly mark as unused
+    (void)y;  // Explicitly mark as unused
+	
 	if (key_code == GLUT_KEY_UP) {
 		zz -= 0.1f;
 		glutPostRedisplay();

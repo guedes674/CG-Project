@@ -6,7 +6,7 @@ using namespace std;
  *
  * @param length     The total length of the plane's side.
  * @param divisions  Number of subdivisions per side (results in divisions x divisions quads).
- * @param vertexB    Output vector for storing vertex positions (x, y, z).
+ * @param vertices    Output vector for storing vertex positions (x, y, z).
  * @param indices    Output vector for storing triangle indices.
  */
 void plane(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indices) {
@@ -40,9 +40,6 @@ void plane(float length, int divisions, vector<float>& vertices, vector<unsigned
         x = xi;
         z += box_side_size;
     }
-
-    // Distance between points (subdivision size)
-    float incr = length / divisions;
 
     // Generating the indices of the plane
     for (int i=1; i <= divisions; i++) {

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring> // Add this for strcmp
 #include "plane.h"
+#include "box.h"
 #include "model.h"
 #include "../aux/aux.h" // Add this to ensure aux.h is included
 
@@ -32,6 +33,13 @@ int main(int argc, char** argv){
                 file_name = argv[4];
                 plane(length, divisions, vertices, indices);
                 cout << "Plane generated with length: " << length << " and divisions: " << divisions << std::endl;
+            }
+            else if (strcmp(argv[1],"box")==0){
+                float length = atof(argv[2]);
+                int divisions = atoi(argv[3]);
+                file_name = argv[4];
+                box(length, divisions, vertices, indices);
+                cout << "Box generated with length: " << length << " and divisions: " << divisions << std::endl;
             }
             else {
                 std::cerr << "Invalid command. Use 'generator help' for usage instructions." << std::endl;

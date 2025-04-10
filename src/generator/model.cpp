@@ -73,7 +73,7 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         vector<string> v = parseLine(line, delimiter); // Split line into float strings
         vertices.reserve(v.size());                    // Reserve memory in vector
 
-        for (int i = 0; i < v.size(); i++) {
+        for (int i = 0; static_cast<unsigned long>(i) < v.size(); i++) {
             value = stof(v[i]);           // Convert string to float
             vertices.push_back(value);    // Store value in vertex vector
             index = (index + 1) % 3;      // Update index cycle (optional use)
@@ -86,7 +86,7 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         vector<string> iv = parseLine(line, delimiter); // Split line into unsigned ints
         indexes.reserve(iv.size());                     // Reserve memory in index vector
 
-        for (int i = 0; i < iv.size(); i++)
+        for (int i = 0; static_cast<unsigned long>(i) < iv.size(); i++)
             indexes.push_back(stoul(iv[i]));            // Convert and store index
 
         return 0; // Success
