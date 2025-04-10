@@ -89,7 +89,7 @@ void renderScene(void) {
 	vector<unsigned int> indices;
 
 	// Read the model file
-	string file_name = "sphere_1_10_10.3d";
+	string file_name = "cone_1_2_4_3.3d";
 
 	read_model(file_name, vertices, indices);
 	
