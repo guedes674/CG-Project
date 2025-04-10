@@ -52,40 +52,36 @@ void changeSize(int w, int h) {
 
 void renderScene(void) {
 
-	// clear buffers
+	// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Draw the object
 	vector<float> vertices;
 	vector<unsigned int> indices;
 
-	//read_model(parser.groups[0].models[0].file_name, vertices, indices);
-	read_model(parser.groups[0].models[0].file_name, vertices, indices);
-
-	// set the camera
+	// Loading the identity matrix
 	glLoadIdentity();
 
+	// Set the camera position and orientation
 	gluLookAt(parser.cam.px, parser.cam.py, parser.cam.pz,
 		parser.cam.lx, parser.cam.ly, parser.cam.lz,
 		parser.cam.ux, parser.cam.uy, parser.cam.uz);
 
+	// --- Draw the axes ---
 	glBegin(GL_LINES);
-	// X axis in red
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(100.0f, 0.0f, 0.0f);
-	// Y Axis in Green
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 100.0f, 0.0f);
-	// Z Axis in Blue
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 0.0f, 100.0f);
+
+		glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(100.0f, 0.0f, 0.0f);
+
+		glColor3f(0.0f, 1.0f, 0.0f);   // y axis in green
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, 100.0f, 0.0f);
+
+		glColor3f(0.0f, 0.0f, 1.0f);   // z axis in blue
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, 0.0f, 100.0f);
 	glEnd();
-
-
-	// put the geometric transformations here
 
 	glRotatef(angle_y, 0.0f, 1.0f, 0.0f);
 	glRotatef(angle_x, 1.0f, 0.0f, 0.0f);
@@ -94,22 +90,25 @@ void renderScene(void) {
 	glScalef(scale, scale, scale);
 
 
-	for (int i = 0; static_cast<unsigned long>(i) < indices.size(); i += 3) {
-		glBegin(GL_TRIANGLES);
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glVertex3f(vertices[indices[i] * 3], vertices[indices[i] * 3 + 1], vertices[indices[i] * 3 + 2]);
-		glVertex3f(vertices[indices[i + 1] * 3], vertices[indices[i + 1] * 3 + 1], vertices[indices[i + 1] * 3 + 2]);
-		glVertex3f(vertices[indices[i + 2] * 3], vertices[indices[i + 2] * 3 + 1], vertices[indices[i + 2] * 3 + 2]);
-		glEnd();
-	}
+	for( int j = 0; static_cast<unsigned long>(j)<parser.groups[0].models.size(); j++){
 
+		vertices.clear();
+		indices.clear();
+
+		read_model(parser.groups[0].models[j].file_name, vertices, indices);
+
+		for (int i = 0; static_cast<unsigned long>(i) < indices.size(); i += 3) {
+			glBegin(GL_TRIANGLES);
+				glColor3f(0.5f, 0.5f, 0.5f);
+				glVertex3f(vertices[indices[i] * 3], vertices[indices[i] * 3 + 1], vertices[indices[i] * 3 + 2]);
+				glVertex3f(vertices[indices[i + 1] * 3], vertices[indices[i + 1] * 3 + 1], vertices[indices[i + 1] * 3 + 2]);
+				glVertex3f(vertices[indices[i + 2] * 3], vertices[indices[i + 2] * 3 + 1], vertices[indices[i + 2] * 3 + 2]);
+			glEnd();
+		}
+	}
 	// End of frame
 	glutSwapBuffers();
 }
-
-
-
-// write function to process keyboard events
 
 void defaultKeyFunc(unsigned char key, int x, int y) {
 	(void)x;  // Explicitly mark as unused

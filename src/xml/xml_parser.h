@@ -28,9 +28,38 @@ class model_xml {
         string file_name; // Changed from char* to std::string
 };
 
+class rotation_xml {
+    public:
+        float angle;
+        float x, y, z;
+        int order;
+};
+
+class translation_xml {
+    public:
+        float x, y, z;
+        int order;
+};
+
+class scale_xml {
+    public:
+        float x, y, z;
+        int order;
+};
+
+class transformations_xml {
+    public:
+        rotation_xml rotation;
+        translation_xml translation;
+        scale_xml scale;
+        int order;
+};
+
 class group_xml {
     public:
         std::vector<model_xml> models; // Removed reference
+        transformations_xml transformations; // Removed reference
+        std::vector<group_xml> groups; // Removed reference
 };
 
 class xml_parser {

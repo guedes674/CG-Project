@@ -24,7 +24,6 @@ int main(int argc, char** argv){
     vector<unsigned int> indices; // Holds all triangle indices
 
     string file_name;           // Output file path
-    printf("Number of arguments: %d\n", argc);
     
     // Process command arguments based on their count
     switch(argc) {

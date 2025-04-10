@@ -44,7 +44,10 @@ $(ENGINE_EXECUTABLE): $(ENGINE_OBJ_FILES)
 
 # Clean rule
 clean:
-	rm -f $(OBJ_FILES) $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE) *.3d
+	rm -f $(OBJ_FILES) $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE)
+
+clean3d:
+	rm -f *.3d
 
 # Auto cleanup rule to remove .o files after successful build
 .PHONY: cleanup

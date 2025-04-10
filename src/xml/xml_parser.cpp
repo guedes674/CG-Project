@@ -15,6 +15,65 @@ string get_string_attribute(XMLElement* element, const char* attributeName, stri
     return value ? string(value) : defaultValue;
 }
 
+group_xml recursive_catch_groups(XMLElement* group) {
+    group_xml new_group;
+    XMLElement* models_element = group->FirstChildElement("models");
+    if (models_element) {
+        XMLElement* model_element = models_element->FirstChildElement("model");
+        while (model_element) {
+            model_xml model;
+            model.file_name = get_string_attribute(model_element, "file", "default.3d");
+            cout << "File detected: " << model.file_name << endl;
+            new_group.models.push_back(model);
+            model_element = model_element->NextSiblingElement("model");
+        }
+        
+    }
+    XMLElement* transform_element = group->FirstChildElement("transform");
+    if(transform_element){
+        // Start with the first child element and iterate through all siblings
+        XMLElement* current_transform = transform_element->FirstChildElement();
+        int orderIndex = 0;
+        
+        while(current_transform) {
+            const char* transform_type = current_transform->Name();
+            
+            if(strcmp(transform_type, "rotation") == 0) {
+                // Process rotation
+                new_group.transformations.rotation.angle = get_float_attribute(current_transform, "angle", 0);
+                new_group.transformations.rotation.x = get_float_attribute(current_transform, "x", 0);
+                new_group.transformations.rotation.y = get_float_attribute(current_transform, "y", 0);
+                new_group.transformations.rotation.z = get_float_attribute(current_transform, "z", 0);
+                new_group.transformations.rotation.order = orderIndex++;
+                
+            } else if(strcmp(transform_type, "translation") == 0) {
+                // Process translation
+                new_group.transformations.translation.x = get_float_attribute(current_transform, "x", 0);
+                new_group.transformations.translation.y = get_float_attribute(current_transform, "y", 0);
+                new_group.transformations.translation.z = get_float_attribute(current_transform, "z", 0);
+                new_group.transformations.translation.order = orderIndex++;
+                
+            } else if(strcmp(transform_type, "scale") == 0) {
+                // Process scale
+                new_group.transformations.scale.x = get_float_attribute(current_transform, "x", 1);
+                new_group.transformations.scale.y = get_float_attribute(current_transform, "y", 1);
+                new_group.transformations.scale.z = get_float_attribute(current_transform, "z", 1);
+                new_group.transformations.scale.order = orderIndex++;
+            }
+            
+            // Move to the next sibling element
+            current_transform = current_transform->NextSiblingElement();
+        }
+    }
+    XMLElement* group_element = group->FirstChildElement("group");
+    while (group_element) {
+        group_xml subGroup = recursive_catch_groups(group_element);
+        new_group.groups.push_back(subGroup);
+        group_element = group_element->NextSiblingElement("group");
+    }
+    return new_group;
+}
+
 xml_parser read_xml_file(string file_name){
     xml_parser parser;
     XMLDocument doc;
@@ -82,22 +141,10 @@ xml_parser read_xml_file(string file_name){
 
     // Load Models from groups
     XMLElement* group = world->FirstChildElement("group");
-    if (group) {
-        cout << "Group detected!" << endl;
-        group_xml newGroup; // Create a new group
-        
-        // Process models in this group
-        XMLElement* modelsElement = group->FirstChildElement("models");
-        if (modelsElement) {
-            XMLElement* modelElement = modelsElement->FirstChildElement("model");
-            model_xml model;
-            model.file_name = get_string_attribute(modelElement, "file", "default.3d");
-            cout << "File detected: " << model.file_name << endl;
-            newGroup.models.push_back(model);
-            modelElement = modelElement->NextSiblingElement("model");
-        }
-        
-        parser.groups.push_back(newGroup); // Add the group to the parser
+    while (group) {
+        group_xml new_group = recursive_catch_groups(group);
+        parser.groups.push_back(new_group);
+        group = group->NextSiblingElement("group");
     }
 
     return parser;
