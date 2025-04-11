@@ -49,11 +49,11 @@ int generate_model(string file_name, vector<float>& vertices, vector<unsigned in
  *
  * The file format contains two lines:
  * 1. First line: All vertex coordinates as semicolon-separated values (x1;y1;z1;x2;y2;z2;...)
- * 2. Second line: All triangle indices as semicolon-separated values (i1;i2;i3;i4;i5;i6;...)
+ * 2. Second line: All triangle indexes as semicolon-separated values (i1;i2;i3;i4;i5;i6;...)
  *
  * @param file_name Name of the file to read from.
  * @param vertices  Vector to store the read vertex data (x, y, z).
- * @param indexes   Vector to store the read triangle indices.
+ * @param indexes   Vector to store the read triangle indexes.
  * @return 0 if successful, 1 if file could not be opened.
  */
 int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes) {
@@ -87,7 +87,7 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         vector<string> iv = parseLine(line, delimiter); // Split line into unsigned int strings
         indexes.reserve(iv.size());                     // Reserve memory in index vector
 
-        // Process each value and add it to the indices vector
+        // Process each value and add it to the indexes vector
         for (int i = 0; static_cast<unsigned long>(i) < iv.size(); i++)
             indexes.push_back(stoul(iv[i]));            // Convert string to unsigned long and store as index
 

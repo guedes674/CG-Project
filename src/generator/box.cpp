@@ -3,7 +3,7 @@
 using namespace std;
 
 /**
- * @brief Helper function to place vertex data at specific indices in the vertices vector.
+ * @brief Helper function to place vertex data at specific indexes in the vertices vector.
  * 
  * @param vertices  The vector storing all vertex coordinates.
  * @param index     Starting index where to place the vertex coordinates.
@@ -23,7 +23,7 @@ void pushback_vertex(vector<float>& vertices, int index, float x, float y, float
  * @param length     The total length of each box side.
  * @param divisions  Number of subdivisions per face (results in divisions x divisions quads per face).
  * @param vertices   Output vector for storing vertex positions (x, y, z).
- * @param indexes    Output vector for storing triangle indices.
+ * @param indexes    Output vector for storing triangle indexes.
  */
 void box(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indexes) {
     // Calculate number of vertices per face
@@ -83,11 +83,11 @@ void box(float length, int divisions, vector<float>& vertices, vector<unsigned i
         x = xi;
     }   
 
-    // Generate indices for all faces
+    // Generate indexes for all faces
     for (int i = 1; i <= divisions; i++){
         for (int j = 1; j <= divisions; j++){
 
-            // Calculate corner indices for current grid cell
+            // Calculate corner indexes for current grid cell
             float bottom_left = (i - 1) * (vertices_per_line) + (j - 1); // Bottom-left vertex index
             float bottom_right = i * (vertices_per_line) + (j - 1);      // Bottom-right vertex index
             float top_right = i * (vertices_per_line) + j;               // Top-right vertex index

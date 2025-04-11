@@ -10,7 +10,7 @@ using namespace std;
  * @param slices     Number of subdivisions around the circular base.
  * @param stacks     Number of subdivisions along the height of the cone.
  * @param vertices   Output vector for storing vertex positions (x, y, z).
- * @param indexes    Output vector for storing triangle indices.
+ * @param indexes    Output vector for storing triangle indexes.
  */
 void cone(float base, float height, int slices, int stacks, vector<float>& vertices, vector<unsigned int>& indexes) {
     // Calculate angular increment for base circle
@@ -64,7 +64,7 @@ current_angle = 0;
     // Calculate total vertex count for index generation
     unsigned int total_vertices = vertices.size() / 3;
 
-    // Generate indices for cone body (connecting stack rings)
+    // Generate indexes for cone body (connecting stack rings)
     for (int i = 1; i <= stacks; i++){
         for(int j = 1; j < slices; j++){
             // First triangle (connecting vertices between adjacent stacks)

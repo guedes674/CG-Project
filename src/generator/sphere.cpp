@@ -9,7 +9,7 @@ using namespace std;
  * @param slices     Number of subdivisions around the vertical axis (longitude).
  * @param stacks     Number of subdivisions along the vertical axis (latitude).
  * @param vertices   Output vector for storing vertex positions (x, y, z).
- * @param indexes    Output vector for storing triangle indices.
+ * @param indexes    Output vector for storing triangle indexes.
  */
 void sphere(float radius, int slices, int stacks, vector<float>& vertices, vector<unsigned int>& indexes){
 

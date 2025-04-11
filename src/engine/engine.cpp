@@ -28,9 +28,9 @@ xml_parser parser;
 
 class vbo{
 	public:
-		GLuint vertices, total_vertices, indices, total_indices;
+		GLuint vertices, total_vertices, indexes, total_indexes;
 
-        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti) : vertices(v), total_vertices(tv), indices(i), total_indices(ti){};
+        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti) : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti){};
 
 };
 
@@ -60,7 +60,7 @@ void changeSize(int w, int h) {
 	// return to the model view matrix mode
 	glMatrixMode(GL_MODELVIEW);
 }
-
+/*
 //Retorna a Model View Matrix
 static inline void mvp_matrix(float* matrix){
 	float modelview_matrix[16],projection_matrix[16];
@@ -73,7 +73,7 @@ static inline void mvp_matrix(float* matrix){
 	glGetFloatv(GL_MODELVIEW_MATRIX,matrix);
 	glPopMatrix();
 }
-
+*/
 void recursive_draw(const group_xml& group) {
     glPushMatrix();
 
@@ -84,13 +84,19 @@ void recursive_draw(const group_xml& group) {
 			if(group.transformations.rotation.order == i){
 				transformation_order[i] = 2;
 			}
-			else if(group.transformations.translation.order == i){
+		}
+		if (group.transformations.translation_exists ==1){
+			if(group.transformations.translation.order == i){
 				transformation_order[i] = 1;
-			}else if(group.transformations.scale.order == i){
+			}
+		}
+		if (group.transformations.scale_exists == 1){
+			if(group.transformations.scale.order == i){
 				transformation_order[i] = 3;
 			}
 		}
 	}
+	
     
 	for(int i = 0; i < 3;i++){
 		if (transformation_order[i]!= 0){
@@ -122,7 +128,7 @@ void recursive_draw(const group_xml& group) {
 	// Set color to white for all subsequent rendering
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-    for (int i = 0; i < group.models.size(); i++) {
+    for (int i = 0; static_cast<unsigned long>(i) < group.models.size(); i++) {
         vbo * current_vbo = model_dict[group.models[i].file_name];
         total_models++;
 
@@ -133,15 +139,15 @@ void recursive_draw(const group_xml& group) {
         // glBindBuffer(GL_ARRAY_BUFFER, current_vbo->normals);
         // glNormalPointer(GL_FLOAT, 0, 0);
         
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indices);
-        glDrawElements(GL_TRIANGLES, current_vbo->total_indices, GL_UNSIGNED_INT, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indexes);
+        glDrawElements(GL_TRIANGLES, current_vbo->total_indexes, GL_UNSIGNED_INT, 0);
     }
 
     // Disable client states
     glDisableClientState(GL_VERTEX_ARRAY);
     // glDisableClientState(GL_NORMAL_ARRAY);  // Uncomment if you have normal data
 
-    for (int i = 0; i < group.groups.size(); i++)
+    for (int i = 0; static_cast<unsigned long>(i) < group.groups.size(); i++)
         recursive_draw(group.groups[i]);
 
     glPopMatrix();
@@ -154,7 +160,7 @@ void renderScene(void) {
 
 	// Draw the object
 	vector<float> vertices;
-	vector<unsigned int> indices;
+	vector<unsigned int> indexes;
 
 	// Loading the identity matrix
 	glLoadIdentity();
@@ -185,7 +191,7 @@ void renderScene(void) {
 	glTranslatef(xx, 0.0f, zz);
 	glScalef(scale, scale, scale);
 	
-	for (int i = 0; i < parser.groups.size(); i++){
+	for (int i = 0; static_cast<unsigned long>(i) < parser.groups.size(); i++){
 		recursive_draw(parser.groups[i]);
 	}
 	// End of frame
@@ -248,17 +254,17 @@ void specialKeyFunc(int key_code, int x, int y) {
 
 int populate_dict(group_xml group, unordered_map<std::string,vbo*>& model_dict){
 
-	for(int i = 0; i < group.models.size(); i++){
+	for(int i = 0; static_cast<unsigned long>(i) < group.models.size(); i++){
 		// Checking if model is already in the dictionary
 		if(model_dict.find(group.models[i].file_name) == model_dict.end()){
 			vector<float> vertices;
-			vector<unsigned int> indices;
-			if(read_model(group.models[i].file_name, vertices, indices)){
+			vector<unsigned int> indexes;
+			if(read_model(group.models[i].file_name, vertices, indexes)){
 				cout << "Error : File\"" << group.models[i].file_name << "\" not found \n";
 				return 1;
 			}
 			else{
-				GLuint vertices_id, indices_id, total_vertices = vertices.size()/3, total_indices = indices.size();
+				GLuint vertices_id, indexes_id, total_vertices = vertices.size()/3, total_indexes = indexes.size();
 
 				// Create vbo
 				glGenBuffers(1, &vertices_id);
@@ -267,18 +273,18 @@ int populate_dict(group_xml group, unordered_map<std::string,vbo*>& model_dict){
 				glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
 				glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-                //Create VBO indices 
-                glGenBuffers(1, &indices_id);
+                //Create VBO indexes 
+                glGenBuffers(1, &indexes_id);
 
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexes_id);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexes.size(), indexes.data(), GL_STATIC_DRAW);
 
-				auto new_vbo = new vbo(vertices_id, total_vertices, indices_id, total_indices);
+				auto new_vbo = new vbo(vertices_id, total_vertices, indexes_id, total_indexes);
 				model_dict[group.models[i].file_name] = new_vbo;
 			}
 		}
 	}
-	for(int i = 0; i < group.groups.size(); i++){
+	for(int i = 0; static_cast<unsigned long>(i) < group.groups.size(); i++){
 		if (populate_dict(group.groups[i], model_dict) == 1) {
 			cout << "Error populating dictionary for group" <<
 			i 

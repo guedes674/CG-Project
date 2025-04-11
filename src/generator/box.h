@@ -3,6 +3,6 @@
 
 #include <vector>
 
-void box(float length, int divisions, std::vector<float>& vertices, std::vector<unsigned int>& indices);
+void box(float length, int divisions, std::vector<float>& vertices, std::vector<unsigned int>& indexes);
 
 #endif

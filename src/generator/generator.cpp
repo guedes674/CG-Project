@@ -21,7 +21,7 @@ int main(int argc, char** argv){
 
     // Storage for the generated shape data
     vector<float> vertices;      // Holds all vertex (x,y,z) coordinates
-    vector<unsigned int> indices; // Holds all triangle indices
+    vector<unsigned int> indexes; // Holds all triangle indexes
 
     string file_name;           // Output file path
     
@@ -52,7 +52,7 @@ int main(int argc, char** argv){
                 file_name = argv[4];               // Output file
                 
                 // Generate plane geometry
-                plane(length, divisions, vertices, indices);
+                plane(length, divisions, vertices, indexes);
                 cout << "Plane generated with length: " << length << " and divisions: " << divisions << std::endl;
             }
             else if (strcmp(argv[1],"box")==0){
@@ -62,7 +62,7 @@ int main(int argc, char** argv){
                 file_name = argv[4];               // Output file
                 
                 // Generate box geometry
-                box(length, divisions, vertices, indices);
+                box(length, divisions, vertices, indexes);
                 cout << "Box generated with length: " << length << " and divisions: " << divisions << std::endl;
             }
             else {
@@ -81,7 +81,7 @@ int main(int argc, char** argv){
                 file_name = argv[5];               // Output file
                 
                 // Generate sphere geometry
-                sphere(radius, slices, stacks, vertices, indices);
+                sphere(radius, slices, stacks, vertices, indexes);
                 cout << "Sphere generated with radius: " << radius << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
             }
             else {
@@ -101,7 +101,7 @@ int main(int argc, char** argv){
                 file_name = argv[6];               // Output file
                 
                 // Generate cone geometry
-                cone(base, height, slices, stacks, vertices, indices);
+                cone(base, height, slices, stacks, vertices, indexes);
                 cout << "Cone generated with base: " << base << ", height: " << height << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
             }
             else {
@@ -118,7 +118,7 @@ int main(int argc, char** argv){
 
     // Save the generated model data to the specified file (if not in help mode)
     if (argc > 2) {
-        generate_model(file_name, vertices, indices);
+        generate_model(file_name, vertices, indexes);
     }
     return 0;
 }

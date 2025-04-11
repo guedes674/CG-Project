@@ -7,9 +7,9 @@ using namespace std;
  * @param length     The total length of the plane's side.
  * @param divisions  Number of subdivisions per side (results in divisions x divisions quads).
  * @param vertices    Output vector for storing vertex positions (x, y, z).
- * @param indices    Output vector for storing triangle indices.
+ * @param indexes    Output vector for storing triangle indexes.
  */
-void plane(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indices) {
+void plane(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indexes) {
 
     // Inicial x value (leftmost point)
     float xi = -length/2;
@@ -41,26 +41,26 @@ void plane(float length, int divisions, vector<float>& vertices, vector<unsigned
         z += box_side_size;
     }
 
-    // Generating the indices of the plane
+    // Generating the indexes of the plane
     for (int i=1; i <= divisions; i++) {
 
         for (int j=1; j <= divisions; j++) {
 
-            // --- Triangle indices ---
+            // --- Triangle indexes ---
             float bottom_left = (i - 1) * (divisions + 1) + (j - 1); // Bottom-left vertex index
             float bottom_right = i * (divisions + 1) + (j - 1);      // Bottom-right vertex index
             float top_right = i * (divisions + 1) + j;               // Top-right vertex index
             float top_left = (i - 1) * (divisions + 1) + j;          // Top-left vertex index
 
             // --- First Triangle ---
-            indices.push_back(bottom_left);  // Bottom-left
-            indices.push_back(bottom_right); // Bottom-right
-            indices.push_back(top_right);    // Top-right
+            indexes.push_back(bottom_left);  // Bottom-left
+            indexes.push_back(bottom_right); // Bottom-right
+            indexes.push_back(top_right);    // Top-right
 
             // --- Second Triangle ---
-            indices.push_back(bottom_left); // Bottom-left
-            indices.push_back(top_right);   // Top-right
-            indices.push_back(top_left);    // Top-left
+            indexes.push_back(bottom_left); // Bottom-left
+            indexes.push_back(top_right);   // Top-right
+            indexes.push_back(top_left);    // Top-left
         }
     }
 
