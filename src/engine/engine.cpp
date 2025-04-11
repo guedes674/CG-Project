@@ -66,12 +66,12 @@ void changeSize(int w, int h) {
 void recursive_draw(const group_xml &group) {
     glPushMatrix();
 
-	if(group.transformations.rotation_exists == 1){
+	if(group.transformations.translation_exists == 1){
 		glTranslatef(group.transformations.translation.x,
 			group.transformations.translation.y,
 			group.transformations.translation.z);
 	}	
-	if(group.transformations.translation_exists == 1){
+	if(group.transformations.rotation_exists == 1){
 		glRotatef(group.transformations.rotation.angle,
 			group.transformations.rotation.x,
 			group.transformations.rotation.y,

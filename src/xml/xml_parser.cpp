@@ -37,7 +37,7 @@ group_xml recursive_catch_groups(XMLElement* group) {
         
         while(current_transform) {
             const char* transform_type = current_transform->Name();
-            if(strcmp(transform_type, "rotation") == 0) {
+            if(strcmp(transform_type, "rotate") == 0) {
                 // Process rotation
                 new_group.transformations.rotation.angle = get_float_attribute(current_transform, "angle", 0);
                 new_group.transformations.rotation.x = get_float_attribute(current_transform, "x", 0);
@@ -45,6 +45,7 @@ group_xml recursive_catch_groups(XMLElement* group) {
                 new_group.transformations.rotation.z = get_float_attribute(current_transform, "z", 0);
                 new_group.transformations.rotation.order = order_index++;
                 new_group.transformations.rotation_exists++;
+                cout << "Rotation detected: " << new_group.transformations.rotation.angle << endl;
             } else if(strcmp(transform_type, "translate") == 0) {
                 // Process translation
                 new_group.transformations.translation.x = get_float_attribute(current_transform, "x", 0);
@@ -52,7 +53,9 @@ group_xml recursive_catch_groups(XMLElement* group) {
                 new_group.transformations.translation.z = get_float_attribute(current_transform, "z", 0);
                 new_group.transformations.translation.order = order_index++;
                 new_group.transformations.translation_exists++;
-                
+                cout << "Translation detected: " << new_group.transformations.translation.x 
+                << " " << new_group.transformations.translation.y << " " << new_group.transformations.translation.z
+                << endl;
             } else if(strcmp(transform_type, "scale") == 0) {
                 // Process scale
                 new_group.transformations.scale.x = get_float_attribute(current_transform, "x", 1);
@@ -60,6 +63,7 @@ group_xml recursive_catch_groups(XMLElement* group) {
                 new_group.transformations.scale.z = get_float_attribute(current_transform, "z", 1);
                 new_group.transformations.scale.order = order_index++;
                 new_group.transformations.scale_exists++;
+                cout << "Scale detected: " << new_group.transformations.scale.x << endl;
             }
             
             // Move to the next sibling element
