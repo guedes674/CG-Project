@@ -1,7 +1,7 @@
 UNAME_S := $(shell uname -s)
 
 CXX = g++
-CXXFLAGS = -Wall -Wextra -g -fsanitize=address -O0 -I$(PWD)/src
+CXXFLAGS = -Wall -Wextra -g -fsanitize=address -O3 -I$(PWD)/src
 
 # OS-specific flags
 ifeq ($(UNAME_S), Darwin) # macOS

@@ -1,0 +1,4 @@
+#ifndef GENERATOR_BEZIER_H
+#define GENERATOR_BEZIER_H
+
+#endif
