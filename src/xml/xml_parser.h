@@ -52,6 +52,7 @@ class transformations_xml {
         rotation_xml rotation;
         translation_xml translation;
         scale_xml scale;
+        int rotation_exists = 0,translation_exists = 0,scale_exists = 0;
         int order;
 };
 
@@ -70,9 +71,9 @@ class xml_parser {
 };
 
 // Function prototypes
-float get_float_attribute(XMLElement* element, const char* attributeName, float defaultValue);
-int get_int_attribute(XMLElement* element, const char* attributeName, int defaultValue);
-string get_string_attribute(XMLElement* element, const char* attributeName, string defaultValue); // Return string instead of char*
+float get_float_attribute(XMLElement* element, const char* attribute_name, float default_value);
+int get_int_attribute(XMLElement* element, const char* attribute_name, int default_value);
+string get_string_attribute(XMLElement* element, const char* attribute_name, string default_value); // Return string instead of char*
 xml_parser read_xml_file(string file_name);
 
 #endif // XML_PARSER_H

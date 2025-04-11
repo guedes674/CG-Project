@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <climits>
+#include <unordered_map>
 #include "../generator/model.h"
 #include "../aux/aux.h"
 #include "../xml/xml_parser.h"
@@ -24,6 +25,17 @@ float scale = 1.0f;
 float xx = 0.0f, zz = 0.0f;
 
 xml_parser parser;
+
+class vbo{
+	public:
+		GLuint vertices, total_vertices, indices;
+
+        vbo(GLuint v, unsigned int tv, GLuint i) : vertices(v), total_vertices(tv), indices(i) {
+        };
+
+};
+
+unordered_map <std::string,vbo*> model_dict;
 
 void changeSize(int w, int h) {
 
@@ -50,6 +62,61 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+// Função recursiva que desenha todos os modelos do grupo e de seus subgrupos.
+void recursive_draw(const group_xml &group) {
+    glPushMatrix();
+
+	if(group.transformations.rotation_exists == 1){
+		glTranslatef(group.transformations.translation.x,
+			group.transformations.translation.y,
+			group.transformations.translation.z);
+	}	
+	if(group.transformations.translation_exists == 1){
+		glRotatef(group.transformations.rotation.angle,
+			group.transformations.rotation.x,
+			group.transformations.rotation.y,
+			group.transformations.rotation.z);
+	}
+	if(group.transformations.scale_exists == 1){
+		glScalef(group.transformations.scale.x,
+			group.transformations.scale.y,
+			group.transformations.scale.z);
+	}
+	
+    // Draw the models for the current group.
+    for (size_t j = 0; j < group.models.size(); j++) {
+        vector<float> vertices;
+        vector<unsigned int> indices;
+
+        if (read_model(group.models[j].file_name, vertices, indices)) {
+            std::cerr << "Error loading model: " << group.models[j].file_name << std::endl;
+            continue;
+        }
+
+        for (size_t i = 0; i < indices.size(); i += 3) {
+            glBegin(GL_TRIANGLES);
+                glColor3f(0.5f, 0.5f, 0.5f);
+                glVertex3f(vertices[indices[i] * 3],
+                           vertices[indices[i] * 3 + 1],
+                           vertices[indices[i] * 3 + 2]);
+                glVertex3f(vertices[indices[i + 1] * 3],
+                           vertices[indices[i + 1] * 3 + 1],
+                           vertices[indices[i + 1] * 3 + 2]);
+                glVertex3f(vertices[indices[i + 2] * 3],
+                           vertices[indices[i + 2] * 3 + 1],
+                           vertices[indices[i + 2] * 3 + 2]);
+            glEnd();
+        }
+    }
+
+    // Recursively draw all subgroups.
+    for (size_t i = 0; i < group.groups.size(); i++) {
+        recursive_draw(group.groups[i]);
+    }
+
+    glPopMatrix();
+}
+
 void renderScene(void) {
 
 	// Clear buffers
@@ -69,7 +136,6 @@ void renderScene(void) {
 
 	// --- Draw the axes ---
 	glBegin(GL_LINES);
-
 		glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glVertex3f(100.0f, 0.0f, 0.0f);
@@ -89,22 +155,8 @@ void renderScene(void) {
 	glTranslatef(xx, 0.0f, zz);
 	glScalef(scale, scale, scale);
 
-
-	for( int j = 0; static_cast<unsigned long>(j)<parser.groups[0].models.size(); j++){
-
-		vertices.clear();
-		indices.clear();
-
-		read_model(parser.groups[0].models[j].file_name, vertices, indices);
-
-		for (int i = 0; static_cast<unsigned long>(i) < indices.size(); i += 3) {
-			glBegin(GL_TRIANGLES);
-				glColor3f(0.5f, 0.5f, 0.5f);
-				glVertex3f(vertices[indices[i] * 3], vertices[indices[i] * 3 + 1], vertices[indices[i] * 3 + 2]);
-				glVertex3f(vertices[indices[i + 1] * 3], vertices[indices[i + 1] * 3 + 1], vertices[indices[i + 1] * 3 + 2]);
-				glVertex3f(vertices[indices[i + 2] * 3], vertices[indices[i + 2] * 3 + 1], vertices[indices[i + 2] * 3 + 2]);
-			glEnd();
-		}
+	for (size_t i = 0; i < parser.groups.size(); i++) {
+		recursive_draw(parser.groups[i]);
 	}
 	// End of frame
 	glutSwapBuffers();
@@ -163,6 +215,46 @@ void specialKeyFunc(int key_code, int x, int y) {
 		glutPostRedisplay();
 	}
 }
+
+int populate_dict(group_xml group, unordered_map<std::string,vbo*>& model_dict){
+
+	for(int i = 0; i < group.models.size(); i++){
+		// Checking if model is already in the dictionary
+		if(model_dict.find(group.models[i].file_name) == model_dict.end()){
+			vector<float> vertices;
+			vector<unsigned int> indices;
+			if(read_model(group.models[i].file_name, vertices, indices)){
+				cout << "Error : File\"" << group.models[i].file_name << "\" not found \n";
+				return 1;
+			}
+			else{
+				GLuint vertices_id, indices_id, total_vertices = vertices.size()/3;
+
+				// Create vbo
+				glGenBuffers(1, &vertices_id);
+
+				//Copy vector to graphics card
+				glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
+				glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+                //Create VBO indices 
+                glGenBuffers(1, &indices_id);
+
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
+
+				auto new_vbo = new vbo(vertices_id, total_vertices, indices_id);
+				model_dict[group.models[i].file_name] = new_vbo;
+			}
+		}
+	}
+	for(int i = 0; i < group.groups.size(); i++){
+		if (populate_dict(group.groups[i], model_dict) == 1) return 1;
+	}
+	return 0;
+}
+
+
 
 int main(int argc, char** argv) {
 

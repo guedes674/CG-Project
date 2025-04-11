@@ -1,17 +1,17 @@
 #include "xml_parser.h"
 
-float get_float_attribute(XMLElement* element, const char* attributeName, float defaultValue) {
-    const char* value = element->Attribute(attributeName);
+float get_float_attribute(XMLElement* element, const char* attribute_name, float defaultValue) {
+    const char* value = element->Attribute(attribute_name);
     return value ? stof(value) : defaultValue;
 }
 
-int get_int_attribute(XMLElement* element, const char* attributeName, int defaultValue) {
-    const char* value = element->Attribute(attributeName);
+int get_int_attribute(XMLElement* element, const char* attribute_name, int defaultValue) {
+    const char* value = element->Attribute(attribute_name);
     return value ? stoi(value) : defaultValue;
 }
 
-string get_string_attribute(XMLElement* element, const char* attributeName, string defaultValue) {
-    const char* value = element->Attribute(attributeName);
+string get_string_attribute(XMLElement* element, const char* attribute_name, string defaultValue) {
+    const char* value = element->Attribute(attribute_name);
     return value ? string(value) : defaultValue;
 }
 
@@ -33,32 +33,33 @@ group_xml recursive_catch_groups(XMLElement* group) {
     if(transform_element){
         // Start with the first child element and iterate through all siblings
         XMLElement* current_transform = transform_element->FirstChildElement();
-        int orderIndex = 0;
+        int order_index = 0;
         
         while(current_transform) {
             const char* transform_type = current_transform->Name();
-            
             if(strcmp(transform_type, "rotation") == 0) {
                 // Process rotation
                 new_group.transformations.rotation.angle = get_float_attribute(current_transform, "angle", 0);
                 new_group.transformations.rotation.x = get_float_attribute(current_transform, "x", 0);
                 new_group.transformations.rotation.y = get_float_attribute(current_transform, "y", 0);
                 new_group.transformations.rotation.z = get_float_attribute(current_transform, "z", 0);
-                new_group.transformations.rotation.order = orderIndex++;
-                
-            } else if(strcmp(transform_type, "translation") == 0) {
+                new_group.transformations.rotation.order = order_index++;
+                new_group.transformations.rotation_exists++;
+            } else if(strcmp(transform_type, "translate") == 0) {
                 // Process translation
                 new_group.transformations.translation.x = get_float_attribute(current_transform, "x", 0);
                 new_group.transformations.translation.y = get_float_attribute(current_transform, "y", 0);
                 new_group.transformations.translation.z = get_float_attribute(current_transform, "z", 0);
-                new_group.transformations.translation.order = orderIndex++;
+                new_group.transformations.translation.order = order_index++;
+                new_group.transformations.translation_exists++;
                 
             } else if(strcmp(transform_type, "scale") == 0) {
                 // Process scale
                 new_group.transformations.scale.x = get_float_attribute(current_transform, "x", 1);
                 new_group.transformations.scale.y = get_float_attribute(current_transform, "y", 1);
                 new_group.transformations.scale.z = get_float_attribute(current_transform, "z", 1);
-                new_group.transformations.scale.order = orderIndex++;
+                new_group.transformations.scale.order = order_index++;
+                new_group.transformations.scale_exists++;
             }
             
             // Move to the next sibling element
