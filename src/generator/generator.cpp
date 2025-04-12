@@ -4,6 +4,7 @@
 #include "box.h"
 #include "sphere.h"
 #include "cone.h"
+#include "cylinder.h"
 #include "model.h"
 #include "../aux/aux.h" // Utilities for parsing and model handling
 
@@ -103,6 +104,18 @@ int main(int argc, char** argv){
                 // Generate cone geometry
                 cone(base, height, slices, stacks, vertices, indexes);
                 cout << "Cone generated with base: " << base << ", height: " << height << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
+            }
+            else if (strcmp(argv[1],"cylinder")==0){
+                // Extract cone parameters from command line
+                float base = atof(argv[2]);        // Base radius
+                float height = atof(argv[3]);      // Cone height
+                int slices = atoi(argv[4]);        // Circular base divisions
+                int stacks = atoi(argv[5]);        // Vertical divisions
+                file_name = argv[6];               // Output file
+
+                // Generate cone geometry
+                cylinder(base, height, slices, stacks, vertices, indexes);
+                cout << "Cylinder generated with base: " << base << ", height: " << height << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
             }
             else {
                 // Display error for invalid command with 7 args

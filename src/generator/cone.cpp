@@ -38,7 +38,7 @@ void cone(float base, float height, int slices, int stacks, vector<float>& verti
     for(int i = 0; i < stacks; i++){
         current_height = height_increment * i;
         current_radius = base - radius_decrement * i;
-current_angle = 0;
+        current_angle = 0;
 
         for(int j = 0; j < slices; j++){
             current_angle = base_angle_increment * j;

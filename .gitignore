@@ -240,3 +240,5 @@ Win32/*
 .vscode
 *.generator 
 *.engine
+
+*.DS_Store

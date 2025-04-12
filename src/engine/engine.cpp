@@ -60,6 +60,7 @@ void changeSize(int w, int h) {
 	// return to the model view matrix mode
 	glMatrixMode(GL_MODELVIEW);
 }
+
 /*
 //Retorna a Model View Matrix
 static inline void mvp_matrix(float* matrix){
@@ -74,6 +75,7 @@ static inline void mvp_matrix(float* matrix){
 	glPopMatrix();
 }
 */
+
 void recursive_draw(const group_xml& group) {
     glPushMatrix();
 
@@ -97,7 +99,6 @@ void recursive_draw(const group_xml& group) {
 		}
 	}
 	
-    
 	for(int i = 0; i < 3;i++){
 		if (transformation_order[i]!= 0){
 			switch(transformation_order[i]) {
@@ -173,16 +174,17 @@ void renderScene(void) {
 	// --- Draw the axes ---
 	glBegin(GL_LINES);
 		glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
-		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(-100.0f, 0.0f, 0.0f);
 		glVertex3f(100.0f, 0.0f, 0.0f);
 
 		glColor3f(0.0f, 1.0f, 0.0f);   // y axis in green
-		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, -100.0f, 0.0f);
 		glVertex3f(0.0f, 100.0f, 0.0f);
 
 		glColor3f(0.0f, 0.0f, 1.0f);   // z axis in blue
-		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, 0.0f, -100.0f);
 		glVertex3f(0.0f, 0.0f, 100.0f);
+
 	glEnd();
 
 	glRotatef(angle_y, 0.0f, 1.0f, 0.0f);
@@ -295,8 +297,6 @@ int populate_dict(group_xml group, unordered_map<std::string,vbo*>& model_dict){
 	return 0;
 }
 
-
-
 int main(int argc, char** argv) {
 
 	std::ifstream fd;
@@ -314,7 +314,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(800, 800);
-	glutCreateWindow("CG@DI-UM");
+	glutCreateWindow("CG@G33");
 
 	// Required callback registry
 	glutDisplayFunc(renderScene);
