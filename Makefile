@@ -19,7 +19,7 @@ SRC_FILES = $(wildcard $(addsuffix /*.cpp, $(SRC_DIR)))
 OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
 
 # Generator files
-GENERATOR_SRC_FILES = src/generator/generator.cpp src/generator/model.cpp src/aux/aux.cpp src/generator/plane.cpp src/generator/box.cpp src/generator/sphere.cpp src/generator/cone.cpp src/generator/cylinder.cpp
+GENERATOR_SRC_FILES = src/generator/generator.cpp src/generator/model.cpp src/aux/aux.cpp src/aux/curves.cpp src/generator/plane.cpp src/generator/box.cpp src/generator/sphere.cpp src/generator/cone.cpp src/generator/cylinder.cpp src/generator/bezier.cpp
 GENERATOR_OBJ_FILES = $(patsubst %.cpp, %.o, $(GENERATOR_SRC_FILES))
 GENERATOR_EXECUTABLE = .generator
 

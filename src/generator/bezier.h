@@ -5,6 +5,8 @@
 #include <iostream>
 #include <fstream>
 
+void bezier(char* patch, int tessellation, std::vector<float>&vertices, std::vector<unsigned int>& indexes);
+
 class point{
     public:
         float x, y, z;

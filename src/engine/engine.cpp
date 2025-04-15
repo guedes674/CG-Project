@@ -314,7 +314,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(800, 800);
-	glutCreateWindow("CG@G33");
+	glutCreateWindow("CG@33");
 
 	// Required callback registry
 	glutDisplayFunc(renderScene);
