@@ -5,6 +5,7 @@
 #include "sphere.h"
 #include "cone.h"
 #include "model.h"
+#include "bezier.h" // Bezier curve generation
 #include "../aux/aux.h" // Utilities for parsing and model handling
 
 /**
@@ -64,6 +65,18 @@ int main(int argc, char** argv){
                 // Generate box geometry
                 box(length, divisions, vertices, indexes);
                 cout << "Box generated with length: " << length << " and divisions: " << divisions << std::endl;
+            }
+            else if (strcmp(argv[1],"patch")==0){
+                // Extract bezier parameters from command line
+                char* patch = argv[2];              // Patch file
+                int tessellation = atoi(argv[3]);   // Tessellation level
+                file_name = argv[4];                // Output file
+                
+                // Generate bezier curve geometry
+                bezier(patch, tessellation, vertices, indexes);
+                cout << "Bezier curve generated with patch: " << patch << " and tessellation: " << tessellation << std::endl;
+                cout << "Total vertices: " << vertices.size()/3 << std::endl;
+                cout << "Total indexes: " << indexes.size() << std::endl;
             }
             else {
                 // Display error for invalid command with 5 args
