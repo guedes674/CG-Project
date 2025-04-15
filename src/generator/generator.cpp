@@ -34,10 +34,12 @@ int main(int argc, char** argv){
             if (strcmp(argv[1],"help") == 0){
                 // Display available commands and their usage
                 cout << "Available commands:\n\n";
-                cout << "EngineExe cone <base_radius> <height> <slices> <stacks>\n";
-                cout << "EngineExe sphere <radius> <slices> <stacks>\n";
-                cout << "EngineExe plane <length> <divisions> \n";
-                cout << "EngineExe box <length> <divisions>\n";
+                cout << "engine cone <base_radius> <height> <slices> <stacks> <output_file>\n";
+                cout << "engine cone <base_radius> <height> <slices> <stacks> <output_file>\n";
+                cout << "engine sphere <radius> <slices> <stacks> <output_file>\n";
+                cout << "engine patch <patch_file> <tesselation> <output_file>\n";
+                cout << "engine plane <length> <divisions> <output_file>\n";
+                cout << "engine box <length> <divisions> <output_file>\n";
             }
             else {
                 // Display error for invalid single argument
@@ -76,8 +78,6 @@ int main(int argc, char** argv){
                 // Generate bezier curve geometry
                 bezier(patch, tessellation, vertices, indexes);
                 cout << "Bezier curve generated with patch: " << patch << " and tessellation: " << tessellation << std::endl;
-                cout << "Total vertices: " << vertices.size()/3 << std::endl;
-                cout << "Total indexes: " << indexes.size() << std::endl;
             }
             else {
                 // Display error for invalid command with 5 args
