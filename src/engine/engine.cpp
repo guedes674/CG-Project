@@ -152,7 +152,7 @@ void time_translation(translation_xml translation) {
 
     glTranslatef(px, py, pz);
 
-    if (translation.time_trans.align) {
+    if (translation.time_trans.align == 0) {
         static float y[4] = { 0.0f, 1.0f, 0.0f };
         float m[16];
         generate_catmull_matrix(current_div, y, m);
@@ -251,7 +251,12 @@ void defaultKeyFunc(unsigned char key, int x, int y) {
     } else if(tolower(key) == 'c') {
         firstPersonMode = !firstPersonMode;
         glutSetCursor(firstPersonMode ? GLUT_CURSOR_NONE : GLUT_CURSOR_INHERIT);
-        if(firstPersonMode) glutWarpPointer(400, 400);
+        if(firstPersonMode){ 
+            glutSetWindowTitle("CG@33 - FPS Mode");
+            glutWarpPointer(400, 400);}
+        else {
+            glutSetWindowTitle("CG@33 - Camera Mode");
+        }
     }
     
     glutPostRedisplay();
@@ -394,7 +399,7 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(800, 800);
-    glutCreateWindow("3D Scene Viewer");
+    glutCreateWindow("CG@33 - Camera Mode");
 
     #ifndef __APPLE__
     // Only initialize GLEW on non-Apple platforms (Linux/Windows)

@@ -71,6 +71,7 @@ group_xml recursive_catch_groups(XMLElement* group) {
                         point_xml = point_xml->NextSiblingElement("point");
                     }
                     time_transformation_xml time_trans(strcmp(align.c_str(),"true"),points);
+                    cout << time_trans.align << endl;
                     new_group.transformations.translation.time_trans = time_trans;
                 }
                 new_group.transformations.translation.order = order_index++;
