@@ -36,13 +36,26 @@ class rotation_xml {
         int order;
 };
 
+class time_transformation_xml {
+    public:
+        int align = 0;
+        vector<point> points;
+        
+        // Add default constructor
+        time_transformation_xml() = default;
+        
+        time_transformation_xml(int align, std::vector<point> points) {
+            this->align = align;
+            this->points = points;
+        }
+};
+
 class translation_xml {
     public:
         float x, y, z;
         int order;
         int time;
-        int align = 0;
-        vector<point> points;
+        time_transformation_xml time_trans;
 };
 
 class scale_xml {

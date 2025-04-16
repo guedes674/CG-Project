@@ -1,3 +1,6 @@
+#ifndef POINT_H
+#define POINT_H
+
 class point{
     public:
         float x, y, z;
@@ -10,3 +13,6 @@ class point{
             z = new_z;
         }
 };
+
+#endif
+

@@ -55,16 +55,19 @@ group_xml recursive_catch_groups(XMLElement* group) {
                     new_group.transformations.translation.z = get_float_attribute(current_transform, "z", 0);
                 }
                 else{
+                    
                     string align = get_string_attribute(current_transform, "align",0);
-                    new_group.transformations.translation.align = (strcmp(align.c_str(),"true"));
                     XMLElement* point_xml = current_transform->FirstChildElement();
+                    vector<point> points;
                     while (point_xml){
                         float x = get_float_attribute(point_xml, "x", 0);
                         float y = get_float_attribute(point_xml, "y", 0);
                         float z = get_float_attribute(point_xml, "z", 0);
-                        new_group.transformations.translation.points.push_back(point(x,y,z));
+                        points.push_back(point(x,y,z));
                         point_xml = current_transform->NextSiblingElement();
                     }
+                    time_transformation_xml time_trans(strcmp(align.c_str(),"true"),points);
+                    new_group.transformations.translation.time_trans = time_trans;
                 }
                 new_group.transformations.translation.order = order_index++;
                 new_group.transformations.translation_exists++;

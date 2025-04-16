@@ -15,6 +15,8 @@
 #include <unordered_map>
 #include "../generator/model.h"
 #include "../aux/aux.h"
+#include "../aux/point.h"
+#include "../aux/curves.h"
 #include "../xml/xml_parser.h"
 using namespace std;
 
@@ -75,6 +77,40 @@ static inline void mvp_matrix(float* matrix){
 	glPopMatrix();
 }
 */
+void time_translation(translation_xml translation) {
+    // Get time in [0, 1]
+    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+    t /= translation.time;
+    t -= floor(t);  // Loop animation
+
+    // Generate interpolated points along the curve
+    int tessellation = 100;
+    int numCurvePoints = tessellation * translation.time_trans.points.size();
+    float* curve_points = new float[numCurvePoints * 3];  // x, y, z
+
+    catmullrom_curve(tessellation, translation.time_trans.points, curve_points);
+
+    // Draw the trajectory (optional)
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < numCurvePoints; ++i) {
+        int idx = i * 3;
+        glVertex3f(curve_points[idx], curve_points[idx + 1], curve_points[idx + 2]);
+    }
+    glEnd();
+
+    // Find current point along the curve
+    int currentIndex = static_cast<int>(t * numCurvePoints);
+    currentIndex = currentIndex % numCurvePoints;
+
+    int offset = currentIndex * 3;
+    float px = curve_points[offset];
+    float py = curve_points[offset + 1];
+    float pz = curve_points[offset + 2];
+
+    glTranslatef(px, py, pz);
+
+    delete[] curve_points;
+}
 
 void recursive_draw(const group_xml& group) {
     glPushMatrix();
@@ -103,9 +139,12 @@ void recursive_draw(const group_xml& group) {
 		if (transformation_order[i]!= 0){
 			switch(transformation_order[i]) {
 				case 1: // Translation
-					glTranslatef(group.transformations.translation.x,
-								group.transformations.translation.y,
-								group.transformations.translation.z);
+					if (group.transformations.translation.time == 0) glTranslatef(group.transformations.translation.x,
+																				group.transformations.translation.y,
+																				group.transformations.translation.z);
+					else {
+						
+					}
 					break;
 				case 2: // Rotation
 					glRotatef(group.transformations.rotation.angle,

@@ -50,11 +50,12 @@ void bezier_curve(int tessellation, float points[4][3], float* result) {
     }
 }
 
-void catmull_rom_curve(int tessellation, float points[4][3], float* result) {
+void catmullrom_curve(int tessellation, std::vector<point> points , float* result) {
+    const int n = points.size();
     const float step = 1.0f / tessellation;
     int offset = 0;
 
-    // Catmull-Rom base matrix
+    // Catmull-Rom basis matrix
     float M[4][4] = {
         {-0.5f,  1.5f, -1.5f,  0.5f},
         { 1.0f, -2.5f,  2.0f, -0.5f},
@@ -62,32 +63,38 @@ void catmull_rom_curve(int tessellation, float points[4][3], float* result) {
         { 0.0f,  1.0f,  0.0f,  0.0f}
     };
 
-    for (float t = 0.0f; t <= 1.0f + 1e-6f; t += step) {
-        float T[4] = {t * t * t, t * t, t, 1.0f};
+    for (int i = 0; i < n; ++i) {
+        // P0, P1, P2, P3 com wrap-around
+        point P0 = points[(i - 1 + n) % n];
+        point P1 = points[i];
+        point P2 = points[(i + 1) % n];
+        point P3 = points[(i + 2) % n];
 
-        for (int axis = 0; axis < 3; ++axis) {
-            float P[4] = {
-                points[0][axis],
-                points[1][axis],
-                points[2][axis],
-                points[3][axis]
-            };
+        for (float t = 0.0f; t <= 1.0f + 1e-6; t += step) {
+            float T[4] = {t * t * t, t * t, t, 1.0f};
 
-            // Multiply M * P
-            float A[4] = {0, 0, 0, 0};
-            for (int i = 0; i < 4; ++i) {
+            for (int axis = 0; axis < 3; ++axis) {
+                float P[4] = {
+                    axis == 0 ? P0.x : (axis == 1 ? P0.y : P0.z),
+                    axis == 0 ? P1.x : (axis == 1 ? P1.y : P1.z),
+                    axis == 0 ? P2.x : (axis == 1 ? P2.y : P2.z),
+                    axis == 0 ? P3.x : (axis == 1 ? P3.y : P3.z)
+                };
+
+                float A[4] = {0, 0, 0, 0};
                 for (int j = 0; j < 4; ++j) {
-                    A[i] += M[i][j] * P[j];
+                    for (int k = 0; k < 4; ++k) {
+                        A[j] += M[j][k] * P[k];
+                    }
                 }
-            }
 
-            // Multiply T * A
-            float value = 0.0f;
-            for (int i = 0; i < 4; ++i) {
-                value += T[i] * A[i];
-            }
+                float pos = 0.0f;
+                for (int j = 0; j < 4; ++j)
+                    pos += T[j] * A[j];
 
-            result[offset++] = value;
+                result[offset++] = pos;
+            }
         }
     }
 }
+
