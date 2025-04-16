@@ -53,27 +53,29 @@ group_xml recursive_catch_groups(XMLElement* group) {
                     new_group.transformations.translation.x = get_float_attribute(current_transform, "x", 0);
                     new_group.transformations.translation.y = get_float_attribute(current_transform, "y", 0);
                     new_group.transformations.translation.z = get_float_attribute(current_transform, "z", 0);
+                    cout << "Translation detected: " << new_group.transformations.translation.x 
+                    << " " << new_group.transformations.translation.y << " " << new_group.transformations.translation.z
+                    << endl;
                 }
                 else{
-                    
-                    string align = get_string_attribute(current_transform, "align",0);
-                    XMLElement* point_xml = current_transform->FirstChildElement();
+                    cout<< "Timed translation\n" << endl;
+                    string align = get_string_attribute(current_transform, "align","false");
+                    cout << "Align: " << align << endl;
+                    XMLElement* point_xml = current_transform->FirstChildElement("point");
                     vector<point> points;
                     while (point_xml){
                         float x = get_float_attribute(point_xml, "x", 0);
                         float y = get_float_attribute(point_xml, "y", 0);
                         float z = get_float_attribute(point_xml, "z", 0);
                         points.push_back(point(x,y,z));
-                        point_xml = current_transform->NextSiblingElement();
+                        point_xml = point_xml->NextSiblingElement("point");
                     }
                     time_transformation_xml time_trans(strcmp(align.c_str(),"true"),points);
                     new_group.transformations.translation.time_trans = time_trans;
                 }
                 new_group.transformations.translation.order = order_index++;
                 new_group.transformations.translation_exists++;
-                cout << "Translation detected: " << new_group.transformations.translation.x 
-                << " " << new_group.transformations.translation.y << " " << new_group.transformations.translation.z
-                << endl;
+                
             } else if(strcmp(transform_type, "scale") == 0) {
                 // Process scale
                 new_group.transformations.scale.x = get_float_attribute(current_transform, "x", 1);

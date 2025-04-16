@@ -2,6 +2,7 @@
 
 float bernstein(int i, int n, float t) {
     // Precomputed binomial coefficients for cubic Bézier (n=3)
+    (void)n;
     static constexpr float coeffs[4] = {1.0f, 3.0f, 3.0f, 1.0f};
     const float mt = 1.0f - t;  // Reuse (1 - t) term
 
@@ -50,7 +51,7 @@ void bezier_curve(int tessellation, float points[4][3], float* result) {
     }
 }
 
-void catmullrom_curve(int tessellation, std::vector<point> points , float* result) {
+void catmullrom_curve(int tessellation, std::vector<point>& points, float* result, float* result_deriv) {
     const int n = points.size();
     const float step = 1.0f / tessellation;
     int offset = 0;
@@ -70,8 +71,9 @@ void catmullrom_curve(int tessellation, std::vector<point> points , float* resul
         point P2 = points[(i + 1) % n];
         point P3 = points[(i + 2) % n];
 
-        for (float t = 0.0f; t <= 1.0f + 1e-6; t += step) {
+        for (float t = 0.0f; t <= 1.0f + 1e-6f; t += step) {
             float T[4] = {t * t * t, t * t, t, 1.0f};
+            float Td[4] = {3 * t * t, 2 * t, 1.0f, 0.0f};
 
             for (int axis = 0; axis < 3; ++axis) {
                 float P[4] = {
@@ -89,12 +91,51 @@ void catmullrom_curve(int tessellation, std::vector<point> points , float* resul
                 }
 
                 float pos = 0.0f;
-                for (int j = 0; j < 4; ++j)
+                float deriv = 0.0f;
+                for (int j = 0; j < 4; ++j) {
                     pos += T[j] * A[j];
+                    deriv += Td[j] * A[j];
+                }
 
-                result[offset++] = pos;
+                result[offset] = pos;
+                result_deriv[offset] = deriv;
+                ++offset;
             }
         }
     }
 }
 
+void build_rot_matrix(float *x, float *y, float *z, float *m) {
+	m[0] = x[0]; m[1] = x[1]; m[2] = x[2]; m[3] = 0;
+	m[4] = y[0]; m[5] = y[1]; m[6] = y[2]; m[7] = 0;
+	m[8] = z[0]; m[9] = z[1]; m[10] = z[2]; m[11] = 0;
+	m[12] = 0; m[13] = 0; m[14] = 0; m[15] = 1;
+}
+
+
+void cross(float *a, float *b, float *res) {
+	res[0] = a[1]*b[2] - a[2]*b[1];
+	res[1] = a[2]*b[0] - a[0]*b[2];
+	res[2] = a[0]*b[1] - a[1]*b[0];
+}
+
+
+void normalize(float *a) {
+	float l = sqrt(a[0]*a[0] + a[1] * a[1] + a[2] * a[2]);
+	a[0] = a[0]/l;
+	a[1] = a[1]/l;
+	a[2] = a[2]/l;
+}
+
+void generate_catmull_matrix(float *div,float *y,float *m){
+
+    float z[4];
+
+    normalize(div);
+    cross(div,y,z);
+    normalize(z);
+    cross(z,div,y);
+    normalize(y);
+
+    build_rot_matrix(div,y,z,m);
+}
