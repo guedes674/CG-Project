@@ -2,8 +2,8 @@
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
-#include <GL/glut.h>
 #include <GL/glew.h>
+#include <GL/glut.h>
 #include <GL/gl.h>
 #endif
 
@@ -152,7 +152,7 @@ void time_translation(translation_xml translation) {
 
     glTranslatef(px, py, pz);
 
-    if (align) {
+    if (translation.time_trans.align) {
         static float y[4] = { 0.0f, 1.0f, 0.0f };
         float m[16];
         generate_catmull_matrix(current_div, y, m);
@@ -391,6 +391,11 @@ int main(int argc, char** argv) {
     parser = read_xml_file(argv[1]);
     initCamera();
 
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+    glutInitWindowSize(800, 800);
+    glutCreateWindow("3D Scene Viewer");
+
     #ifndef __APPLE__
     // Only initialize GLEW on non-Apple platforms (Linux/Windows)
     GLenum err = glewInit();
@@ -399,11 +404,6 @@ int main(int argc, char** argv) {
         return 1;
     }
     #endif
-
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize(800, 800);
-    glutCreateWindow("3D Scene Viewer");
 
     glutDisplayFunc(renderScene);
     glutReshapeFunc(changeSize);
