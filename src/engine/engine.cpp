@@ -3,6 +3,8 @@
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
 #endif
 
 #define _USE_MATH_DEFINES
@@ -388,6 +390,15 @@ int main(int argc, char** argv) {
 
     parser = read_xml_file(argv[1]);
     initCamera();
+
+    #ifndef __APPLE__
+    // Only initialize GLEW on non-Apple platforms (Linux/Windows)
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        cerr << "Error initializing GLEW: " << glewGetErrorString(err) << endl;
+        return 1;
+    }
+    #endif
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);

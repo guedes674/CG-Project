@@ -8,7 +8,7 @@ ifeq ($(UNAME_S), Darwin) # macOS
 	CXXFLAGS += -DGL_SILENCE_DEPRECATION
 	LDFLAGS = -fsanitize=address -framework OpenGL -framework GLUT
 else ifeq ($(UNAME_S), Linux) # Linux
-	LDFLAGS = -fsanitize=address -lGL -lGLU -lglut
+	LDFLAGS = -fsanitize=address -lGL -lGLU -lglut -lGLEW
 else ifeq ($(findstring MINGW,$(UNAME_S)),MINGW) # Windows MinGW
 	LDFLAGS = -fsanitize=address -lopengl32 -lglu32 -lfreeglut
 endif
