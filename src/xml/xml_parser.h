@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "../aux/point.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -39,6 +40,9 @@ class translation_xml {
     public:
         float x, y, z;
         int order;
+        int time;
+        int align = 0;
+        vector<point> points;
 };
 
 class scale_xml {

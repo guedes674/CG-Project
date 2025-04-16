@@ -48,9 +48,24 @@ group_xml recursive_catch_groups(XMLElement* group) {
                 cout << "Rotation detected: " << new_group.transformations.rotation.angle << endl;
             } else if(strcmp(transform_type, "translate") == 0) {
                 // Process translation
-                new_group.transformations.translation.x = get_float_attribute(current_transform, "x", 0);
-                new_group.transformations.translation.y = get_float_attribute(current_transform, "y", 0);
-                new_group.transformations.translation.z = get_float_attribute(current_transform, "z", 0);
+                new_group.transformations.translation.time = get_int_attribute(current_transform, "time",0);
+                if (new_group.transformations.translation.time == 0){
+                    new_group.transformations.translation.x = get_float_attribute(current_transform, "x", 0);
+                    new_group.transformations.translation.y = get_float_attribute(current_transform, "y", 0);
+                    new_group.transformations.translation.z = get_float_attribute(current_transform, "z", 0);
+                }
+                else{
+                    string align = get_string_attribute(current_transform, "align",0);
+                    new_group.transformations.translation.align = (strcmp(align.c_str(),"true"));
+                    XMLElement* point_xml = current_transform->FirstChildElement();
+                    while (point_xml){
+                        float x = get_float_attribute(point_xml, "x", 0);
+                        float y = get_float_attribute(point_xml, "y", 0);
+                        float z = get_float_attribute(point_xml, "z", 0);
+                        new_group.transformations.translation.points.push_back(point(x,y,z));
+                        point_xml = current_transform->NextSiblingElement();
+                    }
+                }
                 new_group.transformations.translation.order = order_index++;
                 new_group.transformations.translation_exists++;
                 cout << "Translation detected: " << new_group.transformations.translation.x 
