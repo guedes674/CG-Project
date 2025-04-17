@@ -216,8 +216,8 @@ struct Camera {
             orbit_radius = fps_position.distance(orbit_look_at);
             Vector3 dir = orbit_look_at - fps_position;
             dir = dir.normalize();
-            orbit_alpha = atan2(dir.x, dir.z);
-            orbit_beta = asin(dir.y);
+            orbit_alpha = atan2(-dir.x, -dir.z);
+            orbit_beta = -asin(dir.y);
         }
     }
 };
@@ -673,10 +673,12 @@ int main(int argc, char** argv) {
 
     glutDisplayFunc(render_scene);
     glutReshapeFunc(change_size);
+
     glutKeyboardFunc(default_key_func);
     glutKeyboardUpFunc(default_key_up_func);
     glutSpecialFunc(special_key_func);
     glutSpecialUpFunc(special_key_up_func);
+    
     glutMotionFunc(process_mouse_motion);
     glutMouseFunc(process_mouse_buttons);
     glutTimerFunc(0, timer_func, 0);
