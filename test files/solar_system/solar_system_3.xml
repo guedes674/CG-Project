@@ -17,6 +17,40 @@
         </xmls>
     </group>
 
+    <!-- MERCURY ORBIT -->
+    <group>
+        <transform>
+            <!-- radius 7, inclination ~7° -->
+            <translate time="30" align="true">
+                <point x="10"   y="0" z="0" />
+                <point x="0"    y="0" z="10" />
+                <point x="-10"  y="0" z="0" />
+                <point x="0"    y="0" z="-10" />
+            </translate>
+            <scale     x="0.2" y="0.2" z="0.2"/>
+        </transform>
+        <xmls>
+            <xml file="test files/solar_system/celestial_bodies/mercury.xml" />
+        </xmls>
+    </group>
+
+    <!-- VENUS ORBIT -->
+    <group>
+        <transform>
+            <!-- radius 7, inclination ~7° -->
+            <translate time="40" align="true">
+                <point x="17.5"   y="0" z="0" />
+                <point x="0"    y="0" z="17.5" />
+                <point x="-17.5"  y="0" z="0" />
+                <point x="0"    y="0" z="-17.5" />
+            </translate>
+            <scale     x="0.2" y="0.2" z="0.2"/>
+        </transform>
+        <xmls>
+            <xml file="test files/solar_system/celestial_bodies/venus.xml" />
+        </xmls>
+    </group>
+
     <!-- EARTH ORBIT -->
     <group>
         <transform>
