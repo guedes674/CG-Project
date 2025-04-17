@@ -15,6 +15,7 @@
 #include <string>
 #include <climits>
 #include <unordered_map>
+#include <algorithm>
 #include "../generator/model.h"
 #include "../aux/aux.h"
 #include "../aux/point.h"
@@ -22,67 +23,295 @@
 #include "../xml/xml_parser.h"
 using namespace std;
 
-// Camera system
-bool firstPersonMode = false;
-float cam_radius;
-float cam_alpha;
-float cam_beta;
-
-// Add these near your other global variables
-bool keys[256] = {false}; // Track regular keys
-bool specialKeys[256] = {false}; // Track special keys
-
-// Vector math struct and functions
-struct vec3 { 
-    float x, y, z; 
-    vec3 operator+(vec3 b) { return {x+b.x, y+b.y, z+b.z}; }
-    vec3 operator-(vec3 b) { return {x-b.x, y-b.y, z-b.z}; }
-    vec3 operator*(float s) { return {x*s, y*s, z*s}; }
-};
-
-vec3 cross_product(vec3 a, vec3 b) {
-    return {
-        a.y*b.z - a.z*b.y,
-        a.z*b.x - a.x*b.z,
-        a.x*b.y - a.y*b.x
-    };
-}
-
-vec3 normalize(vec3 v) {
-    float len = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-    if(len == 0) return {0,0,0};
-    return {v.x/len, v.y/len, v.z/len};
-}
-
-float radians(float degrees) { return degrees * M_PI / 180.0f; }
-float degrees(float radians) { return radians * 180.0f / M_PI; }
-
-// First-person camera
-vec3 fp_pos;
-float fp_yaw = -90.0f;
-float fp_pitch = 0.0f;
-float lastX = 400, lastY = 400;
-bool firstMouse = true;
-float cameraSpeed = 0.1f;
-
-// Add a global variable for the front vector
-vec3 fp_front;
-
-// Rendering
-float scale = 1.0f;
-int total_models = 0;
 xml_parser parser;
 
+/**
+ * @brief Vector3 class for 3D point and vector operations
+ */
+class Vector3 {
+public:
+    float x, y, z;
+
+    /**
+     * @brief Constructor for Vector3
+     * 
+     * @param _x The x coordinate (default 0.0f)
+     * @param _y The y coordinate (default 0.0f)
+     * @param _z The z coordinate (default 0.0f)
+     */
+    Vector3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) : x(_x), y(_y), z(_z) {}
+
+    /**
+     * @brief Vector addition operator
+     * 
+     * @param v The vector to add
+     * @return Vector3 A new vector representing the sum
+     */
+    Vector3 operator+(const Vector3& v) const { 
+        return Vector3(x + v.x, y + v.y, z + v.z); 
+    }
+    
+    /**
+     * @brief Vector subtraction operator
+     * 
+     * @param v The vector to subtract
+     * @return Vector3 A new vector representing the difference
+     */
+    Vector3 operator-(const Vector3& v) const { 
+        return Vector3(x - v.x, y - v.y, z - v.z); 
+    }
+    
+    /**
+     * @brief Scalar multiplication operator
+     * 
+     * @param s The scalar value to multiply by
+     * @return Vector3 A new scaled vector
+     */
+    Vector3 operator*(float s) const { 
+        return Vector3(x * s, y * s, z * s); 
+    }
+    
+    /**
+     * @brief Calculates the length of the vector
+     * 
+     * @return float The vector's magnitude
+     */
+    float length() const { 
+        return sqrt(x * x + y * y + z * z); 
+    }
+    
+    /**
+     * @brief Calculates the distance between this vector and another
+     * 
+     * @param v The other vector
+     * @return float The Euclidean distance between vectors
+     */
+    float distance(const Vector3& v) const {
+        float dx = x - v.x;
+        float dy = y - v.y;
+        float dz = z - v.z;
+        return sqrt(dx * dx + dy * dy + dz * dz);
+    }
+    
+    /**
+     * @brief Normalizes the vector to unit length
+     * 
+     * @return Vector3 A new unit vector in the same direction
+     */
+    Vector3 normalize() const {
+        float len = length();
+        if (len < 0.00001f) return Vector3();
+        return Vector3(x / len, y / len, z / len);
+    }
+    
+    /**
+     * @brief Calculates the cross product with another vector
+     * 
+     * @param v The other vector
+     * @return Vector3 The cross product vector
+     */
+    Vector3 cross(const Vector3& v) const {
+        return Vector3(
+            y * v.z - z * v.y,
+            z * v.x - x * v.z,
+            x * v.y - y * v.x
+        );
+    }
+    
+    /**
+     * @brief Calculates the dot product with another vector
+     * 
+     * @param v The other vector
+     * @return float The dot product value
+     */
+    float dot(const Vector3& v) const {
+        return x * v.x + y * v.y + z * v.z;
+    }
+};
+
+/**
+ * @brief Converts degrees to radians
+ * 
+ * @param degrees The angle in degrees
+ * @return float The angle in radians
+ */
+float radians(float degrees) { return degrees * M_PI / 180.0f; }
+
+/**
+ * @brief Converts radians to degrees
+ * 
+ * @param radians The angle in radians
+ * @return float The angle in degrees
+ */
+float degrees(float radians) { return radians * 180.0f / M_PI; }
+
+/**
+ * @brief Camera system supporting both orbit and first-person modes
+ */
+struct Camera {
+    enum Mode { ORBIT, FPS };
+    Mode mode = ORBIT;
+    
+    // Common parameters
+    float sensitivity = 0.1f;
+    float move_speed = 0.5f;
+    
+    // Orbit mode parameters
+    float orbit_alpha = 0.0f;
+    float orbit_beta = 0.0f;
+    float orbit_radius = 5.0f;
+    Vector3 orbit_look_at;
+    
+    // FPS mode parameters
+    Vector3 fps_position;
+    Vector3 fps_front;
+    Vector3 fps_right;
+    Vector3 fps_up;
+    float fps_yaw = -90.0f;
+    float fps_pitch = 0.0f;
+    
+    /**
+     * @brief Initializes camera parameters from XML configuration
+     */
+    void init_from_xml() {
+        // Orbit mode initialization
+        orbit_look_at = Vector3(parser.cam.lx, parser.cam.ly, parser.cam.lz);
+        Vector3 initial_pos(parser.cam.px, parser.cam.py, parser.cam.pz);
+        orbit_radius = initial_pos.distance(orbit_look_at);
+        
+        Vector3 dir = orbit_look_at - initial_pos;
+        dir = dir.normalize();
+        orbit_alpha = atan2(-dir.x, -dir.z);
+        orbit_beta = -asin(dir.y);
+        
+        // FPS mode initialization
+        fps_position = initial_pos;
+        update_fps_vectors();
+    }
+    
+    /**
+     * @brief Updates the front, right, and up vectors for FPS mode
+     */
+    void update_fps_vectors() {
+        Vector3 front;
+        front.x = cos(radians(fps_yaw)) * cos(radians(fps_pitch));
+        front.y = sin(radians(fps_pitch));
+        front.z = sin(radians(fps_yaw)) * cos(radians(fps_pitch));
+        fps_front = front.normalize();
+        
+        fps_right = fps_front.cross(Vector3(0.0f, 1.0f, 0.0f)).normalize();
+        fps_up = fps_right.cross(fps_front).normalize();
+    }
+    
+    /**
+     * @brief Toggles between orbit and FPS camera modes
+     */
+    void toggle_mode() {
+        if(mode == ORBIT) {
+            // Switch to FPS - maintain current position
+            mode = FPS;
+        } else {
+            // Switch to Orbit - update orbit parameters based on FPS position
+            mode = ORBIT;
+            orbit_radius = fps_position.distance(orbit_look_at);
+            Vector3 dir = orbit_look_at - fps_position;
+            dir = dir.normalize();
+            orbit_alpha = atan2(dir.x, dir.z);
+            orbit_beta = asin(dir.y);
+        }
+    }
+};
+
+Camera camera;
+
+// Track keys
+bool keys[256] = {false}; // Track regular keys
+bool special_keys[256] = {false}; // Track special keys
+
+/**
+ * @brief Mouse handling functionality for camera control
+ */
+int last_mouse_x = 0, last_mouse_y = 0;
+bool mouse_dragging = false;
+
+/**
+ * @brief Processes mouse movement for camera control
+ * 
+ * @param x The current x-coordinate of the mouse pointer
+ * @param y The current y-coordinate of the mouse pointer
+ */
+void process_mouse_motion(int x, int y) {
+    if(camera.mode == Camera::FPS && mouse_dragging) {
+        float xoffset = x - last_mouse_x;
+        float yoffset = last_mouse_y - y;  // Reversed since y-coordinates go from bottom to top
+        
+        xoffset *= camera.sensitivity;
+        yoffset *= camera.sensitivity;
+        
+        camera.fps_yaw += xoffset;
+        camera.fps_pitch += yoffset;
+        
+        // Constrain pitch to avoid screen flip
+        camera.fps_pitch = camera.fps_pitch < -89.0f ? -89.0f : (camera.fps_pitch > 89.0f ? 89.0f : camera.fps_pitch);
+        
+        camera.update_fps_vectors();
+    }
+    last_mouse_x = x;
+    last_mouse_y = y;
+}
+
+/**
+ * @brief Processes mouse button events for camera control
+ * 
+ * @param button The mouse button that was pressed or released
+ * @param state The state of the button (GLUT_DOWN or GLUT_UP)
+ * @param x The x-coordinate where the button was pressed/released
+ * @param y The y-coordinate where the button was pressed/released
+ */
+void process_mouse_buttons(int button, int state, int x, int y) {
+    if(button == GLUT_LEFT_BUTTON) {
+        mouse_dragging = (state == GLUT_DOWN);
+        last_mouse_x = x;
+        last_mouse_y = y;
+    }
+}
+
+/**
+ * @brief Rendering parameters and state
+ */
+float scale = 1.0f;
+int total_models = 0;
+
+int last_frame_time = 0;
+
+/**
+ * @brief Class for storing Vertex Buffer Object (VBO) information
+ */
 class vbo {
 public:
     GLuint vertices, total_vertices, indexes, total_indexes;
+    
+    /**
+     * @brief Constructor for VBO objects
+     * 
+     * @param v The vertex buffer handle
+     * @param tv Total number of vertices
+     * @param i The index buffer handle
+     * @param ti Total number of indices
+     */
     vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti) 
         : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti) {}
 };
 
 unordered_map<string, vbo*> model_dict;
 
-void changeSize(int w, int h) {
+/**
+ * @brief Handles window resize events and updates the projection matrix
+ * 
+ * @param w The new window width
+ * @param h The new window height
+ */
+void change_size(int w, int h) {
     if(h == 0) h = 1;
     float ratio = w * 1.0 / h;
 
@@ -93,31 +322,11 @@ void changeSize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void mouseMotion(int x, int y) {
-    if(firstPersonMode) {
-        if(firstMouse) {
-            lastX = x;
-            lastY = y;
-            firstMouse = false;
-        }
-
-        float xoffset = x - lastX;
-        float yoffset = lastY - y; 
-        lastX = x;
-        lastY = y;
-
-        float sensitivity = 0.1f;
-        fp_yaw += xoffset * sensitivity;
-        fp_pitch += yoffset * sensitivity;
-
-        if(fp_pitch > 89.0f) fp_pitch = 89.0f;
-        if(fp_pitch < -89.0f) fp_pitch = -89.0f;
-
-        glutWarpPointer(400, 400);
-        lastX = lastY = 400;
-    }
-}
-
+/**
+ * @brief Processes time-based translations for object animations
+ * 
+ * @param translation The translation parameters from XML
+ */
 void time_translation(translation_xml translation) {
     double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
     t /= translation.time;
@@ -163,6 +372,11 @@ void time_translation(translation_xml translation) {
     delete[] curve_points;
 }
 
+/**
+ * @brief Recursively draws a group and all its children
+ * 
+ * @param group The group to draw
+ */
 void recursive_draw(const group_xml& group) {
     glPushMatrix();
 
@@ -222,127 +436,79 @@ void recursive_draw(const group_xml& group) {
     glPopMatrix();
 }
 
-void initCamera() {
-    float dx = parser.cam.px - parser.cam.lx;
-    float dy = parser.cam.py - parser.cam.ly;
-    float dz = parser.cam.pz - parser.cam.lz;
-
-    cam_radius = sqrt(dx*dx + dy*dy + dz*dz);
-    cam_alpha = atan2(dx, dz);
-    cam_beta = asin(dy / cam_radius);
-
-    fp_pos = {parser.cam.px, parser.cam.py, parser.cam.pz};
-    fp_yaw = -90.0f + degrees(atan2(dz, dx));
-    fp_pitch = degrees(asin(dy / cam_radius));
+/**
+ * @brief Initializes camera parameters from XML data
+ */
+void init_camera() {
+    camera.init_from_xml();
 }
 
-void defaultKeyFunc(unsigned char key, int x, int y) {
-    keys[tolower(key)] = true;
-    
-    // Keep the 'q' exit and 'c' mode toggle as immediate actions
-    if(tolower(key) == 'q') {
-        // Clean up resources before exiting
-        for(auto& entry : model_dict) {
-            glDeleteBuffers(1, &entry.second->vertices);
-            glDeleteBuffers(1, &entry.second->indexes);
-            delete entry.second;
-        }
-        exit(0);
-    } else if(tolower(key) == 'c') {
-        firstPersonMode = !firstPersonMode;
-        glutSetCursor(firstPersonMode ? GLUT_CURSOR_NONE : GLUT_CURSOR_INHERIT);
-        if(firstPersonMode){ 
-            glutSetWindowTitle("CG@33 - FPS Mode");
-            glutWarpPointer(400, 400);}
-        else {
-            glutSetWindowTitle("CG@33 - Camera Mode");
-        }
+/**
+ * @brief Updates camera position and orientation based on user input
+ */
+void update_camera() {
+    if(camera.mode == Camera::ORBIT) {
+        // Original orbit controls
+        if(keys[(int)'a']) camera.orbit_alpha -= 0.01f;
+        if(keys[(int)'d']) camera.orbit_alpha += 0.01f;
+        if(keys[(int)'w']) camera.orbit_beta = std::min(camera.orbit_beta + 0.01f, float(M_PI/2 - 0.01));
+        if(keys[(int)'s']) camera.orbit_beta = std::max(camera.orbit_beta - 0.01f, float(-M_PI/2 + 0.01));
+        if(special_keys[GLUT_KEY_UP]) camera.orbit_radius = std::max(camera.orbit_radius - 0.25f, 1.0f);
+        if(special_keys[GLUT_KEY_DOWN]) camera.orbit_radius += 0.25f;
+    } else { // FPS mode
+        // FPS movement controls
+        float velocity = camera.move_speed;
+        if(keys[(int)'w']) camera.fps_position = camera.fps_position + camera.fps_front * velocity;
+        if(keys[(int)'s']) camera.fps_position = camera.fps_position - camera.fps_front * velocity;
+        if(keys[(int)'a']) camera.fps_position = camera.fps_position - camera.fps_right * velocity;
+        if(keys[(int)'d']) camera.fps_position = camera.fps_position + camera.fps_right * velocity;
+        if(keys[(int)' ']) camera.fps_position.y += velocity;  // Space to ascend
+        if(keys[(int)'c']) camera.fps_position.y -= velocity;  // C to descend
     }
     
-    glutPostRedisplay();
+    // Common controls
+    if(keys[(int)'i']) scale += 0.025f;
+    if(keys[(int)'o']) scale = std::max(scale - 0.025f, 0.05f);
 }
 
-void defaultKeyUpFunc(unsigned char key, int x, int y) {
-    keys[tolower(key)] = false;
-}
-
-void specialKeyFunc(int key, int x, int y) {
-    specialKeys[key] = true;
-    glutPostRedisplay();
-}
-
-void specialKeyUpFunc(int key, int x, int y) {
-    specialKeys[key] = false;
-}
-
-void updateCamera() {
-    if(firstPersonMode) {
-        // Calculate front and right vectors
-        fp_front = {
-            cos(radians(fp_yaw)) * cos(radians(fp_pitch)),
-            sin(radians(fp_pitch)),
-            sin(radians(fp_yaw)) * cos(radians(fp_pitch))
-        };
-        fp_front = normalize(fp_front);
-        
-        vec3 right = cross_product(fp_front, {0.0f, 1.0f, 0.0f});
-        right = normalize(right);
-        
-        // Apply movement based on which keys are pressed
-        if(keys['w']) fp_pos = fp_pos + fp_front * cameraSpeed;
-        if(keys['s']) fp_pos = fp_pos - fp_front * cameraSpeed;
-        if(keys['a']) fp_pos = fp_pos - right * cameraSpeed;
-        if(keys['d']) fp_pos = fp_pos + right * cameraSpeed;
-    } else {
-        // Third-person camera updates
-        if(keys['a']) cam_alpha -= 0.01f;
-        if(keys['d']) cam_alpha += 0.01f;
-        if(keys['w']) cam_beta = min(cam_beta + 0.01f, float(M_PI/2 - 0.01));
-        if(keys['s']) cam_beta = max(cam_beta - 0.01f, float(-M_PI/2 + 0.01));
-        if(keys['i']) scale += 0.025f;
-        if(keys['o']) scale = max(scale - 0.025f, 0.05f);
-        if(specialKeys[GLUT_KEY_UP]) cam_radius = max(cam_radius - 0.25f, 1.0f);
-        if(specialKeys[GLUT_KEY_DOWN]) cam_radius += 0.25f;
-    }
-}
-
-void renderScene(void) {
+/**
+ * @brief Renders the scene with all models and visual elements
+ */
+void render_scene(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    if(firstPersonMode) {
-
-        // Use the precalculated front vector instead of recalculating
-        gluLookAt(fp_pos.x, fp_pos.y, fp_pos.z,
-                fp_pos.x + fp_front.x,
-				fp_pos.y + fp_front.y,
-                fp_pos.z + fp_front.z,
-                0.0f, 1.0f, 0.0f);
-    } else {
-        float eyeX = parser.cam.lx + cam_radius * cos(cam_beta) * sin(cam_alpha);
-        float eyeY = parser.cam.ly + cam_radius * sin(cam_beta);
-        float eyeZ = parser.cam.lz + cam_radius * cos(cam_beta) * cos(cam_alpha);
-
-        gluLookAt(eyeX, eyeY, eyeZ,
-                parser.cam.lx, parser.cam.ly, parser.cam.lz,
+    // Set up view matrix based on camera mode
+    if(camera.mode == Camera::ORBIT) {
+        // Calculate orbit position
+        float eye_x = camera.orbit_look_at.x + camera.orbit_radius * cos(camera.orbit_beta) * sin(camera.orbit_alpha);
+        float eye_y = camera.orbit_look_at.y + camera.orbit_radius * sin(camera.orbit_beta);
+        float eye_z = camera.orbit_look_at.z + camera.orbit_radius * cos(camera.orbit_beta) * cos(camera.orbit_alpha);
+        
+        gluLookAt(eye_x, eye_y, eye_z,
+                camera.orbit_look_at.x, camera.orbit_look_at.y, camera.orbit_look_at.z,
                 parser.cam.ux, parser.cam.uy, parser.cam.uz);
+    } else { // FPS mode
+        Vector3 look_at = camera.fps_position + camera.fps_front;
+        gluLookAt(camera.fps_position.x, camera.fps_position.y, camera.fps_position.z,
+                look_at.x, look_at.y, look_at.z,
+                camera.fps_up.x, camera.fps_up.y, camera.fps_up.z);
     }
 
-		// --- Draw the axes ---
-	glBegin(GL_LINES);
-		glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
-		glVertex3f(-100.0f, 0.0f, 0.0f);
-		glVertex3f(100.0f, 0.0f, 0.0f);
+    // Draw the axes
+    glBegin(GL_LINES);
+        glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
+        glVertex3f(-100.0f, 0.0f, 0.0f);
+        glVertex3f(100.0f, 0.0f, 0.0f);
 
-		glColor3f(0.0f, 1.0f, 0.0f);   // y axis in green
-		glVertex3f(0.0f, -100.0f, 0.0f);
-		glVertex3f(0.0f, 100.0f, 0.0f);
+        glColor3f(0.0f, 1.0f, 0.0f);   // y axis in green
+        glVertex3f(0.0f, -100.0f, 0.0f);
+        glVertex3f(0.0f, 100.0f, 0.0f);
 
-		glColor3f(0.0f, 0.0f, 1.0f);   // z axis in blue
-		glVertex3f(0.0f, 0.0f, -100.0f);
-		glVertex3f(0.0f, 0.0f, 100.0f);
-
-	glEnd();
+        glColor3f(0.0f, 0.0f, 1.0f);   // z axis in blue
+        glVertex3f(0.0f, 0.0f, -100.0f);
+        glVertex3f(0.0f, 0.0f, 100.0f);
+    glEnd();
 
     glScalef(scale, scale, scale);
     for(const auto& group : parser.groups)
@@ -351,6 +517,85 @@ void renderScene(void) {
     glutSwapBuffers();
 }
 
+/**
+ * @brief Handles keyboard input for regular keys
+ * 
+ * @param key The key that was pressed
+ * @param x The x-coordinate of the mouse when the key was pressed
+ * @param y The y-coordinate of the mouse when the key was pressed
+ */
+void default_key_func(unsigned char key, int x, int y) {
+    (void)x;
+    (void)y;
+    keys[tolower(key)] = true;
+    
+    if(tolower(key) == 'm') {  // Toggle camera mode with M key
+        camera.toggle_mode();
+        glutSetWindowTitle(camera.mode == Camera::ORBIT ? 
+            "CG@33 - Orbit Mode" : "CG@33 - FPS Mode");
+    }
+    
+    // Keep the 'q' exit action
+    if(tolower(key) == 'q') {
+        // Clean up resources before exiting
+        for(auto& entry : model_dict) {
+            glDeleteBuffers(1, &entry.second->vertices);
+            glDeleteBuffers(1, &entry.second->indexes);
+            delete entry.second;
+        }
+        exit(0);
+    }
+    
+    glutPostRedisplay();
+}
+
+/**
+ * @brief Handles keyboard release for regular keys
+ * 
+ * @param key The key that was released
+ * @param x The x-coordinate of the mouse when the key was released
+ * @param y The y-coordinate of the mouse when the key was released
+ */
+void default_key_up_func(unsigned char key, int x, int y) {
+    (void)x;
+    (void)y;
+    keys[tolower(key)] = false;
+}
+
+/**
+ * @brief Handles keyboard input for special keys (arrows, etc.)
+ * 
+ * @param key The special key that was pressed
+ * @param x The x-coordinate of the mouse when the key was pressed
+ * @param y The y-coordinate of the mouse when the key was pressed
+ */
+void special_key_func(int key, int x, int y) {
+    (void)x;
+    (void)y;
+    special_keys[key] = true;
+    glutPostRedisplay();
+}
+
+/**
+ * @brief Handles keyboard release for special keys
+ * 
+ * @param key The special key that was released
+ * @param x The x-coordinate of the mouse when the key was released
+ * @param y The y-coordinate of the mouse when the key was released
+ */
+void special_key_up_func(int key, int x, int y) {
+    (void)x;
+    (void)y;
+    special_keys[key] = false;
+}
+
+/**
+ * @brief Loads models into VBOs and populates the model dictionary
+ * 
+ * @param group The group containing models to load
+ * @param dict The dictionary to store model VBOs
+ * @return int 0 on success, 1 on failure
+ */
 int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
     for(const auto& model : group.models) {
         if(dict.find(model.file_name) == dict.end()) {
@@ -381,12 +626,28 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
     return 0;
 }
 
-void timerFunc(int value) {
-    updateCamera();  // Process movement based on key states
+/**
+ * @brief Timer callback for continuous rendering and input processing
+ * 
+ * @param value Value passed to this function (unused)
+ */
+void timer_func(int value) {
+    (void)value;
+    int current_time = glutGet(GLUT_ELAPSED_TIME);
+    last_frame_time = current_time;
+
+    update_camera();
     glutPostRedisplay();
-    glutTimerFunc(8, timerFunc, 0);  // 8ms for ~120 FPS (smoother)
+    glutTimerFunc(16, timer_func, 0); // Use fixed 60fps timing (16ms)
 }
 
+/**
+ * @brief Main application entry point
+ * 
+ * @param argc Number of command-line arguments
+ * @param argv Array of command-line argument strings
+ * @return int 0 on successful execution, non-zero on error
+ */
 int main(int argc, char** argv) {
     if(argc != 2) {
         cerr << "Usage: " << argv[0] << " <scene.xml>\n";
@@ -394,12 +655,12 @@ int main(int argc, char** argv) {
     }
 
     parser = read_xml_file(argv[1]);
-    initCamera();
+    init_camera();
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(800, 800);
-    glutCreateWindow("CG@33 - Camera Mode");
+    glutCreateWindow("CG@33 - Orbit Mode");
 
     #ifndef __APPLE__
     // Only initialize GLEW on non-Apple platforms (Linux/Windows)
@@ -410,14 +671,15 @@ int main(int argc, char** argv) {
     }
     #endif
 
-    glutDisplayFunc(renderScene);
-    glutReshapeFunc(changeSize);
-    glutKeyboardFunc(defaultKeyFunc);
-    glutKeyboardUpFunc(defaultKeyUpFunc);
-    glutSpecialFunc(specialKeyFunc);
-    glutSpecialUpFunc(specialKeyUpFunc);
-    glutPassiveMotionFunc(mouseMotion);
-    glutTimerFunc(0, timerFunc, 0);
+    glutDisplayFunc(render_scene);
+    glutReshapeFunc(change_size);
+    glutKeyboardFunc(default_key_func);
+    glutKeyboardUpFunc(default_key_up_func);
+    glutSpecialFunc(special_key_func);
+    glutSpecialUpFunc(special_key_up_func);
+    glutMotionFunc(process_mouse_motion);
+    glutMouseFunc(process_mouse_buttons);
+    glutTimerFunc(0, timer_func, 0);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
