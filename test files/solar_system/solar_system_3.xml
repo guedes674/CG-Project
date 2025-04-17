@@ -1,0 +1,69 @@
+<world>
+    <window width="800" height="600" />
+    <camera>
+        <position x="0" y="30" z="50" />
+        <lookAt   x="0" y="0"  z="0"  />
+        <up       x="0" y="1"  z="0"  />
+        <projection fov="60" near="1" far="1000" />
+    </camera>
+
+    <!-- SUN -->
+    <group>
+        <transform>
+            <scale x="2" y="2" z="2" />
+        </transform>
+        <xmls>
+            <xml file="test files/solar_system/celestial_bodies/sun.xml" />
+        </xmls>
+    </group>
+
+    <!-- EARTH ORBIT -->
+    <group>
+        <transform>
+            <translate time="60" align="true">
+                <point x="25"   y="0" z="0" />
+                <point x="0"    y="0" z="25" />
+                <point x="-25"  y="0" z="0" />
+                <point x="0"    y="0" z="-25" />
+            </translate>
+            <rotate  angle="23.5" x="0" y="0" z="1" />
+            <scale   x="0.8"  y="0.8" z="0.8" />
+        </transform>
+        <xmls>
+            <xml file="test files/solar_system/celestial_bodies/earth.xml" />
+        </xmls>
+
+    </group>
+
+    <!-- MARS ORBIT -->
+    <group>
+        <transform>
+            <translate time="80" align="true">
+                <point x="40"   y="0" z="0" />
+                <point x="0"    y="0" z="40" />
+                <point x="-40"  y="0" z="0" />
+                <point x="0"    y="0" z="-40" />
+            </translate>
+            <scale x="0.6" y="0.6" z="0.6" />
+        </transform>
+        <xmls>
+            <xml file="test files/solar_system/celestial_bodies/mars.xml" />
+        </xmls>
+    </group>
+    <!--COMMET ORBIT-->
+    <group>
+        <transform>
+            <translate time="80" align="true">
+                <point x="50"   y="10" z="0" />
+                <point x="0"    y="0" z="30" />
+                <point x="-50"  y="-10" z="0" />
+                <point x="0"    y="0" z="-20" />
+            </translate>
+            <scale x="0.1" y="0.1" z="0.1" />
+        </transform>
+        <models>
+                <!-- generator sphere 1 10 10 sphere.3d -->
+            <model file="bezier_10.3d" />
+        </models>
+    </group>
+</world>

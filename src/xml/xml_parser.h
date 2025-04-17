@@ -31,6 +31,7 @@ class model_xml {
 
 class rotation_xml {
     public:
+        int time;
         float angle;
         float x, y, z;
         int order;

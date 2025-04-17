@@ -247,7 +247,7 @@ void time_translation(translation_xml translation) {
     t /= translation.time;
     t -= floor(t);  // Loop animation
 
-    int tessellation = 100;
+    int tessellation = 1000;
     int num_curve_points = (tessellation + 1) * translation.time_trans.points.size();
     float* curve_points = new float[num_curve_points * 3];
     float* div = new float[num_curve_points * 3];
@@ -287,6 +287,15 @@ void time_translation(translation_xml translation) {
     delete[] curve_points;
 }
 
+void time_rotation(rotation_xml rotation) {
+    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+    t /= rotation.time;
+    t -= floor(t);  // Loop animation
+
+    float angle = rotation.angle * t;
+    glRotatef(angle, rotation.x, rotation.y, rotation.z);
+}
+
 /**
  * @brief Recursively draws a group and all its children
  * 
@@ -308,10 +317,13 @@ void recursive_draw(const group_xml& group) {
     for(int i = 0; i < 3; i++) {
         switch(order[i]) {
             case 1: // Rotation
-                glRotatef(group.transformations.rotation.angle,
-                        group.transformations.rotation.x,
-                        group.transformations.rotation.y,
-                        group.transformations.rotation.z);
+                if(group.transformations.rotation.time == 0)
+                    glRotatef(group.transformations.rotation.angle,
+                            group.transformations.rotation.x,
+                            group.transformations.rotation.y,
+                            group.transformations.rotation.z);
+                else
+                    time_rotation(group.transformations.rotation);
                 break;
             case 2: // Translation
                 if(group.transformations.translation.time == 0)

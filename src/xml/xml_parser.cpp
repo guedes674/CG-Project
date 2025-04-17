@@ -67,13 +67,17 @@ group_xml recursive_catch_groups(XMLElement* group) {
             const char* transform_type = current_transform->Name();
             if(strcmp(transform_type, "rotate") == 0) {
                 // Process rotation
-                new_group.transformations.rotation.angle = get_float_attribute(current_transform, "angle", 0);
+                new_group.transformations.rotation.time = get_int_attribute(current_transform, "time",0);
+                // always read angle (default to 360° per cycle if unspecified)
+                new_group.transformations.rotation.angle = get_float_attribute(current_transform, "angle", 360.0f);
                 new_group.transformations.rotation.x = get_float_attribute(current_transform, "x", 0);
                 new_group.transformations.rotation.y = get_float_attribute(current_transform, "y", 0);
                 new_group.transformations.rotation.z = get_float_attribute(current_transform, "z", 0);
                 new_group.transformations.rotation.order = order_index++;
                 new_group.transformations.rotation_exists++;
-                cout << "Rotation detected: " << new_group.transformations.rotation.angle << endl;
+                cout << "Rotation detected: time=" 
+                     << new_group.transformations.rotation.time 
+                     << " angle=" << new_group.transformations.rotation.angle << endl;
             } else if(strcmp(transform_type, "translate") == 0) {
                 // Process translation
                 new_group.transformations.translation.time = get_int_attribute(current_transform, "time",0);
