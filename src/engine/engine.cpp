@@ -25,109 +25,26 @@ using namespace std;
 
 xml_parser parser;
 
+int window_width = 800;
+int window_height = 800;
+
 /**
- * @brief Vector3 class for 3D point and vector operations
+ * @brief Mouse handling functionality for camera control
  */
-class Vector3 {
-public:
-    float x, y, z;
+int last_mouse_x = 0, last_mouse_y = 0;
+bool mouse_dragging = false;
 
-    /**
-     * @brief Constructor for Vector3
-     * 
-     * @param _x The x coordinate (default 0.0f)
-     * @param _y The y coordinate (default 0.0f)
-     * @param _z The z coordinate (default 0.0f)
-     */
-    Vector3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) : x(_x), y(_y), z(_z) {}
+// Track keys
+bool keys[256] = {false}; // Track regular keys
+bool special_keys[256] = {false}; // Track special keys
 
-    /**
-     * @brief Vector addition operator
-     * 
-     * @param v The vector to add
-     * @return Vector3 A new vector representing the sum
-     */
-    Vector3 operator+(const Vector3& v) const { 
-        return Vector3(x + v.x, y + v.y, z + v.z); 
-    }
-    
-    /**
-     * @brief Vector subtraction operator
-     * 
-     * @param v The vector to subtract
-     * @return Vector3 A new vector representing the difference
-     */
-    Vector3 operator-(const Vector3& v) const { 
-        return Vector3(x - v.x, y - v.y, z - v.z); 
-    }
-    
-    /**
-     * @brief Scalar multiplication operator
-     * 
-     * @param s The scalar value to multiply by
-     * @return Vector3 A new scaled vector
-     */
-    Vector3 operator*(float s) const { 
-        return Vector3(x * s, y * s, z * s); 
-    }
-    
-    /**
-     * @brief Calculates the length of the vector
-     * 
-     * @return float The vector's magnitude
-     */
-    float length() const { 
-        return sqrt(x * x + y * y + z * z); 
-    }
-    
-    /**
-     * @brief Calculates the distance between this vector and another
-     * 
-     * @param v The other vector
-     * @return float The Euclidean distance between vectors
-     */
-    float distance(const Vector3& v) const {
-        float dx = x - v.x;
-        float dy = y - v.y;
-        float dz = z - v.z;
-        return sqrt(dx * dx + dy * dy + dz * dz);
-    }
-    
-    /**
-     * @brief Normalizes the vector to unit length
-     * 
-     * @return Vector3 A new unit vector in the same direction
-     */
-    Vector3 normalize() const {
-        float len = length();
-        if (len < 0.00001f) return Vector3();
-        return Vector3(x / len, y / len, z / len);
-    }
-    
-    /**
-     * @brief Calculates the cross product with another vector
-     * 
-     * @param v The other vector
-     * @return Vector3 The cross product vector
-     */
-    Vector3 cross(const Vector3& v) const {
-        return Vector3(
-            y * v.z - z * v.y,
-            z * v.x - x * v.z,
-            x * v.y - y * v.x
-        );
-    }
-    
-    /**
-     * @brief Calculates the dot product with another vector
-     * 
-     * @param v The other vector
-     * @return float The dot product value
-     */
-    float dot(const Vector3& v) const {
-        return x * v.x + y * v.y + z * v.z;
-    }
-};
+/**
+ * @brief Rendering parameters and state
+ */
+float scale = 1.0f;
+int total_models = 0;
+
+int last_frame_time = 0;
 
 /**
  * @brief Converts degrees to radians
@@ -154,7 +71,7 @@ struct Camera {
     
     // Common parameters
     float sensitivity = 0.1f;
-    float move_speed = 0.5f;
+    float move_speed = 0.25f;
     
     // Orbit mode parameters
     float orbit_alpha = 0.0f;
@@ -202,6 +119,17 @@ struct Camera {
         fps_right = fps_front.cross(Vector3(0.0f, 1.0f, 0.0f)).normalize();
         fps_up = fps_right.cross(fps_front).normalize();
     }
+
+    void update_cursor_mode() {
+        if (mode == Camera::FPS) {
+            glutSetCursor(GLUT_CURSOR_NONE);  // Hide
+            glutWarpPointer(window_width / 2, window_height / 2);  // Center
+            last_mouse_x = window_width / 2;
+            last_mouse_y = window_height / 2;
+        } else {
+            glutSetCursor(GLUT_CURSOR_LEFT_ARROW);  // Show
+        }
+    }    
     
     /**
      * @brief Toggles between orbit and FPS camera modes
@@ -219,20 +147,12 @@ struct Camera {
             orbit_alpha = atan2(-dir.x, -dir.z);
             orbit_beta = -asin(dir.y);
         }
+        update_cursor_mode();
     }
 };
 
 Camera camera;
 
-// Track keys
-bool keys[256] = {false}; // Track regular keys
-bool special_keys[256] = {false}; // Track special keys
-
-/**
- * @brief Mouse handling functionality for camera control
- */
-int last_mouse_x = 0, last_mouse_y = 0;
-bool mouse_dragging = false;
 
 /**
  * @brief Processes mouse movement for camera control
@@ -241,7 +161,8 @@ bool mouse_dragging = false;
  * @param y The current y-coordinate of the mouse pointer
  */
 void process_mouse_motion(int x, int y) {
-    if(camera.mode == Camera::FPS && mouse_dragging) {
+    //if(camera.mode == Camera::FPS && mouse_dragging) {
+    if(camera.mode == Camera::FPS) {
         float xoffset = x - last_mouse_x;
         float yoffset = last_mouse_y - y;  // Reversed since y-coordinates go from bottom to top
         
@@ -255,6 +176,7 @@ void process_mouse_motion(int x, int y) {
         camera.fps_pitch = camera.fps_pitch < -89.0f ? -89.0f : (camera.fps_pitch > 89.0f ? 89.0f : camera.fps_pitch);
         
         camera.update_fps_vectors();
+
     }
     last_mouse_x = x;
     last_mouse_y = y;
@@ -275,14 +197,6 @@ void process_mouse_buttons(int button, int state, int x, int y) {
         last_mouse_y = y;
     }
 }
-
-/**
- * @brief Rendering parameters and state
- */
-float scale = 1.0f;
-int total_models = 0;
-
-int last_frame_time = 0;
 
 /**
  * @brief Class for storing Vertex Buffer Object (VBO) information
@@ -314,7 +228,8 @@ unordered_map<string, vbo*> model_dict;
 void change_size(int w, int h) {
     if(h == 0) h = 1;
     float ratio = w * 1.0 / h;
-
+    window_width = w;
+    window_height = h;
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glViewport(0, 0, w, h);
@@ -679,6 +594,7 @@ int main(int argc, char** argv) {
     glutSpecialFunc(special_key_func);
     glutSpecialUpFunc(special_key_up_func);
     
+    glutPassiveMotionFunc(process_mouse_motion);
     glutMotionFunc(process_mouse_motion);
     glutMouseFunc(process_mouse_buttons);
     glutTimerFunc(0, timer_func, 0);
@@ -687,9 +603,11 @@ int main(int argc, char** argv) {
     glEnable(GL_CULL_FACE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    if(populate_dict(parser.groups[0], model_dict)) {
-        cerr << "Failed to load models\n";
-        return 1;
+    for (const auto& g : parser.groups) {
+        if (populate_dict(g, model_dict)) {
+            cerr << "Failed to load models\n";
+            return 1;
+        }
     }
 
     glutMainLoop();

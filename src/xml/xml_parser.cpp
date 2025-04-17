@@ -15,6 +15,34 @@ string get_string_attribute(XMLElement* element, const char* attribute_name, str
     return value ? string(value) : defaultValue;
 }
 
+group_xml recursive_xml_catch(string file_name){
+    group_xml output_group;
+    cout << "Reading file :" << file_name << endl;
+    XMLDocument doc;
+    XMLError eResult = doc.LoadFile(file_name.c_str());
+
+    if (eResult != XML_SUCCESS) {
+        cout << "Erro ao carregar arquivo XML recursivo: " << doc.ErrorStr() << endl;
+        return output_group; // Return empty group instead of void
+    }
+
+    XMLNode* world = doc.FirstChildElement("world");
+    if (!world) {
+        cout << "Erro ao carregar o nó raiz 'world' do XML!" << endl;
+        return output_group; // Return empty group
+    }
+
+    // Load Models from groups
+    XMLElement* group = world->FirstChildElement("group");
+    while (group) {
+        group_xml new_group = recursive_catch_groups(group);
+        output_group.groups.push_back(new_group);
+        group = group->NextSiblingElement("group");
+    }
+
+    return output_group;
+}
+
 group_xml recursive_catch_groups(XMLElement* group) {
     group_xml new_group;
     XMLElement* models_element = group->FirstChildElement("models");
@@ -91,6 +119,21 @@ group_xml recursive_catch_groups(XMLElement* group) {
             current_transform = current_transform->NextSiblingElement();
         }
     }
+
+    XMLElement* xmls_element = group->FirstChildElement("xmls");
+    if(xmls_element){
+        cout << "XMLs detected!" << endl;
+        XMLElement* xml_element = xmls_element->FirstChildElement("xml");
+        while (xml_element) {
+            group_xml xml;
+            string xml_file = get_string_attribute(xml_element, "file", "");
+            xml = recursive_xml_catch(xml_file);
+            cout << "File detected: " << xml_file << endl;
+            new_group.groups.push_back(xml);
+            xml_element = xml_element->NextSiblingElement("xml");
+        }
+    }
+
     XMLElement* group_element = group->FirstChildElement("group");
     while (group_element) {
         group_xml subGroup = recursive_catch_groups(group_element);

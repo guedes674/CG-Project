@@ -91,6 +91,7 @@ class xml_parser {
 float get_float_attribute(XMLElement* element, const char* attribute_name, float default_value);
 int get_int_attribute(XMLElement* element, const char* attribute_name, int default_value);
 string get_string_attribute(XMLElement* element, const char* attribute_name, string default_value); // Return string instead of char*
+group_xml recursive_catch_groups(XMLElement* group);
 xml_parser read_xml_file(string file_name);
 
 #endif // XML_PARSER_H
