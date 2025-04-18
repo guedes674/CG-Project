@@ -153,7 +153,6 @@ struct Camera {
 
 Camera camera;
 
-
 /**
  * @brief Processes mouse movement for camera control
  * 

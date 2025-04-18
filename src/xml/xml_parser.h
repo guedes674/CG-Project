@@ -79,6 +79,7 @@ class group_xml {
         std::vector<model_xml> models; // Removed reference
         transformations_xml transformations; // Removed reference
         std::vector<group_xml> groups; // Removed reference
+        string xml = "";
 };
 
 class xml_parser {

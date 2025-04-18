@@ -5,6 +5,7 @@
 #include "sphere.h"
 #include "cone.h"
 #include "cylinder.h"
+#include "torus.h"
 #include "model.h"
 #include "bezier.h" // Bezier curve generation
 #include "../aux/aux.h" // Utilities for parsing and model handling
@@ -129,6 +130,17 @@ int main(int argc, char** argv){
                 // Generate cone geometry
                 cylinder(base, height, slices, stacks, vertices, indexes);
                 cout << "Cylinder generated with base: " << base << ", height: " << height << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
+            }
+            else if(strcmp(argv[1], "torus") == 0 && atoi(argv[5]) >= 1 && atoi(argv[4]) >= 1){//TORUS GENERATOR
+                // Extract torus parameters from command line
+                float inner_radius = atof(argv[2]); // Inner radius
+                float outer_radius = atof(argv[3]); // Outer radius
+                int slices = atoi(argv[4]);         // Circular base divisions
+                int stacks = atoi(argv[5]);         // Vertical divisions
+                file_name = argv[6];
+                // Generate torus geometry
+                torus(inner_radius, outer_radius, slices, stacks, vertices, indexes);
+                cout << "Torus created\n";
             }
             else {
                 // Display error for invalid command with 7 args

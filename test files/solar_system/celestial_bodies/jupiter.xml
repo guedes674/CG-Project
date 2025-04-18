@@ -1,0 +1,84 @@
+<world>
+    <window width="800" height="600" />
+    <camera>
+        <position x="0" y="6" z="10" />
+        <lookAt   x="0" y="0"  z="0"  />
+        <up       x="0" y="1"  z="0"  />
+        <projection fov="60" near="1" far="1000" />
+    </camera>
+    <group>        
+        <transform>
+            <rotate time="10" x="0" y="1" z="0" />
+        </transform>
+        <models>
+            <!-- generator sphere 1 10 10 sphere.3d -->
+            <model file="sphere.3d" />
+        </models>
+
+        <!-- IO -->
+        <group>
+            <transform>
+                <translate time="20" align="true">
+                    <point x="3"     y="0" z="0" />
+                    <point x="0"     y="0" z="3" />
+                    <point x="-3"    y="0" z="0" />
+                    <point x="0"     y="0" z="-3" />
+                </translate>
+                <scale     x="0.2" y="0.2" z="0.2"/>
+            </transform>
+            <models>
+                <!-- generator sphere 1 10 10 sphere.3d -->
+                <model file="sphere.3d" />
+            </models>
+        </group>
+        <!-- EUROPA -->
+        <group>
+            <transform>
+                <translate time="15" align="true">
+                    <point x="6"     y="0" z="0" />
+                    <point x="0"     y="0" z="6" />
+                    <point x="-6"    y="0" z="0" />
+                    <point x="0"     y="0" z="-6" />
+                </translate>
+                <scale     x="0.18" y="0.18" z="0.18"/>
+            </transform>
+            <models>
+                <!-- generator sphere 1 10 10 sphere.3d -->
+                <model file="sphere.3d" />
+            </models>
+        </group>
+        <!-- GANYMEDE -->
+        <group>
+            <transform>
+                <translate time="10" align="true">
+                    <point x="9"     y="0" z="0" />
+                    <point x="0"     y="0" z="9" />
+                    <point x="-9"    y="0" z="0" />
+                    <point x="0"     y="0" z="-9" />
+                </translate>
+                <scale     x="0.22" y="0.22" z="0.22"/>
+            </transform>
+            <models>
+                <!-- generator sphere 1 10 10 sphere.3d -->
+                <model file="sphere.3d" />
+            </models>
+        </group>
+        <!-- CALLISTO -->
+        <group>
+            <transform>
+                <translate time="5" align="true">
+                    <point x="12"     y="0" z="0" />
+                    <point x="0"     y="0" z="12" />
+                    <point x="-12"    y="0" z="0" />
+                    <point x="0"     y="0" z="-12" />
+                </translate>
+                <scale     x="0.19" y="0.19" z="0.19"/>
+            </transform>
+            <models>
+                <!-- generator sphere 1 10 10 sphere.3d -->
+                <model file="sphere.3d" />
+            </models>
+        </group>
+    </group>
+
+</world>
