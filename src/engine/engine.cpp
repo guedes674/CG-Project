@@ -295,6 +295,8 @@ void time_rotation(rotation_xml rotation) {
     glRotatef(angle, rotation.x, rotation.y, rotation.z);
 }
 
+int nmodels = 0;
+
 /**
  * @brief Recursively draws a group and all its children
  * 
@@ -344,6 +346,7 @@ void recursive_draw(const group_xml& group) {
     glColor3f(1.0f, 1.0f, 1.0f);
 
     for(const auto& model : group.models) {
+        nmodels++;
         vbo* current_vbo = model_dict[model.file_name];
         total_models++;
 
@@ -397,10 +400,44 @@ void update_camera() {
     if(keys[(int)'o']) scale = std::max(scale - 0.025f, 0.05f);
 }
 
+float emissive_def[4] = {0.0f,0.0f,0.0f,1.0f};
+float emissive_full[4] = {1.0f,1.0f,1.0f,1.0f};
+int timebase = 0, frame = 0;
+
+void render_text(const std::string text,double posx, double posy) {
+    // Guardar a projeção anterior
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    
+    // Projecção ortogonal…
+    gluOrtho2D(0, window_width, window_height, 0);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    void* font = GLUT_BITMAP_HELVETICA_18;
+    // float textw = glutBitmapLength(font, (unsigned char*) text.c_str());
+    // (removed unused variable)
+    glDisable(GL_DEPTH_TEST);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glMaterialfv(GL_FRONT, GL_EMISSION, emissive_full);
+    glRasterPos2d(posx, posy);
+    for (char c : text) glutBitmapCharacter(font, c);
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glEnable(GL_DEPTH_TEST);
+    glMaterialfv(GL_FRONT, GL_EMISSION, emissive_def);
+}
+
 /**
  * @brief Renders the scene with all models and visual elements
  */
 void render_scene(void) {
+    int time;
+	float fps;
+    static char s[64];
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -440,6 +477,47 @@ void render_scene(void) {
     for(const auto& group : parser.groups)
         recursive_draw(group);
 
+    frame++;
+	time = glutGet(GLUT_ELAPSED_TIME); 
+	if (time - timebase > 1000) { 
+		fps = frame*1000.0/(time-timebase); 
+		timebase = time; 
+		frame = 0; 
+		
+		snprintf(s, sizeof(s), "FPS: %.3f", fps);
+	}
+	render_text(s,window_width/40, window_height/35);
+	static char s2[120];
+
+    if (camera.mode == Camera::FPS) {
+        snprintf(s2, sizeof(s2), "FPS Yaw: %.3f", camera.fps_yaw);
+        render_text(s2, window_width/40, window_height/35 + 20);
+        snprintf(s2, sizeof(s2),
+            "Look x: %.3f y: %.3f z: %.3f",
+            camera.fps_front.x, camera.fps_front.y, camera.fps_front.z);
+        render_text(s2, window_width/40, window_height/35 + 40);
+        snprintf(s2, sizeof(s2),
+            "Pos x: %.3f y: %.3f z: %.3f",
+            camera.fps_position.x, camera.fps_position.y, camera.fps_position.z);
+        render_text(s2, window_width/40, window_height/35 + 60);
+    } else {
+        snprintf(s2, sizeof(s2), "Orbit α: %.3f", camera.orbit_alpha);
+        render_text(s2, window_width/40, window_height/35 + 20);
+        snprintf(s2, sizeof(s2),
+            "Look x: %.3f y: %.3f z: %.3f",
+            camera.orbit_look_at.x, camera.orbit_look_at.y, camera.orbit_look_at.z);
+        render_text(s2, window_width/40, window_height/35 + 40);
+        snprintf(s2, sizeof(s2),
+            "Pos x: %.3f y: %.3f z: %.3f",
+            camera.orbit_radius * cos(camera.orbit_beta) * sin(camera.orbit_alpha),
+            camera.orbit_radius * sin(camera.orbit_beta),
+            camera.orbit_radius * cos(camera.orbit_beta) * cos(camera.orbit_alpha));
+        render_text(s2, window_width/40, window_height/35 + 60);
+    }
+
+    snprintf(s2, sizeof(s2), "Numero de modelos: %d", nmodels);
+    render_text(s2, window_width/40, window_height/35 + 80);
+    nmodels = 0;
     glutSwapBuffers();
 }
 
@@ -598,6 +676,7 @@ int main(int argc, char** argv) {
     #endif
 
     glutDisplayFunc(render_scene);
+    glutIdleFunc(render_scene);
     glutReshapeFunc(change_size);
 
     glutKeyboardFunc(default_key_func);

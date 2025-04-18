@@ -153,6 +153,7 @@
                 <point x="-50"  y="-10" z="0" />
                 <point x="0"    y="0" z="-20" />
             </translate>
+            <rotate angle="-90" x = "1" y="0" z = "0" />
             <scale x="0.1" y="0.1" z="0.1" />
         </transform>
         <models>
