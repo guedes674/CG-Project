@@ -1,6 +1,8 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <cmath>
+
 class point{
     public:
         float x, y, z;
