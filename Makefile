@@ -14,7 +14,7 @@ else ifeq ($(findstring MINGW,$(UNAME_S)),MINGW) # Windows MinGW
 endif
 
 # Directory structure
-SRC_DIR = src/classes src/generator src/aux
+SRC_DIR = src/classes src/generator src/aux src/engine src/xml
 SRC_FILES = $(wildcard $(addsuffix /*.cpp, $(SRC_DIR)))
 OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
 
@@ -24,7 +24,7 @@ GENERATOR_OBJ_FILES = $(patsubst %.cpp, %.o, $(GENERATOR_SRC_FILES))
 GENERATOR_EXECUTABLE = .generator
 
 # Engine files (define these if you need them)
-ENGINE_SRC_FILES = src/engine/engine.cpp src/generator/model.cpp src/aux/aux.cpp src/xml/xml_parser.cpp src/xml/tinyxml2.cpp src/aux/curves.cpp
+ENGINE_SRC_FILES = src/engine/engine.cpp src/generator/model.cpp src/aux/aux.cpp src/xml/xml_parser.cpp src/xml/tinyxml2.cpp src/aux/curves.cpp src/engine/camera.cpp src/engine/model_handling.cpp src/engine/input_handling.cpp
 ENGINE_OBJ_FILES = $(patsubst %.cpp, %.o, $(ENGINE_SRC_FILES))
 ENGINE_EXECUTABLE = .engine
 

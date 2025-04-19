@@ -8,6 +8,7 @@
 #endif
 
 #define _USE_MATH_DEFINES
+
 #include <math.h>
 #include <iostream>
 #include <fstream>
@@ -16,7 +17,10 @@
 #include <climits>
 #include <unordered_map>
 #include <algorithm>
-#include "../generator/model.h"
+
+#include "camera.h"
+#include "model_handling.h"
+#include "input_handling.h"
 #include "../aux/aux.h"
 #include "../aux/point.h"
 #include "../aux/curves.h"
@@ -25,198 +29,40 @@ using namespace std;
 
 xml_parser parser;
 
-int window_width = 800;
-int window_height = 800;
+// --- CAMERA VARIABLES ---
+Camera camera;
 
-/**
- * @brief Mouse handling functionality for camera control
- */
-int last_mouse_x = 0, last_mouse_y = 0;
+int window_width  = 800;
+int window_height = 600;
+int last_mouse_x  = 0;
+int last_mouse_y  = 0;
+
+// --- MODEL VARIABLES ---
+int nmodels      = 0;
+int total_models = 0;
+std::unordered_map<std::string, vbo*> model_dict;
+
+// --- INPUT HANDLING VARIABLES ---
 bool mouse_dragging = false;
 
-// Track keys
 bool keys[256] = {false}; // Track regular keys
 bool special_keys[256] = {false}; // Track special keys
 
-/**
- * @brief Rendering parameters and state
- */
 float scale = 1.0f;
-int total_models = 0;
 
 int last_frame_time = 0;
 
-/**
- * @brief Converts degrees to radians
- * 
- * @param degrees The angle in degrees
- * @return float The angle in radians
- */
-float radians(float degrees) { return degrees * M_PI / 180.0f; }
+// --- TEXT VARIABLES ---
+float emissive_def[4] = {0.0f,0.0f,0.0f,1.0f};
+float emissive_full[4] = {1.0f,1.0f,1.0f,1.0f};
+int timebase = 0, frame = 0;
 
 /**
- * @brief Converts radians to degrees
- * 
- * @param radians The angle in radians
- * @return float The angle in degrees
+ * @brief Initializes camera parameters from XML data
  */
-float degrees(float radians) { return radians * 180.0f / M_PI; }
-
-/**
- * @brief Camera system supporting both orbit and first-person modes
- */
-struct Camera {
-    enum Mode { ORBIT, FPS };
-    Mode mode = ORBIT;
-    
-    // Common parameters
-    float sensitivity = 0.1f;
-    float move_speed = 0.25f;
-    
-    // Orbit mode parameters
-    float orbit_alpha = 0.0f;
-    float orbit_beta = 0.0f;
-    float orbit_radius = 5.0f;
-    Vector3 orbit_look_at;
-    
-    // FPS mode parameters
-    Vector3 fps_position;
-    Vector3 fps_front;
-    Vector3 fps_right;
-    Vector3 fps_up;
-    float fps_yaw = -90.0f;
-    float fps_pitch = 0.0f;
-    
-    /**
-     * @brief Initializes camera parameters from XML configuration
-     */
-    void init_from_xml() {
-        // Orbit mode initialization
-        orbit_look_at = Vector3(parser.cam.lx, parser.cam.ly, parser.cam.lz);
-        Vector3 initial_pos(parser.cam.px, parser.cam.py, parser.cam.pz);
-        orbit_radius = initial_pos.distance(orbit_look_at);
-        
-        Vector3 dir = orbit_look_at - initial_pos;
-        dir = dir.normalize();
-        orbit_alpha = atan2(-dir.x, -dir.z);
-        orbit_beta = -asin(dir.y);
-        
-        // FPS mode initialization
-        fps_position = initial_pos;
-        update_fps_vectors();
-    }
-    
-    /**
-     * @brief Updates the front, right, and up vectors for FPS mode
-     */
-    void update_fps_vectors() {
-        Vector3 front;
-        front.x = cos(radians(fps_yaw)) * cos(radians(fps_pitch));
-        front.y = sin(radians(fps_pitch));
-        front.z = sin(radians(fps_yaw)) * cos(radians(fps_pitch));
-        fps_front = front.normalize();
-        
-        fps_right = fps_front.cross(Vector3(0.0f, 1.0f, 0.0f)).normalize();
-        fps_up = fps_right.cross(fps_front).normalize();
-    }
-
-    void update_cursor_mode() {
-        if (mode == Camera::FPS) {
-            glutSetCursor(GLUT_CURSOR_NONE);  // Hide
-            glutWarpPointer(window_width / 2, window_height / 2);  // Center
-            last_mouse_x = window_width / 2;
-            last_mouse_y = window_height / 2;
-        } else {
-            glutSetCursor(GLUT_CURSOR_LEFT_ARROW);  // Show
-        }
-    }    
-    
-    /**
-     * @brief Toggles between orbit and FPS camera modes
-     */
-    void toggle_mode() {
-        if(mode == ORBIT) {
-            // Switch to FPS - maintain current position
-            mode = FPS;
-        } else {
-            // Switch to Orbit - update orbit parameters based on FPS position
-            mode = ORBIT;
-            orbit_radius = fps_position.distance(orbit_look_at);
-            Vector3 dir = orbit_look_at - fps_position;
-            dir = dir.normalize();
-            orbit_alpha = atan2(-dir.x, -dir.z);
-            orbit_beta = -asin(dir.y);
-        }
-        update_cursor_mode();
-    }
-};
-
-Camera camera;
-
-/**
- * @brief Processes mouse movement for camera control
- * 
- * @param x The current x-coordinate of the mouse pointer
- * @param y The current y-coordinate of the mouse pointer
- */
-void process_mouse_motion(int x, int y) {
-    //if(camera.mode == Camera::FPS && mouse_dragging) {
-    if(camera.mode == Camera::FPS) {
-        float xoffset = x - last_mouse_x;
-        float yoffset = last_mouse_y - y;  // Reversed since y-coordinates go from bottom to top
-        
-        xoffset *= camera.sensitivity;
-        yoffset *= camera.sensitivity;
-        
-        camera.fps_yaw += xoffset;
-        camera.fps_pitch += yoffset;
-        
-        // Constrain pitch to avoid screen flip
-        camera.fps_pitch = camera.fps_pitch < -89.0f ? -89.0f : (camera.fps_pitch > 89.0f ? 89.0f : camera.fps_pitch);
-        
-        camera.update_fps_vectors();
-
-    }
-    last_mouse_x = x;
-    last_mouse_y = y;
+void init_camera() {
+    camera.init_from_xml(parser);
 }
-
-/**
- * @brief Processes mouse button events for camera control
- * 
- * @param button The mouse button that was pressed or released
- * @param state The state of the button (GLUT_DOWN or GLUT_UP)
- * @param x The x-coordinate where the button was pressed/released
- * @param y The y-coordinate where the button was pressed/released
- */
-void process_mouse_buttons(int button, int state, int x, int y) {
-    if(button == GLUT_LEFT_BUTTON) {
-        mouse_dragging = (state == GLUT_DOWN);
-        last_mouse_x = x;
-        last_mouse_y = y;
-    }
-}
-
-/**
- * @brief Class for storing Vertex Buffer Object (VBO) information
- */
-class vbo {
-public:
-    GLuint vertices, total_vertices, indexes, total_indexes;
-    
-    /**
-     * @brief Constructor for VBO objects
-     * 
-     * @param v The vertex buffer handle
-     * @param tv Total number of vertices
-     * @param i The index buffer handle
-     * @param ti Total number of indices
-     */
-    vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti) 
-        : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti) {}
-};
-
-unordered_map<string, vbo*> model_dict;
 
 /**
  * @brief Handles window resize events and updates the projection matrix
@@ -237,173 +83,12 @@ void change_size(int w, int h) {
 }
 
 /**
- * @brief Processes time-based translations for object animations
+ * @brief Renders text on the screen at a specified position
  * 
- * @param translation The translation parameters from XML
+ * @param text The text to render
+ * @param posx The x-coordinate of the text position
+ * @param posy The y-coordinate of the text position
  */
-void time_translation(translation_xml translation) {
-    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
-    t /= translation.time;
-    t -= floor(t);  // Loop animation
-
-    int tessellation = 1000;
-    int num_curve_points = (tessellation + 1) * translation.time_trans.points.size();
-    float* curve_points = new float[num_curve_points * 3];
-    float* div = new float[num_curve_points * 3];
-
-    catmullrom_curve(tessellation, translation.time_trans.points, curve_points, div);
-
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < num_curve_points; ++i) {
-        int idx = i * 3;
-        glVertex3f(curve_points[idx], curve_points[idx + 1], curve_points[idx + 2]);
-    }
-    glEnd();
-
-    int current_index = static_cast<int>(t * num_curve_points);
-    current_index = current_index % num_curve_points;
-
-    int offset = current_index * 3;
-    float px = curve_points[offset];
-    float py = curve_points[offset + 1];
-    float pz = curve_points[offset + 2];
-
-    float current_div[3];
-    current_div[0] = div[offset];
-    current_div[1] = div[offset + 1];
-    current_div[2] = div[offset + 2];
-
-    glTranslatef(px, py, pz);
-
-    if (translation.time_trans.align == 0) {
-        static float y[4] = { 0.0f, 1.0f, 0.0f };
-        float m[16];
-        generate_catmull_matrix(current_div, y, m);
-        glMultMatrixf(m);
-    }
-
-    delete[] div;
-    delete[] curve_points;
-}
-
-void time_rotation(rotation_xml rotation) {
-    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
-    t /= rotation.time;
-    t -= floor(t);  // Loop animation
-
-    float angle = rotation.angle * t;
-    glRotatef(angle, rotation.x, rotation.y, rotation.z);
-}
-
-int nmodels = 0;
-
-/**
- * @brief Recursively draws a group and all its children
- * 
- * @param group The group to draw
- */
-void recursive_draw(const group_xml& group) {
-    glPushMatrix();
-
-    int order[3] = {0};
-    for(int i = 0; i < 3; i++) {
-        if(group.transformations.rotation_exists && group.transformations.rotation.order == i)
-            order[i] = 1;
-        if(group.transformations.translation_exists && group.transformations.translation.order == i)
-            order[i] = 2;
-        if(group.transformations.scale_exists && group.transformations.scale.order == i)
-            order[i] = 3;
-    }
-
-    for(int i = 0; i < 3; i++) {
-        switch(order[i]) {
-            case 1: // Rotation
-                if(group.transformations.rotation.time == 0)
-                    glRotatef(group.transformations.rotation.angle,
-                            group.transformations.rotation.x,
-                            group.transformations.rotation.y,
-                            group.transformations.rotation.z);
-                else
-                    time_rotation(group.transformations.rotation);
-                break;
-            case 2: // Translation
-                if(group.transformations.translation.time == 0)
-                    glTranslatef(group.transformations.translation.x,
-                                group.transformations.translation.y,
-                                group.transformations.translation.z);
-                else
-                    time_translation(group.transformations.translation);
-                break;
-            case 3: // Scale
-                glScalef(group.transformations.scale.x,
-                        group.transformations.scale.y,
-                        group.transformations.scale.z);
-                break;
-        }
-    }
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glColor3f(1.0f, 1.0f, 1.0f);
-
-    for(const auto& model : group.models) {
-        nmodels++;
-        vbo* current_vbo = model_dict[model.file_name];
-        total_models++;
-
-        glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
-        glVertexPointer(3, GL_FLOAT, 0, 0);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indexes);
-        glDrawElements(GL_TRIANGLES, current_vbo->total_indexes, GL_UNSIGNED_INT, 0);
-    }
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-
-    for(const auto& subgroup : group.groups)
-        recursive_draw(subgroup);
-
-    glPopMatrix();
-}
-
-/**
- * @brief Initializes camera parameters from XML data
- */
-void init_camera() {
-    camera.init_from_xml();
-}
-
-/**
- * @brief Updates camera position and orientation based on user input
- */
-void update_camera() {
-    if(camera.mode == Camera::ORBIT) {
-        // Original orbit controls
-        if(keys[(int)'a']) camera.orbit_alpha -= 0.01f;
-        if(keys[(int)'d']) camera.orbit_alpha += 0.01f;
-        if(keys[(int)'w']) camera.orbit_beta = std::min(camera.orbit_beta + 0.01f, float(M_PI/2 - 0.01));
-        if(keys[(int)'s']) camera.orbit_beta = std::max(camera.orbit_beta - 0.01f, float(-M_PI/2 + 0.01));
-        if(special_keys[GLUT_KEY_UP]) camera.orbit_radius = std::max(camera.orbit_radius - 0.25f, 1.0f);
-        if(special_keys[GLUT_KEY_DOWN]) camera.orbit_radius += 0.25f;
-    } else { // FPS mode
-        // FPS movement controls
-        float velocity = camera.move_speed;
-        if(keys[(int)'w']) camera.fps_position = camera.fps_position + camera.fps_front * velocity;
-        if(keys[(int)'s']) camera.fps_position = camera.fps_position - camera.fps_front * velocity;
-        if(keys[(int)'a']) camera.fps_position = camera.fps_position - camera.fps_right * velocity;
-        if(keys[(int)'d']) camera.fps_position = camera.fps_position + camera.fps_right * velocity;
-        if(keys[(int)' ']) camera.fps_position.y += velocity;  // Space to ascend
-        if(keys[(int)'c']) camera.fps_position.y -= velocity;  // C to descend
-    }
-    
-    // Common controls
-    if(keys[(int)'i']) scale += 0.025f;
-    if(keys[(int)'o']) scale = std::max(scale - 0.025f, 0.05f);
-}
-
-float emissive_def[4] = {0.0f,0.0f,0.0f,1.0f};
-float emissive_full[4] = {1.0f,1.0f,1.0f,1.0f};
-int timebase = 0, frame = 0;
-
 void render_text(const std::string text,double posx, double posy) {
     // Guardar a projeção anterior
     glMatrixMode(GL_PROJECTION);
@@ -415,18 +100,19 @@ void render_text(const std::string text,double posx, double posy) {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+
     void* font = GLUT_BITMAP_HELVETICA_18;
-    // float textw = glutBitmapLength(font, (unsigned char*) text.c_str());
-    // (removed unused variable)
     glDisable(GL_DEPTH_TEST);
     glColor3f(1.0f, 1.0f, 1.0f);
     glMaterialfv(GL_FRONT, GL_EMISSION, emissive_full);
     glRasterPos2d(posx, posy);
     for (char c : text) glutBitmapCharacter(font, c);
+
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+
     glEnable(GL_DEPTH_TEST);
     glMaterialfv(GL_FRONT, GL_EMISSION, emissive_def);
 }
@@ -437,7 +123,8 @@ void render_text(const std::string text,double posx, double posy) {
 void render_scene(void) {
     int time;
 	float fps;
-    static char s[64];
+    static char text_fps[64];
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -478,156 +165,49 @@ void render_scene(void) {
         recursive_draw(group);
 
     frame++;
-	time = glutGet(GLUT_ELAPSED_TIME); 
-	if (time - timebase > 1000) { 
-		fps = frame*1000.0/(time-timebase); 
-		timebase = time; 
-		frame = 0; 
-		
-		snprintf(s, sizeof(s), "FPS: %.3f", fps);
-	}
-	render_text(s,window_width/40, window_height/35);
-	static char s2[120];
+    time = glutGet(GLUT_ELAPSED_TIME);
+    if (time - timebase > 1000) {
+        fps = frame * 1000.0f / (time - timebase);
+        timebase = time;
+        frame = 0;
+        snprintf(text_fps, sizeof(text_fps), "FPS: %.3f", fps);
+    }
+
+    render_text(text_fps, window_width/40, window_height/35);
+
+    static char text[120];
 
     if (camera.mode == Camera::FPS) {
-        snprintf(s2, sizeof(s2), "FPS Yaw: %.3f", camera.fps_yaw);
-        render_text(s2, window_width/40, window_height/35 + 20);
-        snprintf(s2, sizeof(s2),
+        snprintf(text, sizeof(text), "FPS Yaw: %.3f", camera.fps_yaw);
+        render_text(text, window_width/40, window_height/35 + 20);
+        snprintf(text, sizeof(text),
             "Look x: %.3f y: %.3f z: %.3f",
             camera.fps_front.x, camera.fps_front.y, camera.fps_front.z);
-        render_text(s2, window_width/40, window_height/35 + 40);
-        snprintf(s2, sizeof(s2),
+        render_text(text, window_width/40, window_height/35 + 40);
+        snprintf(text, sizeof(text),
             "Pos x: %.3f y: %.3f z: %.3f",
             camera.fps_position.x, camera.fps_position.y, camera.fps_position.z);
-        render_text(s2, window_width/40, window_height/35 + 60);
+        render_text(text, window_width/40, window_height/35 + 60);
     } else {
-        snprintf(s2, sizeof(s2), "Orbit α: %.3f", camera.orbit_alpha);
-        render_text(s2, window_width/40, window_height/35 + 20);
-        snprintf(s2, sizeof(s2),
+        snprintf(text, sizeof(text), "Orbit α: %.3f", camera.orbit_alpha);
+        render_text(text, window_width/40, window_height/35 + 20);
+        snprintf(text, sizeof(text),
             "Look x: %.3f y: %.3f z: %.3f",
             camera.orbit_look_at.x, camera.orbit_look_at.y, camera.orbit_look_at.z);
-        render_text(s2, window_width/40, window_height/35 + 40);
-        snprintf(s2, sizeof(s2),
+        render_text(text, window_width/40, window_height/35 + 40);
+        snprintf(text, sizeof(text),
             "Pos x: %.3f y: %.3f z: %.3f",
             camera.orbit_radius * cos(camera.orbit_beta) * sin(camera.orbit_alpha),
             camera.orbit_radius * sin(camera.orbit_beta),
             camera.orbit_radius * cos(camera.orbit_beta) * cos(camera.orbit_alpha));
-        render_text(s2, window_width/40, window_height/35 + 60);
+        render_text(text, window_width/40, window_height/35 + 60);
     }
 
-    snprintf(s2, sizeof(s2), "Numero de modelos: %d", nmodels);
-    render_text(s2, window_width/40, window_height/35 + 80);
+    snprintf(text, sizeof(text), "Numero de modelos: %d", nmodels);
+    render_text(text, window_width/40, window_height/35 + 80);
     nmodels = 0;
+
     glutSwapBuffers();
-}
-
-/**
- * @brief Handles keyboard input for regular keys
- * 
- * @param key The key that was pressed
- * @param x The x-coordinate of the mouse when the key was pressed
- * @param y The y-coordinate of the mouse when the key was pressed
- */
-void default_key_func(unsigned char key, int x, int y) {
-    (void)x;
-    (void)y;
-    keys[tolower(key)] = true;
-    
-    if(tolower(key) == 'm') {  // Toggle camera mode with M key
-        camera.toggle_mode();
-        glutSetWindowTitle(camera.mode == Camera::ORBIT ? 
-            "CG@33 - Orbit Mode" : "CG@33 - FPS Mode");
-    }
-    
-    // Keep the 'q' exit action
-    if(tolower(key) == 'q') {
-        // Clean up resources before exiting
-        for(auto& entry : model_dict) {
-            glDeleteBuffers(1, &entry.second->vertices);
-            glDeleteBuffers(1, &entry.second->indexes);
-            delete entry.second;
-        }
-        exit(0);
-    }
-    
-    glutPostRedisplay();
-}
-
-/**
- * @brief Handles keyboard release for regular keys
- * 
- * @param key The key that was released
- * @param x The x-coordinate of the mouse when the key was released
- * @param y The y-coordinate of the mouse when the key was released
- */
-void default_key_up_func(unsigned char key, int x, int y) {
-    (void)x;
-    (void)y;
-    keys[tolower(key)] = false;
-}
-
-/**
- * @brief Handles keyboard input for special keys (arrows, etc.)
- * 
- * @param key The special key that was pressed
- * @param x The x-coordinate of the mouse when the key was pressed
- * @param y The y-coordinate of the mouse when the key was pressed
- */
-void special_key_func(int key, int x, int y) {
-    (void)x;
-    (void)y;
-    special_keys[key] = true;
-    glutPostRedisplay();
-}
-
-/**
- * @brief Handles keyboard release for special keys
- * 
- * @param key The special key that was released
- * @param x The x-coordinate of the mouse when the key was released
- * @param y The y-coordinate of the mouse when the key was released
- */
-void special_key_up_func(int key, int x, int y) {
-    (void)x;
-    (void)y;
-    special_keys[key] = false;
-}
-
-/**
- * @brief Loads models into VBOs and populates the model dictionary
- * 
- * @param group The group containing models to load
- * @param dict The dictionary to store model VBOs
- * @return int 0 on success, 1 on failure
- */
-int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
-    for(const auto& model : group.models) {
-        if(dict.find(model.file_name) == dict.end()) {
-            vector<float> vertices;
-            vector<unsigned int> indexes;
-            
-            if(read_model(model.file_name, vertices, indexes)) {
-                cerr << "Error loading model: " << model.file_name << endl;
-                return 1;
-            }
-
-            GLuint vboID, iboID;
-            glGenBuffers(1, &vboID);
-            glBindBuffer(GL_ARRAY_BUFFER, vboID);
-            glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_STATIC_DRAW);
-
-            glGenBuffers(1, &iboID);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboID);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes.size()*sizeof(unsigned int), indexes.data(), GL_STATIC_DRAW);
-
-            dict[model.file_name] = new vbo(vboID, vertices.size()/3, iboID, indexes.size());
-        }
-    }
-
-    for(const auto& subgroup : group.groups)
-        if(populate_dict(subgroup, dict)) return 1;
-
-    return 0;
 }
 
 /**
