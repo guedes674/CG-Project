@@ -39,7 +39,7 @@
             </transform>
             <models>
                 <!-- generator sphere 1 10 10 sphere.3d -->
-                <model file="sphere.3d" />
+                <model file="sphere.3d"/>
             </models>
         </group>
         <!-- RHEA -->

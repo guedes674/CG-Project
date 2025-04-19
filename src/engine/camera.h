@@ -19,7 +19,6 @@ extern int window_height;
 extern int last_mouse_x;
 extern int last_mouse_y;
 
-
 struct Camera{
     enum Mode { ORBIT, FPS };
     Mode mode = ORBIT;
@@ -46,6 +45,8 @@ struct Camera{
     void update_fps_vectors();
     void update_cursor_mode();
     void toggle_mode();
+    void follow_target(const Vector3&  new_target_position);
+    Vector3 get_orbit_camera_position() const;
 };
 
 #endif

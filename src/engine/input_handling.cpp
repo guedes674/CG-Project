@@ -5,6 +5,24 @@ using namespace std;
 // Guarda a posição inicial do clique
 int startX = 0, startY = 0;
 
+void update_camera_target_from_index() {
+    if (current_target_index >= 0 && current_target_index < (int)position_keys.size()) {
+        camera.orbit_look_at = position_dict[position_keys[current_target_index]];
+    } else {
+        camera.orbit_look_at = Vector3(0.0f, 0.0f, 0.0f); // reset para origem
+    }
+
+    // Atualiza parâmetros da câmara ORBIT com base na nova posição
+    Vector3 dir = camera.orbit_look_at - (camera.orbit_look_at - Vector3(
+        camera.orbit_radius * sin(camera.orbit_alpha) * cos(camera.orbit_beta),
+        camera.orbit_radius * sin(camera.orbit_beta),
+        camera.orbit_radius * cos(camera.orbit_alpha) * cos(camera.orbit_beta)
+    ));
+    dir = dir.normalize();
+    camera.orbit_alpha = atan2(-dir.x, -dir.z);
+    camera.orbit_beta = -asin(dir.y);
+}
+
 /**
  * @brief Processa os cliques do rato (drag ou scroll)
  */
@@ -55,16 +73,22 @@ void process_mouse_motion(int x, int y) {
  * @brief Updates camera position and orientation based on user input
  */
 void update_camera() {
-    if(camera.mode == Camera::ORBIT) {
-        // Original orbit controls
-        if(keys[(int)'a']) camera.orbit_alpha -= 0.01f;
-        if(keys[(int)'d']) camera.orbit_alpha += 0.01f;
-        if(keys[(int)'w']) camera.orbit_beta = std::min(camera.orbit_beta + 0.01f, float(M_PI/2 - 0.01));
-        if(keys[(int)'s']) camera.orbit_beta = std::max(camera.orbit_beta - 0.01f, float(-M_PI/2 + 0.01));
-        if(special_keys[GLUT_KEY_UP]) camera.orbit_radius = std::max(camera.orbit_radius - 0.25f, 1.0f);
-        if(special_keys[GLUT_KEY_DOWN]) camera.orbit_radius += 0.25f;
-    } else { // FPS mode
-        // FPS movement controls
+    if (camera.mode == Camera::ORBIT) {
+        // --- existing orbit controls ---
+        if(keys['a']) camera.orbit_alpha -= 0.01f;
+        if(keys['d']) camera.orbit_alpha += 0.01f;
+        if(keys['w']) camera.orbit_beta  = std::min(camera.orbit_beta + 0.01f, float(M_PI/2 - .01));
+        if(keys['s']) camera.orbit_beta  = std::max(camera.orbit_beta - 0.01f, float(-M_PI/2 + .01));
+        if(special_keys[GLUT_KEY_UP])   camera.orbit_radius = std::max(camera.orbit_radius - .25f, 1.0f);
+        if(special_keys[GLUT_KEY_DOWN]) camera.orbit_radius += .25f;
+
+        // ← add this block to continuously follow the tracked object
+        if (current_target_index >= 0 && current_target_index < (int)position_keys.size()) {
+            int id = position_keys[current_target_index];
+            camera.follow_target(position_dict[id]);
+        }
+    } else {
+        // --- FPS controls ---
         float velocity = camera.move_speed;
         if(keys[(int)'w']) camera.fps_position = camera.fps_position + camera.fps_front * velocity;
         if(keys[(int)'s']) camera.fps_position = camera.fps_position - camera.fps_front * velocity;
@@ -73,10 +97,7 @@ void update_camera() {
         if(keys[(int)' ']) camera.fps_position.y += velocity;  // Space to ascend
         if(keys[(int)'c']) camera.fps_position.y -= velocity;  // C to descend
     }
-    
-    // Common controls
-    if(keys[(int)'i']) scale += 0.025f;
-    if(keys[(int)'o']) scale = std::max(scale - 0.025f, 0.05f);
+
 }
 
 /**
@@ -135,6 +156,21 @@ void special_key_func(int key, int x, int y) {
     (void)x;
     (void)y;
     special_keys[key] = true;
+    
+    if (camera.mode == Camera::ORBIT) {
+        if (key == GLUT_KEY_LEFT) {
+            current_target_index--;
+            if (current_target_index < -1)
+                current_target_index = position_keys.size() - 1;
+            update_camera_target_from_index();
+        } else if (key == GLUT_KEY_RIGHT) {
+            current_target_index++;
+            if (current_target_index > (int)position_keys.size() - 1)
+                current_target_index = -1;
+            update_camera_target_from_index();
+        }
+    }
+
     glutPostRedisplay();
 }
 

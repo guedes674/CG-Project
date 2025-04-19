@@ -38,6 +38,14 @@ void time_translation(translation_xml translation) {
     current_div[1] = div[offset + 1];
     current_div[2] = div[offset + 2];
 
+    //cout << "Xml: " << xml << endl;
+    if (translation.time_trans.tracking) {
+        int id = translation.time_trans.tracking_id;
+        position_dict[id] = Vector3(px, py, pz);
+        if (std::find(position_keys.begin(), position_keys.end(), id) == position_keys.end())
+            position_keys.push_back(id);
+    }
+    
     glTranslatef(px, py, pz);
 
     if (translation.time_trans.align == 0) {
@@ -67,7 +75,7 @@ void time_rotation(rotation_xml rotation) {
  */
 void recursive_draw(const group_xml& group) {
     glPushMatrix();
-
+    
     int order[3] = {0};
     for(int i = 0; i < 3; i++) {
         if(group.transformations.rotation_exists && group.transformations.rotation.order == i)
@@ -94,8 +102,8 @@ void recursive_draw(const group_xml& group) {
                     glTranslatef(group.transformations.translation.x,
                                 group.transformations.translation.y,
                                 group.transformations.translation.z);
-                else
-                    time_translation(group.transformations.translation);
+                else{
+                    time_translation(group.transformations.translation);}
                 break;
             case 3: // Scale
                 glScalef(group.transformations.scale.x,
@@ -122,8 +130,9 @@ void recursive_draw(const group_xml& group) {
 
     glDisableClientState(GL_VERTEX_ARRAY);
 
-    for(const auto& subgroup : group.groups)
+    for(const auto& subgroup : group.groups){
         recursive_draw(subgroup);
+    }
 
     glPopMatrix();
 }

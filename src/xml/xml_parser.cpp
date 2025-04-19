@@ -17,7 +17,6 @@ string get_string_attribute(XMLElement* element, const char* attribute_name, str
 
 group_xml recursive_xml_catch(string file_name){
     group_xml output_group;
-    output_group.xml = file_name;
     cout << "Reading file :" << file_name << endl;
     XMLDocument doc;
     XMLError eResult = doc.LoadFile(file_name.c_str());
@@ -52,7 +51,6 @@ group_xml recursive_catch_groups(XMLElement* group) {
         while (model_element) {
             model_xml model;
             model.file_name = get_string_attribute(model_element, "file", "default.3d");
-            cout << "File detected: " << model.file_name << endl;
             new_group.models.push_back(model);
             model_element = model_element->NextSiblingElement("model");
         }
@@ -76,9 +74,6 @@ group_xml recursive_catch_groups(XMLElement* group) {
                 new_group.transformations.rotation.z = get_float_attribute(current_transform, "z", 0);
                 new_group.transformations.rotation.order = order_index++;
                 new_group.transformations.rotation_exists++;
-                cout << "Rotation detected: time=" 
-                     << new_group.transformations.rotation.time 
-                     << " angle=" << new_group.transformations.rotation.angle << endl;
             } else if(strcmp(transform_type, "translate") == 0) {
                 // Process translation
                 new_group.transformations.translation.time = get_int_attribute(current_transform, "time",0);
@@ -86,14 +81,13 @@ group_xml recursive_catch_groups(XMLElement* group) {
                     new_group.transformations.translation.x = get_float_attribute(current_transform, "x", 0);
                     new_group.transformations.translation.y = get_float_attribute(current_transform, "y", 0);
                     new_group.transformations.translation.z = get_float_attribute(current_transform, "z", 0);
-                    cout << "Translation detected: " << new_group.transformations.translation.x 
-                    << " " << new_group.transformations.translation.y << " " << new_group.transformations.translation.z
-                    << endl;
                 }
                 else{
-                    cout<< "Timed translation\n" << endl;
-                    string align = get_string_attribute(current_transform, "align","false");
-                    cout << "Align: " << align << endl;
+                    string align      = get_string_attribute(current_transform, "align",    "false");
+                    string tracking   = get_string_attribute(current_transform, "tracking", "false");
+    
+                    if ((strcmp(tracking.c_str(),"true"))==0)cout << "TRACKING TRACKING TRACKING: " << tracking << endl;
+
                     XMLElement* point_xml = current_transform->FirstChildElement("point");
                     vector<point> points;
                     while (point_xml){
@@ -103,8 +97,9 @@ group_xml recursive_catch_groups(XMLElement* group) {
                         points.push_back(point(x,y,z));
                         point_xml = point_xml->NextSiblingElement("point");
                     }
-                    time_transformation_xml time_trans(strcmp(align.c_str(),"true"),points);
-                    cout << time_trans.align << endl;
+                    bool align_flag    = (align    == "true");
+                    bool tracking_flag = (tracking == "true");
+                    time_transformation_xml time_trans(align_flag, tracking_flag, points);
                     new_group.transformations.translation.time_trans = time_trans;
                 }
                 new_group.transformations.translation.order = order_index++;
@@ -117,7 +112,6 @@ group_xml recursive_catch_groups(XMLElement* group) {
                 new_group.transformations.scale.z = get_float_attribute(current_transform, "z", 1);
                 new_group.transformations.scale.order = order_index++;
                 new_group.transformations.scale_exists++;
-                cout << "Scale detected: " << new_group.transformations.scale.x << endl;
             }
             
             // Move to the next sibling element
@@ -127,13 +121,11 @@ group_xml recursive_catch_groups(XMLElement* group) {
 
     XMLElement* xmls_element = group->FirstChildElement("xmls");
     if(xmls_element){
-        cout << "XMLs detected!" << endl;
         XMLElement* xml_element = xmls_element->FirstChildElement("xml");
         while (xml_element) {
             group_xml xml;
             string xml_file = get_string_attribute(xml_element, "file", "");
             xml = recursive_xml_catch(xml_file);
-            cout << "File detected: " << xml_file << endl;
             new_group.groups.push_back(xml);
             xml_element = xml_element->NextSiblingElement("xml");
         }
@@ -180,7 +172,6 @@ xml_parser read_xml_file(string file_name){
 		cout << "Erro ao carregar o nó 'camera' do XML!" << endl;
 		return parser;
 	}
-    cout << "Camera detected!" << endl;
     // Carrega a posição da câmera
     XMLElement* pos = cam->FirstChildElement("position");
     if (pos) {

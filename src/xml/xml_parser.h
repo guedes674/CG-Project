@@ -10,6 +10,8 @@
 using namespace std;
 using namespace tinyxml2;
 
+extern int global_id; 
+
 class window {
     public:
         int width;
@@ -41,12 +43,16 @@ class time_transformation_xml {
     public:
         int align = 0;
         vector<point> points;
+        int tracking = 0; // Removed reference
+        int tracking_id;
         
         // Add default constructor
         time_transformation_xml() = default;
         
-        time_transformation_xml(int align, std::vector<point> points) {
+        time_transformation_xml(int align,int tracking_flag ,std::vector<point> points) {
             this->align = align;
+            this->tracking = tracking_flag;
+            this->tracking_id = global_id++;
             this->points = points;
         }
 };
@@ -79,7 +85,6 @@ class group_xml {
         std::vector<model_xml> models; // Removed reference
         transformations_xml transformations; // Removed reference
         std::vector<group_xml> groups; // Removed reference
-        string xml = "";
 };
 
 class xml_parser {

@@ -21,7 +21,8 @@
 
 extern int nmodels;
 extern int total_models;
-
+extern std::unordered_map<int, Vector3> position_dict;
+extern std::vector<int> position_keys;
 /**
  * @brief Class for storing Vertex Buffer Object (VBO) information
  */

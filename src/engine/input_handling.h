@@ -22,7 +22,7 @@ extern bool keys[256];
 extern bool special_keys[256];
 extern int last_frame_time;
 extern float scale;
-
+extern int current_target_index;
 extern std::unordered_map<std::string, vbo*> model_dict;
 
 void process_mouse_motion(int x, int y);

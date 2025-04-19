@@ -38,9 +38,17 @@ int last_mouse_x  = 0;
 int last_mouse_y  = 0;
 
 // --- MODEL VARIABLES ---
+int global_id = 0;
+
 int nmodels      = 0;
 int total_models = 0;
 std::unordered_map<std::string, vbo*> model_dict;
+
+int xml_id = 1;
+std::unordered_map<int, Vector3> position_dict;
+int current_group = 0;
+std::vector<int> position_keys;
+int current_target_index = -1; // -1 significa olhar para (0,0,0)
 
 // --- INPUT HANDLING VARIABLES ---
 bool mouse_dragging = false;

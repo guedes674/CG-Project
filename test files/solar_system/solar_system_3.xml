@@ -137,7 +137,7 @@
     <!-- JUPITER ORBIT -->
     <group>
         <transform>
-            <translate time="45" align="true">
+            <translate time="45" align="true" tracking="true">
                 <!-- radius 65 -->
                 <point x="65.00" y="0" z="0.00" />
                 <point x="60.41" y="0" z="24.92" />
@@ -166,7 +166,7 @@
     <!-- SATURN ORBIT -->
     <group>
         <transform>
-            <translate time="55" align="true">
+            <translate time="55" align="true" tracking="true">
                 <!-- radius 80 -->
                 <point x="80.00" y="0" z="0.00" />
                 <point x="74.55" y="0" z="30.64" />
