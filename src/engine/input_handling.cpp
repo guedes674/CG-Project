@@ -2,70 +2,53 @@
 
 using namespace std;
 
-/**
- * @brief Processes mouse movement for camera control
- * 
- * @param x The current x-coordinate of the mouse pointer
- * @param y The current y-coordinate of the mouse pointer
- */
-void process_mouse_motion(int x, int y) {
-    // ignore the next motion callback after a glutWarpPointer
-    static bool first_mouse = false;
-    static float last_x2 = 0.0f;
-    static float last_y2 = 0.0f;
-
-    const int cx = window_width/2;
-    const int cy = window_height/2;
-
-    // while we're re‐centering, ignore every callback
-    if (first_mouse) {
-            // cursor is now centered, reset state
-            first_mouse = false;
-            last_x2 = cx;
-            last_y2 = cy;
-        
-        return;
-    }
-    if(camera.mode == Camera::FPS) {
-        if (x <= 0 || x >= window_width || y <= 0 || y >= window_height) {
-            first_mouse = true;
-            glutWarpPointer(cx, cy);
-            return;
-        }
-        float xoffset = x - last_x2;
-        float yoffset = last_y2 - y;  // invert Y
-        
-        xoffset *= camera.sensitivity;
-        yoffset *= camera.sensitivity;
-        
-        camera.fps_yaw += xoffset;
-        camera.fps_pitch += yoffset;
-        
-        // Constrain pitch to avoid screen flip
-        camera.fps_pitch = camera.fps_pitch < -89.0f ? -89.0f : (camera.fps_pitch > 89.0f ? 89.0f : camera.fps_pitch);
-        
-        camera.update_fps_vectors();
-
-    }
-    last_x2 = x;
-    last_y2 = y;
-}
+// Guarda a posição inicial do clique
+int startX = 0, startY = 0;
 
 /**
- * @brief Processes mouse button events for camera control
- * 
- * @param button The mouse button that was pressed or released
- * @param state The state of the button (GLUT_DOWN or GLUT_UP)
- * @param x The x-coordinate where the button was pressed/released
- * @param y The y-coordinate where the button was pressed/released
+ * @brief Processa os cliques do rato (drag ou scroll)
  */
 void process_mouse_buttons(int button, int state, int x, int y) {
-    if(button == GLUT_LEFT_BUTTON) {
-        mouse_dragging = (state == GLUT_DOWN);
-        last_mouse_x = x;
-        last_mouse_y = y;
+    if (state == GLUT_DOWN) {
+        if (button == GLUT_LEFT_BUTTON && camera.mode == Camera::FPS) {
+            startX = x;
+            startY = y;
+            mouse_dragging = true;
+        } else if (camera.mode == Camera::ORBIT) {
+            if (button == 3) camera.orbit_radius = std::max(camera.orbit_radius - 0.25f, 1.0f);
+            else if (button == 4) camera.orbit_radius += 0.25f;
+        }
+    } else if (state == GLUT_UP && button == GLUT_LEFT_BUTTON) {
+        mouse_dragging = false;
     }
+
+    glutPostRedisplay();
 }
+
+
+/**
+ * @brief Arrasta a câmara com o rato em modo ORBIT
+ */
+void process_mouse_motion(int x, int y) {
+    if (!mouse_dragging || camera.mode != Camera::FPS) return;
+
+    float dx = (x - startX) * camera.sensitivity;
+    float dy = (y - startY) * camera.sensitivity;
+
+    camera.fps_yaw   += dx;
+    camera.fps_pitch -= dy;
+
+    camera.fps_pitch = camera.fps_pitch < -89.0f ? -89.0f : (camera.fps_pitch > 89.0f ? 89.0f : camera.fps_pitch);
+
+    // Atualiza a direção do vetor frontal
+    camera.update_fps_vectors();
+
+    startX = x;
+    startY = y;
+
+    glutPostRedisplay();
+}
+
 
 
 /**

@@ -264,7 +264,6 @@ int main(int argc, char** argv) {
     glutSpecialFunc(special_key_func);
     glutSpecialUpFunc(special_key_up_func);
     
-    glutPassiveMotionFunc(process_mouse_motion);
     glutMotionFunc(process_mouse_motion);
     glutMouseFunc(process_mouse_buttons);
     glutTimerFunc(0, timer_func, 0);

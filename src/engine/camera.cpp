@@ -52,14 +52,12 @@ void Camera::update_fps_vectors() {
 
 void Camera::update_cursor_mode() {
     if (mode == Camera::FPS) {
-        glutSetCursor(GLUT_CURSOR_NONE);  // Hide
-        glutWarpPointer(window_width / 2, window_height / 2);  // Center
-        last_mouse_x = window_width / 2;
-        last_mouse_y = window_height / 2;
+        glutSetCursor(GLUT_CURSOR_LEFT_ARROW); 
     } else {
-        glutSetCursor(GLUT_CURSOR_LEFT_ARROW);  // Show
+        glutSetCursor(GLUT_CURSOR_CYCLE); 
     }
-}    
+}
+ 
 
 /**
  * @brief Toggles between orbit and FPS camera modes
