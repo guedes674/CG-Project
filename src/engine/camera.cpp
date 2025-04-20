@@ -92,9 +92,18 @@ void Camera::follow_target(const Vector3& new_target_position) {
     Vector3 smoothed_pos = current_pos + (desired_pos - current_pos);// * smoothFactor;
 
     Vector3 dir = (orbit_look_at - smoothed_pos).normalize();
-    orbit_radius = old_radius;               // ← preserve constant radius
+    //orbit_radius = old_radius;               // ← preserve constant radius
+    bool old_alpha = (orbit_alpha > 0.0f);
     orbit_alpha  = atan2(-dir.x, -dir.z);
+    if (old_alpha != (orbit_alpha > 0.0f)) {
+        orbit_alpha = -orbit_alpha;
+    }
+    bool old_beta = (orbit_beta > 0.0f);
     orbit_beta   = -asin(dir.y);
+    if (old_beta != (orbit_beta > 0.0f)) {
+        orbit_beta = -orbit_beta;
+    }
+
 }
 
 Vector3 Camera::get_orbit_camera_position() const {

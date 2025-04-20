@@ -42,14 +42,14 @@ class rotation_xml {
 class time_transformation_xml {
     public:
         int align = 0;
-        vector<point> points;
+        vector<Vector3> points;
         int tracking = 0; // Removed reference
         int tracking_id;
         
         // Add default constructor
         time_transformation_xml() = default;
         
-        time_transformation_xml(int align,int tracking_flag ,std::vector<point> points) {
+        time_transformation_xml(int align,int tracking_flag ,std::vector<Vector3> points) {
             this->align = align;
             this->tracking = tracking_flag;
             this->tracking_id = global_id++;

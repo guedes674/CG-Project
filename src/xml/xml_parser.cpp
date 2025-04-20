@@ -89,16 +89,17 @@ group_xml recursive_catch_groups(XMLElement* group) {
                     if ((strcmp(tracking.c_str(),"true"))==0)cout << "TRACKING TRACKING TRACKING: " << tracking << endl;
 
                     XMLElement* point_xml = current_transform->FirstChildElement("point");
-                    vector<point> points;
+                    vector<Vector3> points;
                     while (point_xml){
                         float x = get_float_attribute(point_xml, "x", 0);
                         float y = get_float_attribute(point_xml, "y", 0);
                         float z = get_float_attribute(point_xml, "z", 0);
-                        points.push_back(point(x,y,z));
+                        points.push_back(Vector3(x,y,z));
                         point_xml = point_xml->NextSiblingElement("point");
                     }
-                    bool align_flag    = (align    == "true");
-                    bool tracking_flag = (tracking == "true");
+                    bool align_flag    = strcmp(align.c_str(), "true") == 0;
+                    bool tracking_flag = strcmp(tracking.c_str(), "true") == 0;
+                    if (align_flag) cout << "ALIGN ALIGN ALIGN: " << align << endl;
                     time_transformation_xml time_trans(align_flag, tracking_flag, points);
                     new_group.transformations.translation.time_trans = time_trans;
                 }

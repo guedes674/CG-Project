@@ -51,7 +51,7 @@ void bezier_curve(int tessellation, float points[4][3], float* result) {
     }
 }
 
-void catmullrom_curve(int tessellation, std::vector<point>& points, float* result, float* result_deriv) {
+void catmullrom_curve(int tessellation, std::vector<Vector3>& points, float* result, float* result_deriv) {
     const int n = points.size();
     const float step = 1.0f / tessellation;
     int offset = 0;
@@ -66,10 +66,10 @@ void catmullrom_curve(int tessellation, std::vector<point>& points, float* resul
 
     for (int i = 0; i < n; ++i) {
         // P0, P1, P2, P3 com wrap-around
-        point P0 = points[(i - 1 + n) % n];
-        point P1 = points[i];
-        point P2 = points[(i + 1) % n];
-        point P3 = points[(i + 2) % n];
+        Vector3 P0 = points[(i - 1 + n) % n];
+        Vector3 P1 = points[i];
+        Vector3 P2 = points[(i + 1) % n];
+        Vector3 P3 = points[(i + 2) % n];
 
         for (float t = 0.0f; t <= 1.0f + 1e-6f; t += step) {
             float T[4] = {t * t * t, t * t, t, 1.0f};

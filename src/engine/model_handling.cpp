@@ -48,7 +48,7 @@ void time_translation(translation_xml translation) {
     
     glTranslatef(px, py, pz);
 
-    if (translation.time_trans.align == 0) {
+    if (translation.time_trans.align == 1) {
         static float y[4] = { 0.0f, 1.0f, 0.0f };
         float m[16];
         generate_catmull_matrix(current_div, y, m);

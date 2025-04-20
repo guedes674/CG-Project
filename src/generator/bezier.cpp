@@ -11,14 +11,14 @@ using namespace std;
  * - First line: number of patches
  * - Next N lines: indices of control points for each patch (16 indices per patch)
  * - Next line: number of control points
- * - Next M lines: x,y,z coordinates of each control point
+ * - Next M lines: x,y,z coordinates of each control Vector3
  *
  * @param patch           Path to the patch file.
  * @param points          Output vector for storing control points.
  * @param indexes_matrix  Output vector of vectors for storing patch indices.
  * @return                0 if successful, 1 if file opening failed.
  */
-int read_patch_file(char* patch, vector<point> &points, vector<vector<int>> &indexes_matrix){
+int read_patch_file(char* patch, vector<Vector3> &points, vector<vector<int>> &indexes_matrix){
     std::ifstream file;
     file.open(patch, ios::in);
 
@@ -60,15 +60,15 @@ int read_patch_file(char* patch, vector<point> &points, vector<vector<int>> &ind
         // Reserve space for control points
         points.reserve(points_lines);
         
-        // Read control point coordinates
+        // Read control Vector3 coordinates
         for(int i = 0; i < points_lines; i++){
             getline(file,line);
             
             // Parse comma-separated coordinates
             vector<string> input = parseLine(line, delimiter);
             
-            // Create point from x,y,z coordinates
-            points.push_back(point(stof(input[0]),stof(input[1]),stof(input[2])));
+            // Create Vector3 from x,y,z coordinates
+            points.push_back(Vector3(stof(input[0]),stof(input[1]),stof(input[2])));
         }
     }
     return 0;
@@ -88,7 +88,7 @@ int read_patch_file(char* patch, vector<point> &points, vector<vector<int>> &ind
  */
 void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsigned int>& indexes){
 
-    vector<point> points;
+    vector<Vector3> points;
     vector<vector <int>> indexes_matrix;
 
     // Load control points and patch indices from file
@@ -109,8 +109,8 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
         // Organize control points into a 4x4 grid for easier calculation
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                // Get point from the loaded control points
-                point pt = points[index_patch[i * 4 + j]];
+                // Get Vector3 from the loaded control points
+                Vector3 pt = points[index_patch[i * 4 + j]];
                 control_points[i][j][0] = pt.x;
                 control_points[i][j][1] = pt.y;
                 control_points[i][j][2] = pt.z;
@@ -123,12 +123,12 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
             for (int u = 0; u <= tessellation; u++) {
                 float t_u = u * inc;  // Parametric u coordinate [0,1]
     
-                // Arrays to store the calculated point and its derivatives
-                float point[3] = {0};  // Surface point (x,y,z)
+                // Arrays to store the calculated Vector3 and its derivatives
+                float Vector3[3] = {0};  // Surface Vector3 (x,y,z)
                 float du[3] = {0};     // Derivative with respect to u
                 float dv[3] = {0};     // Derivative with respect to v
     
-                // Calculate surface point using bicubic Bezier formula with Bernstein polynomials
+                // Calculate surface Vector3 using bicubic Bezier formula with Bernstein polynomials
                 for (int i = 0; i < 4; i++) {
                     float bi = bernstein(i, 3, t_u);       // Bernstein polynomial for u
                     float dbi = bernstein_deriv(i, 3, t_u); // Derivative of Bernstein polynomial for u
@@ -140,7 +140,7 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
                         // Calculate position and derivatives for x, y, and z
                         for (int k = 0; k < 3; k++) {
                             float cp = control_points[i][j][k];
-                            point[k] += bi * bj * cp;      // Surface point
+                            Vector3[k] += bi * bj * cp;      // Surface Vector3
                             du[k] += dbi * bj * cp;        // Partial derivative with respect to u
                             dv[k] += bi * dbj * cp;        // Partial derivative with respect to v
                         }
@@ -149,7 +149,7 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
     
                 // Store the calculated vertex position
                 for (int k = 0; k < 3; k++) {
-                    vertices.push_back(point[k]);
+                    vertices.push_back(Vector3[k]);
                 }
             }
         }
