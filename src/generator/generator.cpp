@@ -35,12 +35,12 @@ int main(int argc, char** argv){
             if (strcmp(argv[1],"help") == 0){
                 // Display available commands and their usage
                 cout << "Available commands:\n\n";
-                cout << "engine cone <base_radius> <height> <slices> <stacks> <output_file>\n";
-                cout << "engine cone <base_radius> <height> <slices> <stacks> <output_file>\n";
-                cout << "engine sphere <radius> <slices> <stacks> <output_file>\n";
-                cout << "engine patch <patch_file> <tesselation> <output_file>\n";
-                cout << "engine plane <length> <divisions> <output_file>\n";
-                cout << "engine box <length> <divisions> <output_file>\n";
+                cout << "generator cone <base_radius> <height> <slices> <stacks> <output_file>\n";
+                cout << "generator cone <base_radius> <height> <slices> <stacks> <output_file>\n";
+                cout << "generator sphere <radius> <slices> <stacks> <output_file>\n";
+                cout << "generator patch <patch_file> <tesselation> <output_file>\n";
+                cout << "generator plane <length> <divisions> <output_file>\n";
+                cout << "generator box <length> <divisions> <output_file>\n";
             }
             else {
                 // Display error for invalid single argument
