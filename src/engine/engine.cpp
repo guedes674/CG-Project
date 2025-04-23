@@ -233,6 +233,22 @@ void timer_func(int value) {
     glutTimerFunc(16, timer_func, 0); // Use fixed 60fps timing (16ms)
 }
 
+void menu(int value) {
+    switch(value) {
+        case 1:
+            camera.toggle_mode();
+            glutSetWindowTitle(
+                camera.mode == Camera::ORBIT ? "CG@33 - Orbit Mode" : "CG@33 - FPS Mode"
+            );
+            break;
+        case 2:
+            exit(0);
+            break;
+        default:
+            break;
+    }
+}
+
 /**
  * @brief Main application entry point
  * 
@@ -275,6 +291,10 @@ int main(int argc, char** argv) {
     glutMotionFunc(process_mouse_motion);
     glutMouseFunc(process_mouse_buttons);
     glutTimerFunc(0, timer_func, 0);
+
+    glutCreateMenu(menu);  
+    glutAddMenuEntry("Change Cam Mode",1);  
+    glutAttachMenu(GLUT_RIGHT_BUTTON);  
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
