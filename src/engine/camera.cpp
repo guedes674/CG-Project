@@ -82,7 +82,6 @@ void Camera::toggle_mode() {
 void Camera::follow_target(const Vector3& new_target_position) {
 
     Vector3 old_target = orbit_look_at;
-    float   old_radius = orbit_radius;
     Vector3 current_pos = get_orbit_camera_position();
 
     orbit_look_at = old_target + (new_target_position - old_target);// * smoothFactor;

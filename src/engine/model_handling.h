@@ -19,8 +19,9 @@
 #include "../aux/curves.h"
 #include "../generator/model.h"
 
-extern int nmodels;
-extern int total_models;
+extern int current_models;
+extern bool show_bounding_box;
+extern bool show_catmull_curves;
 extern std::unordered_map<int, Vector3> position_dict;
 extern std::vector<int> position_keys;
 /**
@@ -29,7 +30,7 @@ extern std::vector<int> position_keys;
 class vbo {
     public:
         GLuint vertices, total_vertices, indexes, total_indexes;
-        
+        float bounding_box[6]; // xmin, xmax, ymin, ymax, zmin, zmax
         /**
          * @brief Constructor for VBO objects
          * 
@@ -37,9 +38,14 @@ class vbo {
          * @param tv Total number of vertices
          * @param i The index buffer handle
          * @param ti Total number of indices
+         * @param bounding_box 
          */
-        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti) 
-            : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti) {}
+        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti, float* bounding_box) 
+            : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti) {
+                for (int j = 0; j < 6; ++j) {
+                    this->bounding_box[j] = bounding_box[j];
+                }
+            }
     };
 
 extern std::unordered_map<std::string, vbo*> model_dict;

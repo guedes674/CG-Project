@@ -75,10 +75,10 @@ void process_mouse_motion(int x, int y) {
 void update_camera() {
     if (camera.mode == Camera::ORBIT) {
         // --- existing orbit controls ---
-        if(keys['a']) camera.orbit_alpha -= 0.01f;
-        if(keys['d']) camera.orbit_alpha += 0.01f;
-        if(keys['w']) camera.orbit_beta  = std::min(camera.orbit_beta + 0.01f, float(M_PI/2 - .01));
-        if(keys['s']) camera.orbit_beta  = std::max(camera.orbit_beta - 0.01f, float(-M_PI/2 + .01));
+        if(keys[(int)'a']) camera.orbit_alpha -= 0.01f;
+        if(keys[(int)'d']) camera.orbit_alpha += 0.01f;
+        if(keys[(int)'w']) camera.orbit_beta  = std::min(camera.orbit_beta + 0.01f, float(M_PI/2 - .01));
+        if(keys[(int)'s']) camera.orbit_beta  = std::max(camera.orbit_beta - 0.01f, float(-M_PI/2 + .01));
         if(special_keys[GLUT_KEY_UP])   camera.orbit_radius = std::max(camera.orbit_radius - .25f, 1.0f);
         if(special_keys[GLUT_KEY_DOWN]) camera.orbit_radius += .25f;
 
@@ -128,7 +128,19 @@ void default_key_func(unsigned char key, int x, int y) {
         }
         exit(0);
     }
+
+    if (tolower(key) == 'b') {
+        show_bounding_box = !show_bounding_box;
+    }
+
+    if (tolower(key) == 'p') {
+        show_catmull_curves = !show_catmull_curves;
+    }
     
+    if (tolower(key) == 'o') {
+        show_axes = !show_axes;
+    }
+
     glutPostRedisplay();
 }
 

@@ -56,17 +56,19 @@ int generate_model(string file_name, vector<float>& vertices, vector<unsigned in
  * @param indexes   Vector to store the read triangle indexes.
  * @return 0 if successful, 1 if file could not be opened.
  */
-int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes) {
+int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes, float* bounding_box) {
 
     ifstream file;
     file.open(file_name, ios::in); // Open file in input mode
 
-    int index = 0;     // Tracks component index (x, y, z), if needed
     float value = 0;   // Temporary storage for numeric conversion
 
     if (file.fail()) return 1; // Failed to open file
 
     else {
+        // Initialize the bounding box to ±infinity
+        bounding_box[0] = bounding_box[2] = bounding_box[4] =  std::numeric_limits<float>::max();   // mins
+        bounding_box[1] = bounding_box[3] = bounding_box[5] =  std::numeric_limits<float>::lowest(); // maxs
         string line;             // String to hold each line read from file
         string delimiter = ";";  // Delimiter used to split values
 
@@ -78,8 +80,15 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         // Process each value and add it to the vertices vector
         for (int i = 0; static_cast<unsigned long>(i) < v.size(); i++) {
             value = stof(v[i]);           // Convert string to float
+
+            size_t axis = i % 3;  // 0=x, 1=y, 2=z
+
+            // update min/max for this axis
+            bounding_box[axis*2 + 0] = std::min(bounding_box[axis*2 + 0], value);
+            bounding_box[axis*2 + 1] = std::max(bounding_box[axis*2 + 1], value);
+
             vertices.push_back(value);    // Store value in vertex vector
-            index = (index + 1) % 3;      // Update index cycle (tracking x,y,z components)
+            
         }
 
         // --- Second Line ---

@@ -40,8 +40,8 @@ int last_mouse_y  = 0;
 // --- MODEL VARIABLES ---
 int global_id = 0;
 
-int nmodels      = 0;
-int total_models = 0;
+int current_models      = 0;
+
 std::unordered_map<std::string, vbo*> model_dict;
 
 int xml_id = 1;
@@ -50,6 +50,9 @@ int current_group = 0;
 std::vector<int> position_keys;
 int current_target_index = -1; // -1 significa olhar para (0,0,0)
 
+bool show_bounding_box = false;
+bool show_catmull_curves = true;
+bool show_axes = true;
 // --- INPUT HANDLING VARIABLES ---
 bool mouse_dragging = false;
 
@@ -154,19 +157,21 @@ void render_scene(void) {
     }
 
     // Draw the axes
-    glBegin(GL_LINES);
-        glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
-        glVertex3f(-100.0f, 0.0f, 0.0f);
-        glVertex3f(100.0f, 0.0f, 0.0f);
+    if (show_axes){
+        glBegin(GL_LINES);
+            glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
+            glVertex3f(-100.0f, 0.0f, 0.0f);
+            glVertex3f(100.0f, 0.0f, 0.0f);
 
-        glColor3f(0.0f, 1.0f, 0.0f);   // y axis in green
-        glVertex3f(0.0f, -100.0f, 0.0f);
-        glVertex3f(0.0f, 100.0f, 0.0f);
+            glColor3f(0.0f, 1.0f, 0.0f);   // y axis in green
+            glVertex3f(0.0f, -100.0f, 0.0f);
+            glVertex3f(0.0f, 100.0f, 0.0f);
 
-        glColor3f(0.0f, 0.0f, 1.0f);   // z axis in blue
-        glVertex3f(0.0f, 0.0f, -100.0f);
-        glVertex3f(0.0f, 0.0f, 100.0f);
-    glEnd();
+            glColor3f(0.0f, 0.0f, 1.0f);   // z axis in blue
+            glVertex3f(0.0f, 0.0f, -100.0f);
+            glVertex3f(0.0f, 0.0f, 100.0f);
+        glEnd();
+    }
 
     glScalef(scale, scale, scale);
     for(const auto& group : parser.groups)
@@ -211,9 +216,9 @@ void render_scene(void) {
         render_text(text, window_width/40, window_height/35 + 60);
     }
 
-    snprintf(text, sizeof(text), "Numero de modelos: %d", nmodels);
+    snprintf(text, sizeof(text), "Numero de modelos: %d", current_models);
     render_text(text, window_width/40, window_height/35 + 80);
-    nmodels = 0;
+    current_models = 0;
 
     glutSwapBuffers();
 }
@@ -234,6 +239,7 @@ void timer_func(int value) {
 }
 
 void menu(int value) {
+
     switch(value) {
         case 1:
             camera.toggle_mode();
@@ -242,10 +248,27 @@ void menu(int value) {
             );
             break;
         case 2:
+            show_bounding_box = !show_bounding_box;
+            break;
+        case 3:
+            show_catmull_curves = !show_catmull_curves;
+            break;
+        case 4:
+            show_axes = !show_axes;
+            break;
+        case 9:
             exit(0);
             break;
         default:
             break;
+    }
+}
+
+void menu_status(int status, int x, int y) {
+    (void)x; (void)y;
+    if (status == GLUT_MENU_IN_USE) {
+        std::fill_n(keys,         256, false);
+        std::fill_n(special_keys, 256, false);
     }
 }
 
@@ -264,7 +287,7 @@ int main(int argc, char** argv) {
 
     parser = read_xml_file(argv[1]);
     init_camera();
-
+    camera.update_cursor_mode();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(800, 800);
@@ -293,8 +316,12 @@ int main(int argc, char** argv) {
     glutTimerFunc(0, timer_func, 0);
 
     glutCreateMenu(menu);  
-    glutAddMenuEntry("Change Cam Mode",1);  
+    glutAddMenuEntry("Change Cam Mode",1);
+    glutAddMenuEntry("Show/Hide Bounding Boxes",2);
+    glutAddMenuEntry("Show/Hide Catmull-Rom Curves",3);
+    glutAddMenuEntry("Show/Hide Axes",4);  
     glutAttachMenu(GLUT_RIGHT_BUTTON);  
+    glutMenuStatusFunc(menu_status);   
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);

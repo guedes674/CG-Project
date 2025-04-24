@@ -7,6 +7,6 @@
 #include "../aux/aux.h"
 
 int generate_model(std::string file_name, std::vector<float>& vertices, std::vector<unsigned int>& indexes);
-int read_model(std::string file_name, std::vector<float>& vertices, std::vector<unsigned int>& indexes);
+int read_model(std::string file_name, std::vector<float>& vertices, std::vector<unsigned int>& indexes,float * bounding_box);
 
 #endif

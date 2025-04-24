@@ -24,6 +24,7 @@ extern int last_frame_time;
 extern float scale;
 extern int current_target_index;
 extern std::unordered_map<std::string, vbo*> model_dict;
+extern bool show_axes;
 
 void process_mouse_motion(int x, int y);
 void process_mouse_buttons(int button, int state, int x, int y);
