@@ -15,6 +15,7 @@ static inline void get_mvp_matrix(float *matrix){
 	glPopMatrix();
 }
 
+
 // TODO : Fix this function!!!!!!!!
 static inline bool check_viewfrustum_draw(float *mvp, float *points) {
     for (int i = 0; i < 3; i++) {
@@ -23,8 +24,15 @@ static inline bool check_viewfrustum_draw(float *mvp, float *points) {
         // extract left/top/near  planes:  row_i + row3
         // extract right/bottom/far planes: row3   - row_i
         for (int j = 0; j < 4; j++) {
-            pos_plane[j] = mvp[i + 4*j]     + mvp[4*j + 3];
-            neg_plane[j] = mvp[4*j + 3]     - mvp[i + 4*j];
+            if (i == 1) {
+                // i==1: want pos_plane = row3 - row1 (top), neg_plane = row1 + row3 (bottom)
+                pos_plane[j] = mvp[4*j + 3]     - mvp[i + 4*j];
+                neg_plane[j] = mvp[i + 4*j]     + mvp[4*j + 3];
+            } else {
+                // i==0 or 2: left/near etc. unchanged
+                pos_plane[j] = mvp[i + 4*j]     + mvp[4*j + 3];
+                neg_plane[j] = mvp[4*j + 3]     - mvp[i + 4*j];
+            }
         }
 
         // pick the “farthest” AABB point for each plane
@@ -78,7 +86,6 @@ void draw_bounding_box(float * bounding_box){
         glVertex3f(bounding_box[1] - 0.1,bounding_box[2] + 0.1,bounding_box[5] - 0.1);
 	glEnd();
 }
-
 /**
  * @brief Processes time-based translations for object animations
  * 
@@ -204,16 +211,18 @@ void recursive_draw(const group_xml& group) {
     for(const auto& model : group.models) {
         vbo* current_vbo = model_dict[model.file_name];
         // Check here for view frustum culling
+        
             if (check_viewfrustum_draw(gl_matrix, current_vbo->bounding_box)){
             current_models++;
 
-            if (show_bounding_box)draw_bounding_box(current_vbo->bounding_box);
+
 
             glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
             glVertexPointer(3, GL_FLOAT, 0, 0);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indexes);
             glDrawElements(GL_TRIANGLES, current_vbo->total_indexes, GL_UNSIGNED_INT, 0);
+            if (show_bounding_box)draw_bounding_box(current_vbo->bounding_box);
         }
     }
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -260,4 +269,40 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
         if(populate_dict(subgroup, dict)) return 1;
 
     return 0;
+}
+
+void vbo::recomputeAABB_fromVBO(const float model[16]) {
+    // 1) liga o buffer e mapeia
+    glBindBuffer(GL_ARRAY_BUFFER, vertices);
+    float* data = (float*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+    if (!data) return;  // falha ao mapear, sai sem alterar a box
+
+    // 2) prepara min/max iniciais
+    float wminX =  FLT_MAX, wminY =  FLT_MAX, wminZ =  FLT_MAX;
+    float wmaxX = -FLT_MAX, wmaxY = -FLT_MAX, wmaxZ = -FLT_MAX;
+
+    // 3) percorre todos os vértices
+    for (unsigned i = 0; i < total_vertices; ++i) {
+        // posições no VBO
+        float x = data[3*i + 0];
+        float y = data[3*i + 1];
+        float z = data[3*i + 2];
+
+        // multiplica pela matriz model (coluna-major):
+        float wx = model[0]*x + model[4]*y + model[ 8]*z + model[12];
+        float wy = model[1]*x + model[5]*y + model[ 9]*z + model[13];
+        float wz = model[2]*x + model[6]*y + model[10]*z + model[14];
+
+        // atualiza min/max
+        wminX = std::min(wminX, wx);  wmaxX = std::max(wmaxX, wx);
+        wminY = std::min(wminY, wy);  wmaxY = std::max(wmaxY, wy);
+        wminZ = std::min(wminZ, wz);  wmaxZ = std::max(wmaxZ, wz);
+    }
+
+    // 4) desmapeia e guarda a nova box
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+
+    bounding_box[0] = wminX;  bounding_box[1] = wmaxX;
+    bounding_box[2] = wminY;  bounding_box[3] = wmaxY;
+    bounding_box[4] = wminZ;  bounding_box[5] = wmaxZ;
 }

@@ -8,7 +8,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #endif
-
+#include <cfloat>    
 #include <iostream>
 #include <unordered_map>
 #include <string>
@@ -40,13 +40,14 @@ class vbo {
          * @param ti Total number of indices
          * @param bounding_box 
          */
-        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti, float* bounding_box) 
-            : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti) {
-                for (int j = 0; j < 6; ++j) {
-                    this->bounding_box[j] = bounding_box[j];
-                }
+        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti, float* bounding_box) : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti) {
+            for (int j = 0; j < 6; ++j) {
+                this->bounding_box[j] = bounding_box[j];
             }
-    };
+        }
+
+        void recomputeAABB_fromVBO(const float model[16]);
+};
 
 extern std::unordered_map<std::string, vbo*> model_dict;
 
