@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <limits>
 #include <fstream>
 #include "../aux/aux.h"
 

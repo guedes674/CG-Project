@@ -13,7 +13,7 @@
             <scale x="2" y="2" z="2" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/sun.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/sun.xml" />
         </xmls>
     </group>
 
@@ -42,7 +42,7 @@
             <scale x="0.2" y="0.2" z="0.2" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/mercury.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/mercury.xml" />
         </xmls>
     </group>
 
@@ -71,7 +71,7 @@
             <scale x="0.2" y="0.2" z="0.2" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/venus.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/venus.xml" />
         </xmls> 
     </group>
 
@@ -101,7 +101,7 @@
             <scale x="0.8" y="0.8" z="0.8" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/earth.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/earth.xml" />
         </xmls>
     </group>
 
@@ -130,7 +130,7 @@
             <scale x="0.6" y="0.6" z="0.6" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/mars.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/mars.xml" />
         </xmls>
     </group>
 
@@ -159,7 +159,7 @@
             <scale x="0.8" y="0.8" z="0.8" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/jupiter.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/jupiter.xml" />
         </xmls>
     </group>
 
@@ -188,7 +188,7 @@
             <scale x="0.6" y="0.6" z="0.6" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/saturn.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/saturn.xml" />
         </xmls>
     </group>
 
@@ -217,7 +217,7 @@
             <scale x="0.7" y="0.7" z="0.7" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/uranus.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/uranus.xml" />
         </xmls>
     </group>
 
@@ -246,7 +246,7 @@
             <scale x="0.75" y="0.75" z="0.75" />
         </transform>
         <xmls>
-            <xml file="test files/solar_system/celestial_bodies/neptune.xml" />
+            <xml file="engine-files/solar_system/celestial_bodies/neptune.xml" />
         </xmls>
     </group>
     <!--COMMET ORBIT-->

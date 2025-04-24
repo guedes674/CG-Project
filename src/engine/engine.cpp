@@ -287,7 +287,6 @@ int main(int argc, char** argv) {
 
     parser = read_xml_file(argv[1]);
     init_camera();
-    camera.update_cursor_mode();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(800, 800);
@@ -315,6 +314,7 @@ int main(int argc, char** argv) {
     glutMouseFunc(process_mouse_buttons);
     glutTimerFunc(0, timer_func, 0);
 
+    camera.update_cursor_mode();
     glutCreateMenu(menu);  
     glutAddMenuEntry("Change Cam Mode",1);
     glutAddMenuEntry("Show/Hide Bounding Boxes",2);

@@ -25,7 +25,7 @@
             <rotate angle="90" x = "0" y="1" z = "0" />
         </transform>
         <xmls>
-            <xml file="test files/test_files_phase_2/test_2_6.xml" />
+            <xml file="engine-files/test_files_phase_2/test_2_6.xml" />
         </xmls>
     </group> 	
 </world>
