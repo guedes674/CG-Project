@@ -7,20 +7,11 @@ int startX = 0, startY = 0;
 
 void update_camera_target_from_index() {
     if (current_target_index >= 0 && current_target_index < (int)position_keys.size()) {
-        camera.orbit_look_at = position_dict[position_keys[current_target_index]];
+        int id = position_keys[current_target_index];
+        camera.orbit_look_at = position_dict[id];
     } else {
         camera.orbit_look_at = Vector3(0.0f, 0.0f, 0.0f); // reset para origem
     }
-
-    // Atualiza parâmetros da câmara ORBIT com base na nova posição
-    Vector3 dir = camera.orbit_look_at - (camera.orbit_look_at - Vector3(
-        camera.orbit_radius * sin(camera.orbit_alpha) * cos(camera.orbit_beta),
-        camera.orbit_radius * sin(camera.orbit_beta),
-        camera.orbit_radius * cos(camera.orbit_alpha) * cos(camera.orbit_beta)
-    ));
-    dir = dir.normalize();
-    camera.orbit_alpha = atan2(-dir.x, -dir.z);
-    camera.orbit_beta = -asin(dir.y);
 }
 
 /**
@@ -28,15 +19,19 @@ void update_camera_target_from_index() {
  */
 void process_mouse_buttons(int button, int state, int x, int y) {
     if (state == GLUT_DOWN) {
-        if (button == GLUT_LEFT_BUTTON && camera.mode == Camera::FPS) {
+        // start dragging on left button in both FPS and ORBIT
+        if (button == GLUT_LEFT_BUTTON) {
             startX = x;
             startY = y;
             mouse_dragging = true;
-        } else if (camera.mode == Camera::ORBIT) {
+        }
+        else if (camera.mode == Camera::ORBIT) {
+            // scroll wheel zoom in/out
             if (button == 3) camera.orbit_radius = std::max(camera.orbit_radius - 0.25f, 1.0f);
             else if (button == 4) camera.orbit_radius += 0.25f;
         }
-    } else if (state == GLUT_UP && button == GLUT_LEFT_BUTTON) {
+    }
+    else if (state == GLUT_UP && button == GLUT_LEFT_BUTTON) {
         mouse_dragging = false;
     }
 
@@ -48,22 +43,32 @@ void process_mouse_buttons(int button, int state, int x, int y) {
  * @brief Arrasta a câmara com o rato em modo ORBIT
  */
 void process_mouse_motion(int x, int y) {
-    if (!mouse_dragging || camera.mode != Camera::FPS) return;
+    if (!mouse_dragging) return;
 
-    float dx = (x - startX) * camera.sensitivity;
-    float dy = (y - startY) * camera.sensitivity;
+    float dx;
+    float dy;
+    if (camera.mode == Camera::FPS) {
+        // --- FPS rotation ---
+        dx = (x - startX) * camera.sensitivity;
+        dy = (y - startY) * camera.sensitivity;
+        camera.fps_yaw   += dx;
+        camera.fps_pitch -= dy;
+        camera.fps_pitch = camera.fps_pitch < -89.0f ? -89.0f : (camera.fps_pitch > 89.0f ? 89.0f : camera.fps_pitch);
+        camera.update_fps_vectors();
 
-    camera.fps_yaw   += dx;
-    camera.fps_pitch -= dy;
-
-    camera.fps_pitch = camera.fps_pitch < -89.0f ? -89.0f : (camera.fps_pitch > 89.0f ? 89.0f : camera.fps_pitch);
-
-    // Atualiza a direção do vetor frontal
-    camera.update_fps_vectors();
+    } else if (camera.mode == Camera::ORBIT) {
+        dx = (x - startX) * camera.sensitivity_orbit;
+        dy = (y - startY) * camera.sensitivity_orbit;
+        // --- ORBIT drag rotates around target ---
+        camera.orbit_azimuth += dx;
+        camera.orbit_polar  -= dy;
+        // clamp beta to avoid gimbal‐lock at poles
+        float limit = M_PI/2.0f - 0.01f;
+        camera.orbit_polar = std::max(std::min(camera.orbit_polar, limit), -limit);
+    }
 
     startX = x;
     startY = y;
-
     glutPostRedisplay();
 }
 
@@ -75,10 +80,10 @@ void process_mouse_motion(int x, int y) {
 void update_camera() {
     if (camera.mode == Camera::ORBIT) {
         // --- existing orbit controls ---
-        if(keys[(int)'a']) camera.orbit_alpha -= 0.01f;
-        if(keys[(int)'d']) camera.orbit_alpha += 0.01f;
-        if(keys[(int)'w']) camera.orbit_beta  = std::min(camera.orbit_beta + 0.01f, float(M_PI/2 - .01));
-        if(keys[(int)'s']) camera.orbit_beta  = std::max(camera.orbit_beta - 0.01f, float(-M_PI/2 + .01));
+        if(keys[(int)'a']) camera.orbit_azimuth -= 0.01f;
+        if(keys[(int)'d']) camera.orbit_azimuth += 0.01f;
+        if(keys[(int)'w']) camera.orbit_polar  = std::min(camera.orbit_polar + 0.01f, float(M_PI/2 - .01));
+        if(keys[(int)'s']) camera.orbit_polar  = std::max(camera.orbit_polar - 0.01f, float(-M_PI/2 + .01));
         if(special_keys[GLUT_KEY_UP])   camera.orbit_radius = std::max(camera.orbit_radius - .25f, 1.0f);
         if(special_keys[GLUT_KEY_DOWN]) camera.orbit_radius += .25f;
 

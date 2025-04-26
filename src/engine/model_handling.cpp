@@ -38,9 +38,9 @@ static inline bool check_viewfrustum_draw(float *mvp, float *points) {
         // pick the “farthest” AABB point for each plane
         for (int j = 0; j < 3; j++) {
             p_pos[j] = (pos_plane[j] < 0)
-                         ? points[2*j]   : points[2*j+1];
+                        ? points[2*j]   : points[2*j+1];
             p_neg[j] = (neg_plane[j] < 0)
-                         ? points[2*j]   : points[2*j+1];
+                        ? points[2*j]   : points[2*j+1];
         }
 
         // if *either* plane pushes its farthest point behind it, cull immediately
@@ -271,6 +271,8 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
     return 0;
 }
 
+
+// May be used in the future
 void vbo::recomputeAABB_fromVBO(const float model[16]) {
     // 1) liga o buffer e mapeia
     glBindBuffer(GL_ARRAY_BUFFER, vertices);

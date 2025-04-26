@@ -142,10 +142,9 @@ void render_scene(void) {
     // Set up view matrix based on camera mode
     if(camera.mode == Camera::ORBIT) {
         // Calculate orbit position
-        float eye_x = camera.orbit_look_at.x + camera.orbit_radius * cos(camera.orbit_beta) * sin(camera.orbit_alpha);
-        float eye_y = camera.orbit_look_at.y + camera.orbit_radius * sin(camera.orbit_beta);
-        float eye_z = camera.orbit_look_at.z + camera.orbit_radius * cos(camera.orbit_beta) * cos(camera.orbit_alpha);
-        
+        float eye_x = camera.orbit_look_at.x + camera.orbit_radius * cos(camera.orbit_polar) * sin(camera.orbit_azimuth);
+        float eye_y = camera.orbit_look_at.y + camera.orbit_radius * sin(camera.orbit_polar);
+        float eye_z = camera.orbit_look_at.z + camera.orbit_radius * cos(camera.orbit_polar) * cos(camera.orbit_azimuth);
         gluLookAt(eye_x, eye_y, eye_z,
                 camera.orbit_look_at.x, camera.orbit_look_at.y, camera.orbit_look_at.z,
                 parser.cam.ux, parser.cam.uy, parser.cam.uz);
@@ -202,7 +201,7 @@ void render_scene(void) {
             camera.fps_position.x, camera.fps_position.y, camera.fps_position.z);
         render_text(text, window_width/40, window_height/35 + 60);
     } else {
-        snprintf(text, sizeof(text), "Orbit α: %.3f", camera.orbit_alpha);
+        snprintf(text, sizeof(text), "Orbit α: %.3f", camera.orbit_azimuth);
         render_text(text, window_width/40, window_height/35 + 20);
         snprintf(text, sizeof(text),
             "Look x: %.3f y: %.3f z: %.3f",
@@ -210,9 +209,9 @@ void render_scene(void) {
         render_text(text, window_width/40, window_height/35 + 40);
         snprintf(text, sizeof(text),
             "Pos x: %.3f y: %.3f z: %.3f",
-            camera.orbit_radius * cos(camera.orbit_beta) * sin(camera.orbit_alpha),
-            camera.orbit_radius * sin(camera.orbit_beta),
-            camera.orbit_radius * cos(camera.orbit_beta) * cos(camera.orbit_alpha));
+            camera.orbit_radius * cos(camera.orbit_polar) * sin(camera.orbit_azimuth),
+            camera.orbit_radius * sin(camera.orbit_polar),
+            camera.orbit_radius * cos(camera.orbit_polar) * cos(camera.orbit_azimuth));
         render_text(text, window_width/40, window_height/35 + 60);
     }
 

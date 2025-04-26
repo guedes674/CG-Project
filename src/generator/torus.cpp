@@ -21,7 +21,7 @@ void torus(float inner_radius, float outer_radius, int slices, int stacks, vecto
 
         for (int j = 0; j <= stacks; j++) {
 
-            aux_radius = cos(stacks_ang_inc * j) * inner_radius; //anglo interno rebatido para o o plano xoz
+            aux_radius = cos(stacks_ang_inc * j) * inner_radius;
             vertices.push_back(radius_x + aux_radius * cos_B);
             vertices.push_back(sin(stacks_ang_inc * j) * inner_radius);
             vertices.push_back(radius_z + aux_radius * sin_B);
@@ -31,13 +31,13 @@ void torus(float inner_radius, float outer_radius, int slices, int stacks, vecto
 
     for (int i = 0; i < slices; i++) {
         for (int j = 0; j < stacks; j++) {
-        	indexes.push_back(i*(stacks+1)+j);
-        	indexes.push_back(i*(stacks+1)+(j + 1));
-        	indexes.push_back((i+1)*(stacks+1)+j);
+            indexes.push_back(i*(stacks+1)+j);  
+            indexes.push_back(i*(stacks+1)+(j + 1));
+            indexes.push_back((i+1)*(stacks+1)+j);
 
-        	indexes.push_back(i*(stacks+1)+(j + 1));
-        	indexes.push_back((i+1)*(stacks+1)+(j+1));
-        	indexes.push_back((i+1)*(stacks+1)+j);
+            indexes.push_back(i*(stacks+1)+(j + 1));
+            indexes.push_back((i+1)*(stacks+1)+(j+1));
+            indexes.push_back((i+1)*(stacks+1)+j);
         }
     }
 }

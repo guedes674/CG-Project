@@ -85,8 +85,6 @@ group_xml recursive_catch_groups(XMLElement* group) {
                 else{
                     string align      = get_string_attribute(current_transform, "align",    "false");
                     string tracking   = get_string_attribute(current_transform, "tracking", "false");
-    
-                    if ((strcmp(tracking.c_str(),"true"))==0)cout << "TRACKING TRACKING TRACKING: " << tracking << endl;
 
                     XMLElement* point_xml = current_transform->FirstChildElement("point");
                     vector<Vector3> points;
@@ -99,7 +97,6 @@ group_xml recursive_catch_groups(XMLElement* group) {
                     }
                     bool align_flag    = strcmp(align.c_str(), "true") == 0;
                     bool tracking_flag = strcmp(tracking.c_str(), "true") == 0;
-                    if (align_flag) cout << "ALIGN ALIGN ALIGN: " << align << endl;
                     time_transformation_xml time_trans(align_flag, tracking_flag, points);
                     new_group.transformations.translation.time_trans = time_trans;
                 }
@@ -165,7 +162,6 @@ xml_parser read_xml_file(string file_name){
 	}
     parser.win.width = get_int_attribute(win, "width", 800);
     parser.win.width = get_int_attribute(win, "height", 800);
-	printf("Tamanho da janela: %d x %d\n", parser.win.width, parser.win.width);
 
     // Carrega a configuração da câmera
     XMLElement* cam = world->FirstChildElement("camera");

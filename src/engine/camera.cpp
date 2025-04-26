@@ -28,8 +28,8 @@ void Camera::init_from_xml(xml_parser& parser) {
     
     Vector3 dir = orbit_look_at - initial_pos;
     dir = dir.normalize();
-    orbit_alpha = atan2(-dir.x, -dir.z);
-    orbit_beta = -asin(dir.y);
+    orbit_azimuth = atan2(-dir.x, -dir.z);
+    orbit_polar = -asin(dir.y);
     
     // FPS mode initialization
     fps_position = initial_pos;
@@ -72,8 +72,8 @@ void Camera::toggle_mode() {
         orbit_radius = fps_position.distance(orbit_look_at);
         Vector3 dir = orbit_look_at - fps_position;
         dir = dir.normalize();
-        orbit_alpha = atan2(-dir.x, -dir.z);
-        orbit_beta = -asin(dir.y);
+        orbit_azimuth = atan2(-dir.x, -dir.z);
+        orbit_polar = -asin(dir.y);
     }
     update_cursor_mode();
 }
@@ -92,23 +92,23 @@ void Camera::follow_target(const Vector3& new_target_position) {
 
     Vector3 dir = (orbit_look_at - smoothed_pos).normalize();
     //orbit_radius = old_radius;               // ← preserve constant radius
-    bool old_alpha = (orbit_alpha > 0.0f);
-    orbit_alpha  = atan2(-dir.x, -dir.z);
-    if (old_alpha != (orbit_alpha > 0.0f)) {
-        orbit_alpha = -orbit_alpha;
+    bool old_alpha = (orbit_azimuth > 0.0f);
+    orbit_azimuth  = atan2(-dir.x, -dir.z);
+    if (old_alpha != (orbit_azimuth > 0.0f)) {
+        orbit_azimuth = -orbit_azimuth;
     }
-    bool old_beta = (orbit_beta > 0.0f);
-    orbit_beta   = -asin(dir.y);
-    if (old_beta != (orbit_beta > 0.0f)) {
-        orbit_beta = -orbit_beta;
+    bool old_beta = (orbit_polar > 0.0f);
+    orbit_polar   = -asin(dir.y);
+    if (old_beta != (orbit_polar > 0.0f)) {
+        orbit_polar = -orbit_polar;
     }
 
 }
 
 Vector3 Camera::get_orbit_camera_position() const {
-    float x = orbit_look_at.x + orbit_radius * cos(orbit_beta) * sin(orbit_alpha);
-    float y = orbit_look_at.y + orbit_radius * sin(orbit_beta);
-    float z = orbit_look_at.z + orbit_radius * cos(orbit_beta) * cos(orbit_alpha);
+    float x = orbit_look_at.x + orbit_radius * cos(orbit_polar) * sin(orbit_azimuth);
+    float y = orbit_look_at.y + orbit_radius * sin(orbit_polar);
+    float z = orbit_look_at.z + orbit_radius * cos(orbit_polar) * cos(orbit_azimuth);
     return Vector3(x, y, z);
 }
 
