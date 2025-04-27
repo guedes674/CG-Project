@@ -15,40 +15,37 @@ static inline void get_mvp_matrix(float *matrix){
 	glPopMatrix();
 }
 
+static inline bool check_viewfrustum_draw(
+    const float mvp[16],     // MVP em column-major
+    const float bounds[6])   // { minX, maxX, minY, maxY, minZ, maxZ }
+{
+    // Extrai os 6 planos: left, right, bottom, top, near, far
+    float planes[6][4];
+    for (int i = 0; i < 4; ++i) {
+        planes[0][i] =  mvp[3 + 4*i] + mvp[0 + 4*i]; // left
+        planes[1][i] =  mvp[3 + 4*i] - mvp[0 + 4*i]; // right
+        planes[2][i] =  mvp[3 + 4*i] + mvp[1 + 4*i]; // bottom
+        planes[3][i] =  mvp[3 + 4*i] - mvp[1 + 4*i]; // top
+        planes[4][i] =  mvp[3 + 4*i] + mvp[2 + 4*i]; // near
+        planes[5][i] =  mvp[3 + 4*i] - mvp[2 + 4*i]; // far
+    }
 
-// TODO : Fix this function!!!!!!!!
-static inline bool check_viewfrustum_draw(float *mvp, float *points) {
-    for (int i = 0; i < 3; i++) {
-        float pos_plane[4], neg_plane[4], p_pos[3], p_neg[3];
+    // Normaliza cada plano (|normal| = 1)
+    for (int p = 0; p < 6; p++) {
+        float a = planes[p][0], b = planes[p][1], c = planes[p][2];
+        float invLen = 1.0f / sqrtf(a*a + b*b + c*c);
+        for (int i = 0; i < 4; i++)
+            planes[p][i] *= invLen;
+    }
 
-        // extract left/top/near  planes:  row_i + row3
-        // extract right/bottom/far planes: row3   - row_i
-        for (int j = 0; j < 4; j++) {
-            if (i == 1) {
-                // i==1: want pos_plane = row3 - row1 (top), neg_plane = row1 + row3 (bottom)
-                pos_plane[j] = mvp[4*j + 3]     - mvp[i + 4*j];
-                neg_plane[j] = mvp[i + 4*j]     + mvp[4*j + 3];
-            } else {
-                // i==0 or 2: left/near etc. unchanged
-                pos_plane[j] = mvp[i + 4*j]     + mvp[4*j + 3];
-                neg_plane[j] = mvp[4*j + 3]     - mvp[i + 4*j];
-            }
-        }
-
-        // pick the “farthest” AABB point for each plane
-        for (int j = 0; j < 3; j++) {
-            p_pos[j] = (pos_plane[j] < 0)
-                        ? points[2*j]   : points[2*j+1];
-            p_neg[j] = (neg_plane[j] < 0)
-                        ? points[2*j]   : points[2*j+1];
-        }
-
-        // if *either* plane pushes its farthest point behind it, cull immediately
-        if ((pos_plane[0]*p_pos[0] + pos_plane[1]*p_pos[1] + pos_plane[2]*p_pos[2] + pos_plane[3]) < 0 ||
-            (neg_plane[0]*p_neg[0] + neg_plane[1]*p_neg[1] + neg_plane[2]*p_neg[2] + neg_plane[3]) < 0)
-        {
+    // Testa cada plano com o "p-vertex" do AABB
+    for (int p = 0; p < 6; p++) {
+        const float* pl = planes[p];
+        float x = (pl[0] >= 0.0f) ? bounds[1] : bounds[0];
+        float y = (pl[1] >= 0.0f) ? bounds[3] : bounds[2];
+        float z = (pl[2] >= 0.0f) ? bounds[5] : bounds[4];
+        if (pl[0]*x + pl[1]*y + pl[2]*z + pl[3] < 0.0f)
             return false;
-        }
     }
     return true;
 }
@@ -166,7 +163,6 @@ void recursive_draw(const group_xml& group) {
 
     glPushMatrix();
     
-    get_mvp_matrix(gl_matrix);
 
     int order[3] = {0};
     for(int i = 0; i < 3; i++) {
@@ -205,6 +201,8 @@ void recursive_draw(const group_xml& group) {
         }
     }
 
+    get_mvp_matrix(gl_matrix);
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -212,7 +210,7 @@ void recursive_draw(const group_xml& group) {
         vbo* current_vbo = model_dict[model.file_name];
         // Check here for view frustum culling
         
-            if (check_viewfrustum_draw(gl_matrix, current_vbo->bounding_box)){
+        if (check_viewfrustum_draw(gl_matrix, current_vbo->bounding_box)){
             current_models++;
 
             glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
