@@ -22,6 +22,8 @@
 extern int current_models;
 extern bool show_bounding_box;
 extern bool show_catmull_curves;
+extern bool snapshot;
+extern int last_time;
 extern std::unordered_map<int, Vector3> position_dict;
 extern std::vector<int> position_keys;
 /**

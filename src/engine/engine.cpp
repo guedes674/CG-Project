@@ -41,8 +41,8 @@ int last_mouse_y  = 0;
 int global_id = 0;
 
 int current_models      = 0;
-float gl_last_matrix[16];
 bool snapshot = false;
+int last_time = 0;
 
 std::unordered_map<std::string, vbo*> model_dict;
 
@@ -137,6 +137,8 @@ void render_scene(void) {
     int time;
 	float fps;
     static char text_fps[64];
+
+    if (!snapshot)last_time = glutGet(GLUT_ELAPSED_TIME);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();

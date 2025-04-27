@@ -1,8 +1,5 @@
 #include "model_handling.h"
 
-extern bool snapshot;
-extern float gl_last_matrix[16];
-
 //Retorna a Model View Matrix
 static inline void get_mvp_matrix(float *matrix){
 	float model_view[16],projection[16];
@@ -92,7 +89,7 @@ void draw_bounding_box(float * bounding_box){
  * @param translation The translation parameters from XML
  */
 void time_translation(translation_xml translation) {
-    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+    double t = last_time / 1000.0;
     t /= translation.time;
     t -= floor(t);  // Loop animation
 
@@ -147,7 +144,7 @@ void time_translation(translation_xml translation) {
 }
 
 void time_rotation(rotation_xml rotation) {
-    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+    double t = last_time / 1000.0;
     t /= rotation.time;
     t -= floor(t);  // Loop animation
 
@@ -204,16 +201,9 @@ void recursive_draw(const group_xml& group) {
         }
     }
 
-    /*
-    if (snapshot){
-        for (int i = 0; i < 16; i++) gl_matrix[i] = gl_last_matrix[i];
-    }
-    else{
-        get_mvp_matrix(gl_matrix);
-        for (int i = 0; i < 16; i++) gl_last_matrix[i] = gl_matrix[i];
-    }
-    */
     get_mvp_matrix(gl_matrix);
+
+    //get_mvp_matrix(gl_matrix);
     glEnableClientState(GL_VERTEX_ARRAY);
     glColor3f(1.0f, 1.0f, 1.0f);
 
