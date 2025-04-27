@@ -8,4 +8,4 @@
 #include <sstream>
 #include <vector>
 
-std::vector<std::string> parseLine(std::string s, std::string delimiter);
+std::vector<std::string> parse_line(std::string s, std::string delimiter);

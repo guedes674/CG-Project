@@ -74,7 +74,7 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
 
         // --- First Lines ---
         getline(file, line);                           // Read the first line
-        vector<string> v = parseLine(line, delimiter); // Split line into float strings
+        vector<string> v = parse_line(line, delimiter); // Split line into float strings
         vertices.reserve(v.size());                    // Reserve memory in vector for efficiency
 
         // Process each value and add it to the vertices vector
@@ -93,7 +93,7 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
 
         // --- Second Line ---
         getline(file, line);                            // Read second line
-        vector<string> iv = parseLine(line, delimiter); // Split line into unsigned int strings
+        vector<string> iv = parse_line(line, delimiter); // Split line into unsigned int strings
         indexes.reserve(iv.size());                     // Reserve memory in index vector
 
         // Process each value and add it to the indexes vector

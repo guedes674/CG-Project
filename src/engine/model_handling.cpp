@@ -215,8 +215,6 @@ void recursive_draw(const group_xml& group) {
             if (check_viewfrustum_draw(gl_matrix, current_vbo->bounding_box)){
             current_models++;
 
-
-
             glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
             glVertexPointer(3, GL_FLOAT, 0, 0);
 

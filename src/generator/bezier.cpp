@@ -42,7 +42,7 @@ int read_patch_file(char* patch, vector<Vector3> &points, vector<vector<int>> &i
             vector<int> index_line;
 
             // Parse comma-separated list of indices
-            vector<string> input = parseLine(line,delimiter);
+            vector<string> input = parse_line(line,delimiter);
             int line_size = input.size();
             index_line.reserve(line_size);
 
@@ -65,7 +65,7 @@ int read_patch_file(char* patch, vector<Vector3> &points, vector<vector<int>> &i
             getline(file,line);
             
             // Parse comma-separated coordinates
-            vector<string> input = parseLine(line, delimiter);
+            vector<string> input = parse_line(line, delimiter);
             
             // Create Vector3 from x,y,z coordinates
             points.push_back(Vector3(stof(input[0]),stof(input[1]),stof(input[2])));
@@ -125,24 +125,18 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
     
                 // Arrays to store the calculated Vector3 and its derivatives
                 float Vector3[3] = {0};  // Surface Vector3 (x,y,z)
-                float du[3] = {0};     // Derivative with respect to u
-                float dv[3] = {0};     // Derivative with respect to v
     
                 // Calculate surface Vector3 using bicubic Bezier formula with Bernstein polynomials
                 for (int i = 0; i < 4; i++) {
                     float bi = bernstein(i, 3, t_u);       // Bernstein polynomial for u
-                    float dbi = bernstein_deriv(i, 3, t_u); // Derivative of Bernstein polynomial for u
                     
                     for (int j = 0; j < 4; j++) {
                         float bj = bernstein(j, 3, t_v);       // Bernstein polynomial for v
-                        float dbj = bernstein_deriv(j, 3, t_v); // Derivative of Bernstein polynomial for v
     
                         // Calculate position and derivatives for x, y, and z
                         for (int k = 0; k < 3; k++) {
                             float cp = control_points[i][j][k];
                             Vector3[k] += bi * bj * cp;      // Surface Vector3
-                            du[k] += dbi * bj * cp;        // Partial derivative with respect to u
-                            dv[k] += bi * dbj * cp;        // Partial derivative with respect to v
                         }
                     }
                 }

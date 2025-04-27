@@ -2,7 +2,7 @@
 
 using namespace std;
 
-vector<string> parseLine(string s, string delimiter) {
+vector<string> parse_line(string s, string delimiter) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     string token;
     vector<string> res;

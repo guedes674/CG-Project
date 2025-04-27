@@ -20,37 +20,6 @@ float bernstein_deriv(int i, int n, float t) {
     return n * (bernstein(i-1, n-1, t) - bernstein(i, n-1, t));
 }
 
-void bezier_curve(int tessellation, float points[4][3], float* result) {
-    const float step = 1.0f / tessellation;
-    int offset = 0;
-
-    for (float t = 0.0f; t <= 1.0f + 1e-6; t += step) {
-        // Precompute (1-t) and its powers
-        const float mt = 1.0f - t;
-        const float mt2 = mt * mt;
-        const float mt3 = mt2 * mt;
-        const float t2 = t * t;
-        const float t3 = t2 * t;
-
-        // Hardcoded Bernstein weights for cubic Bézier
-        const float B[4] = {
-            1.0f * mt3,          // i=0
-            3.0f * t * mt2,      // i=1
-            3.0f * t2 * mt,      // i=2
-            1.0f * t3            // i=3
-        };
-
-        // Compute position (same as before)
-        for (int axis = 0; axis < 3; ++axis) {
-            float sum = 0.0f;
-            for (int i = 0; i < 4; ++i) {
-                sum += points[i][axis] * B[i];
-            }
-            result[offset++] = sum;
-        }
-    }
-}
-
 void catmullrom_curve(int tessellation, std::vector<Vector3>& points, float* result, float* result_deriv) {
     const int n = points.size();
     const float step = 1.0f / tessellation;
