@@ -41,6 +41,8 @@ int last_mouse_y  = 0;
 int global_id = 0;
 
 int current_models      = 0;
+float gl_last_matrix[16];
+bool snapshot = false;
 
 std::unordered_map<std::string, vbo*> model_dict;
 
@@ -201,7 +203,7 @@ void render_scene(void) {
             camera.fps_position.x, camera.fps_position.y, camera.fps_position.z);
         render_text(text, window_width/40, window_height/35 + 60);
     } else {
-        snprintf(text, sizeof(text), "Orbit α: %.3f", camera.orbit_azimuth);
+        snprintf(text, sizeof(text), "Radius α: %.3f", camera.orbit_radius);
         render_text(text, window_width/40, window_height/35 + 20);
         snprintf(text, sizeof(text),
             "Look x: %.3f y: %.3f z: %.3f",
@@ -254,6 +256,9 @@ void menu(int value) {
             break;
         case 4:
             show_axes = !show_axes;
+            break;
+        case 5:
+            snapshot = !snapshot;
             break;
         case 9:
             exit(0);
@@ -318,7 +323,8 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Change Cam Mode",1);
     glutAddMenuEntry("Show/Hide Bounding Boxes",2);
     glutAddMenuEntry("Show/Hide Catmull-Rom Curves",3);
-    glutAddMenuEntry("Show/Hide Axes",4);  
+    glutAddMenuEntry("Show/Hide Axes",4);
+    glutAddMenuEntry("Snapshot",5);    
     glutAttachMenu(GLUT_RIGHT_BUTTON);  
     glutMenuStatusFunc(menu_status);   
 

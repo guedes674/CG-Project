@@ -1,5 +1,8 @@
 #include "model_handling.h"
 
+extern bool snapshot;
+extern float gl_last_matrix[16];
+
 //Retorna a Model View Matrix
 static inline void get_mvp_matrix(float *matrix){
 	float model_view[16],projection[16];
@@ -201,8 +204,16 @@ void recursive_draw(const group_xml& group) {
         }
     }
 
+    /*
+    if (snapshot){
+        for (int i = 0; i < 16; i++) gl_matrix[i] = gl_last_matrix[i];
+    }
+    else{
+        get_mvp_matrix(gl_matrix);
+        for (int i = 0; i < 16; i++) gl_last_matrix[i] = gl_matrix[i];
+    }
+    */
     get_mvp_matrix(gl_matrix);
-
     glEnableClientState(GL_VERTEX_ARRAY);
     glColor3f(1.0f, 1.0f, 1.0f);
 
