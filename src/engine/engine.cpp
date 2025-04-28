@@ -42,8 +42,10 @@ int global_id = 0;
 
 int current_models      = 0;
 bool snapshot = false;
+bool time_stop = false;
 int last_time = 0;
-
+int delta_time = 0;
+float gl_last_matrix[16];
 std::unordered_map<std::string, vbo*> model_dict;
 
 int xml_id = 1;
@@ -138,7 +140,11 @@ void render_scene(void) {
 	float fps;
     static char text_fps[64];
 
-    if (!snapshot)last_time = glutGet(GLUT_ELAPSED_TIME);
+    if (!time_stop){
+        last_time = glutGet(GLUT_ELAPSED_TIME) - delta_time;
+    }else {
+        delta_time = glutGet(GLUT_ELAPSED_TIME) - last_time;
+    }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -260,7 +266,11 @@ void menu(int value) {
             show_axes = !show_axes;
             break;
         case 5:
+            time_stop = !time_stop;
+            break;
+        case 6:
             snapshot = !snapshot;
+            if((!time_stop && snapshot)||(time_stop && !snapshot)) time_stop = !time_stop;
             break;
         case 9:
             exit(0);
@@ -326,7 +336,8 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Show/Hide Bounding Boxes",2);
     glutAddMenuEntry("Show/Hide Catmull-Rom Curves",3);
     glutAddMenuEntry("Show/Hide Axes",4);
-    glutAddMenuEntry("Snapshot",5);    
+    glutAddMenuEntry("Time Stop",5);  
+    glutAddMenuEntry("Snapshot",6);  
     glutAttachMenu(GLUT_RIGHT_BUTTON);  
     glutMenuStatusFunc(menu_status);   
 

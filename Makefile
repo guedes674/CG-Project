@@ -14,18 +14,19 @@ else ifeq ($(findstring MINGW,$(UNAME_S)),MINGW) # Windows MinGW
 endif
 
 # Directory structure
-SRC_DIR = src/classes src/generator src/aux src/engine src/xml
-SRC_FILES = $(wildcard $(addsuffix /*.cpp, $(SRC_DIR)))
-OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
+SRC_DIR := src/classes src/generator src/aux src/engine src/xml
+SRC_FILES := $(wildcard $(addsuffix /*.cpp,$(SRC_DIR)))
+OBJ_DIR   := obj
+OBJ_FILES := $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 # Generator files
 GENERATOR_SRC_FILES = src/generator/generator.cpp src/generator/model.cpp src/aux/aux.cpp src/aux/curves.cpp src/generator/plane.cpp src/generator/box.cpp src/generator/sphere.cpp src/generator/cone.cpp src/generator/cylinder.cpp src/generator/bezier.cpp src/generator/torus.cpp
-GENERATOR_OBJ_FILES = $(patsubst %.cpp, %.o, $(GENERATOR_SRC_FILES))
+GENERATOR_OBJ_FILES := $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(GENERATOR_SRC_FILES))
 GENERATOR_EXECUTABLE = .generator
 
 # Engine files (define these if you need them)
 ENGINE_SRC_FILES = src/engine/engine.cpp src/generator/model.cpp src/aux/aux.cpp src/xml/xml_parser.cpp src/xml/tinyxml2.cpp src/aux/curves.cpp src/engine/camera.cpp src/engine/model_handling.cpp src/engine/input_handling.cpp
-ENGINE_OBJ_FILES = $(patsubst %.cpp, %.o, $(ENGINE_SRC_FILES))
+ENGINE_OBJ_FILES    := $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(ENGINE_SRC_FILES))
 ENGINE_EXECUTABLE = .engine
 
 # Total number of files for progress calculation
@@ -37,7 +38,7 @@ all:
 	@$(MAKE) --no-print-directory build_with_progress
 	@echo "Compilation complete!"
 
-build_with_progress: reset_progress $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE) cleanup
+build_with_progress: reset_progress $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE)
 
 # Reset progress counter
 reset_progress:
@@ -51,11 +52,12 @@ $(ENGINE_EXECUTABLE): $(ENGINE_OBJ_FILES)
 	@$(CXX) $^ -o $@ $(LDFLAGS)
 
 # Generic rule for object files with progress tracking
-%.o: %.cpp
+# Change dependency to src/%.cpp so that obj/generator/foo.o ← src/generator/foo.cpp
+$(OBJ_DIR)/%.o: src/%.cpp
+	@mkdir -p $(dir $@)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 	@count=$$(cat .progress); \
-	count=$$((count+1)); \
-	echo $$count > .progress; \
+	count=$$((count+1)); echo $$count > .progress; \
 	percentage=$$((count * 100 / $(TOTAL_FILES))); \
 	current_file=$$(basename $<); \
 	printf "\r%-100s" ""; \

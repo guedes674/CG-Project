@@ -101,8 +101,9 @@ void update_camera() {
         if(keys[(int)'d']) camera.fps_position = camera.fps_position + camera.fps_right * velocity;
         if(keys[(int)' ']) camera.fps_position.y += velocity;  // Space to ascend
         if(keys[(int)'c']) camera.fps_position.y -= velocity;  // C to descend
+        //glViewport(camera.fps_position.x + 20, camera.fps_position.y, 30, 30);
     }
-
+    
 }
 
 /**

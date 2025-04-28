@@ -162,7 +162,6 @@ void recursive_draw(const group_xml& group) {
     float gl_matrix[16];
 
     glPushMatrix();
-    
 
     int order[3] = {0};
     for(int i = 0; i < 3; i++) {
@@ -201,8 +200,13 @@ void recursive_draw(const group_xml& group) {
         }
     }
 
-    get_mvp_matrix(gl_matrix);
-
+    // set matrix above
+    if (!snapshot){
+        get_mvp_matrix(gl_matrix);
+        for (int i = 0; i < 16; ++i) {
+            gl_last_matrix[i] = gl_matrix[i];
+        }
+    }
     //get_mvp_matrix(gl_matrix);
     glEnableClientState(GL_VERTEX_ARRAY);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -211,7 +215,7 @@ void recursive_draw(const group_xml& group) {
         vbo* current_vbo = model_dict[model.file_name];
         // Check here for view frustum culling
         
-        if (check_viewfrustum_draw(gl_matrix, current_vbo->bounding_box)){
+        if (check_viewfrustum_draw(gl_last_matrix, current_vbo->bounding_box)){
             current_models++;
 
             glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
