@@ -93,7 +93,9 @@ void time_translation(translation_xml translation) {
     t /= translation.time;
     t -= floor(t);  // Loop animation
 
-    int tessellation = 1000;
+    int tessellation = 100;
+    if ((current_target_index> -1) && (translation.time_trans.tracking_id == position_keys[current_target_index])) 
+        tessellation = 2000;
     int num_curve_points = (tessellation + 1) * translation.time_trans.points.size();
     float* curve_points = new float[num_curve_points * 3];
     float* div = new float[num_curve_points * 3];
@@ -107,7 +109,7 @@ void time_translation(translation_xml translation) {
             glVertex3f(curve_points[idx], curve_points[idx + 1], curve_points[idx + 2]);
         }
         glEnd();
-    }
+        }
 
     int current_index = static_cast<int>(t * num_curve_points);
     current_index = current_index % num_curve_points;
@@ -247,8 +249,9 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
             vector<float> vertices;
             vector<unsigned int> indexes;
             float bounding_box[6];
-
-            if(read_model(model.file_name, vertices, indexes,bounding_box)) {
+            Vector3 center;
+            float radius;
+            if(read_model(model.file_name, vertices, indexes,bounding_box,center,radius)) {
                 cerr << "Error loading model: " << model.file_name << endl;
                 return 1;
             }
@@ -262,7 +265,7 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboID);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes.size()*sizeof(unsigned int), indexes.data(), GL_STATIC_DRAW);
 
-            dict[model.file_name] = new vbo(vboID, vertices.size()/3, iboID, indexes.size(),bounding_box);
+            dict[model.file_name] = new vbo(vboID, vertices.size()/3, iboID, indexes.size(),bounding_box,center,radius);
         }
     }
 

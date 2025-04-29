@@ -263,7 +263,7 @@
         </transform>
         <models>
                 <!-- generator sphere 1 10 10 sphere.3d -->
-            <model file="bezier_10.3d" />
+            <model file="bezier_10.3d"/>
         </models>
     </group>
 </world>

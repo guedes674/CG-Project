@@ -56,7 +56,7 @@ int generate_model(string file_name, vector<float>& vertices, vector<unsigned in
  * @param indexes   Vector to store the read triangle indexes.
  * @return 0 if successful, 1 if file could not be opened.
  */
-int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes, float* bounding_box) {
+int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes, float* bounding_box, Vector3 center, float radius) {
 
     ifstream file;
     file.open(file_name, ios::in); // Open file in input mode
@@ -90,7 +90,12 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
             vertices.push_back(value);    // Store value in vertex vector
             
         }
+        float center_x = (fabs(bounding_box[0]) + fabs(bounding_box[1]))/2;
+        float center_y = (fabs(bounding_box[2]) + fabs(bounding_box[3]))/2;
+        float center_z = (fabs(bounding_box[4]) + fabs(bounding_box[5]))/2;
+        center = Vector3(center_x,center_y,center_z);
 
+        radius = fabs(bounding_box[1])-center_x;
         // --- Second Line ---
         getline(file, line);                            // Read second line
         vector<string> iv = parse_line(line, delimiter); // Split line into unsigned int strings

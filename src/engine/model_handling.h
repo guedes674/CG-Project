@@ -24,6 +24,7 @@ extern bool show_bounding_box;
 extern bool show_catmull_curves;
 extern bool snapshot;
 extern int last_time;
+extern int current_target_index;
 extern float gl_last_matrix[16];
 extern std::unordered_map<int, Vector3> position_dict;
 extern std::vector<int> position_keys;
@@ -34,6 +35,8 @@ class vbo {
     public:
         GLuint vertices, total_vertices, indexes, total_indexes;
         float bounding_box[6]; // xmin, xmax, ymin, ymax, zmin, zmax
+        Vector3 center;
+        float radius;
         /**
          * @brief Constructor for VBO objects
          * 
@@ -43,7 +46,8 @@ class vbo {
          * @param ti Total number of indices
          * @param bounding_box 
          */
-        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti, float* bounding_box) : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti) {
+        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti, float* bounding_box, Vector3 c, float r) 
+        : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti), center(c), radius(r) {
             for (int j = 0; j < 6; ++j) {
                 this->bounding_box[j] = bounding_box[j];
             }
@@ -53,6 +57,7 @@ class vbo {
 };
 
 extern std::unordered_map<std::string, vbo*> model_dict;
+extern std::vector<vbo*> snapshot_models;
 
 int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict);
 void recursive_draw(const group_xml& group);
