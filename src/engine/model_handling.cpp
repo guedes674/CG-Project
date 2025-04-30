@@ -52,35 +52,35 @@ static inline bool check_viewfrustum_draw(
 
 void draw_bounding_box(float * bounding_box){
     glBegin(GL_QUADS);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[2] + 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[2] + 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[2] + 0.1,bounding_box[5] - 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[2] + 0.1,bounding_box[5] - 0.1);
+        glVertex3f(bounding_box[1] ,bounding_box[2] ,bounding_box[4] );
+        glVertex3f(bounding_box[0] ,bounding_box[2] ,bounding_box[4] );
+        glVertex3f(bounding_box[0] ,bounding_box[2] ,bounding_box[5] );
+        glVertex3f(bounding_box[1] ,bounding_box[2] ,bounding_box[5] );
 
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[3] - 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[3] - 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[3] - 0.1,bounding_box[5] - 0.1);
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[3] - 0.1,bounding_box[5] - 0.1);
+        glVertex3f(bounding_box[0] ,bounding_box[3] ,bounding_box[4] );
+        glVertex3f(bounding_box[1] ,bounding_box[3] ,bounding_box[4] );
+        glVertex3f(bounding_box[1] ,bounding_box[3] ,bounding_box[5] );
+        glVertex3f(bounding_box[0] ,bounding_box[3] ,bounding_box[5] );
 
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[3] - 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[2] + 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[2] + 0.1,bounding_box[5] - 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[3] - 0.1,bounding_box[5] - 0.1);
+        glVertex3f(bounding_box[1] ,bounding_box[3] ,bounding_box[4] );
+        glVertex3f(bounding_box[1] ,bounding_box[2] ,bounding_box[4] );
+        glVertex3f(bounding_box[1] ,bounding_box[2] ,bounding_box[5] );
+        glVertex3f(bounding_box[1] ,bounding_box[3] ,bounding_box[5] );
 
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[2] + 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[3] - 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[3] - 0.1,bounding_box[5] - 0.1);
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[2] + 0.1,bounding_box[5] - 0.1);
+        glVertex3f(bounding_box[0] ,bounding_box[2] ,bounding_box[4] );
+        glVertex3f(bounding_box[0] ,bounding_box[3] ,bounding_box[4] );
+        glVertex3f(bounding_box[0] ,bounding_box[3] ,bounding_box[5] );
+        glVertex3f(bounding_box[0] ,bounding_box[2] ,bounding_box[5] );
 
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[3] - 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[2] + 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[2] + 0.1,bounding_box[4] + 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[3] - 0.1,bounding_box[4] + 0.1);
+        glVertex3f(bounding_box[0] ,bounding_box[3] ,bounding_box[4] );
+        glVertex3f(bounding_box[0] ,bounding_box[2] ,bounding_box[4] );
+        glVertex3f(bounding_box[1] ,bounding_box[2] ,bounding_box[4] );
+        glVertex3f(bounding_box[1] ,bounding_box[3] ,bounding_box[4] );
 
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[2] + 0.1,bounding_box[5] - 0.1);
-        glVertex3f(bounding_box[0] + 0.1,bounding_box[3] - 0.1,bounding_box[5] - 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[3] - 0.1,bounding_box[5] - 0.1);
-        glVertex3f(bounding_box[1] - 0.1,bounding_box[2] + 0.1,bounding_box[5] - 0.1);
+        glVertex3f(bounding_box[0] ,bounding_box[2] ,bounding_box[5] );
+        glVertex3f(bounding_box[0] ,bounding_box[3] ,bounding_box[5] );
+        glVertex3f(bounding_box[1] ,bounding_box[3] ,bounding_box[5] );
+        glVertex3f(bounding_box[1] ,bounding_box[2] ,bounding_box[5] );
 	glEnd();
 }
 /**
@@ -212,14 +212,27 @@ void recursive_draw(const group_xml& group) {
     //get_mvp_matrix(gl_matrix);
     glEnableClientState(GL_VERTEX_ARRAY);
     glColor3f(1.0f, 1.0f, 1.0f);
+    if(!snapshot){
+        for(const auto& model : group.models) {
 
-    for(const auto& model : group.models) {
-        vbo* current_vbo = model_dict[model.file_name];
-        // Check here for view frustum culling
-        
-        if (check_viewfrustum_draw(gl_last_matrix, current_vbo->bounding_box)){
-            current_models++;
+            vbo* current_vbo = model_dict[model.file_name];
+            // Check here for view frustum culling
+            
+            if (check_viewfrustum_draw(gl_last_matrix, current_vbo->bounding_box)){
+                current_models++;
+                snapshot_models.push_back(current_vbo);
+                glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
+                glVertexPointer(3, GL_FLOAT, 0, 0);
 
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indexes);
+                glDrawElements(GL_TRIANGLES, current_vbo->total_indexes, GL_UNSIGNED_INT, 0);
+                if (show_bounding_box)draw_bounding_box(current_vbo->bounding_box);
+            }
+        }
+    }
+    else{
+        for(int i = 0;i<snapshot_models.size();i++){
+            vbo* current_vbo = snapshot_models[i];
             glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
             glVertexPointer(3, GL_FLOAT, 0, 0);
 
@@ -233,6 +246,7 @@ void recursive_draw(const group_xml& group) {
     for(const auto& subgroup : group.groups){
         recursive_draw(subgroup);
     }
+    
 
     glPopMatrix();
 }

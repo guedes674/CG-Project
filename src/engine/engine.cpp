@@ -186,6 +186,7 @@ void render_scene(void) {
     glScalef(scale, scale, scale);
     for(const auto& group : parser.groups)
         recursive_draw(group);
+    
 
     frame++;
     time = glutGet(GLUT_ELAPSED_TIME);
