@@ -252,7 +252,7 @@
     <!--COMMET ORBIT-->
     <group>
         <transform>
-            <translate time="80" align="true">
+            <translate time="80" align="true" tracking="true">
                 <point x="50"   y="10" z="0" />
                 <point x="0"    y="0" z="30" />
                 <point x="-50"  y="-10" z="0" />
