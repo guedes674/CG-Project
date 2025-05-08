@@ -3,6 +3,6 @@
 
 #include <vector>
 
-void box(float length, int divisions, std::vector<float>& vertices, std::vector<unsigned int>& indexes);
+void box(float length, int divisions, std::vector<float>& vertices, std::vector<unsigned int>& indexes, std::vector<float>& normals, std::vector<float>& textures);
 
 #endif

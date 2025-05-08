@@ -14,6 +14,8 @@ float bernstein_deriv(int i, int n, float t);
 
 void bezier_curve(int tesselation, float points[4][3], float * result);
 
+void calculate_normal(float *u, float * v, float * output);
+
 void catmullrom_curve(int tessellation, std::vector<Vector3>& points, float* result, float* result_deriv);
 
 void generate_catmull_matrix(float *div,float *y,float *m);

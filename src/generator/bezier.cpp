@@ -86,7 +86,7 @@ int read_patch_file(char* patch, vector<Vector3> &points, vector<vector<int>> &i
  * @param vertices      Output vector for storing vertex positions (x, y, z).
  * @param indexes       Output vector for storing triangle indexes.
  */
-void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsigned int>& indexes){
+void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsigned int>& indexes, vector<float>& normals, vector<float>& textures){
 
     vector<Vector3> points;
     vector<vector <int>> indexes_matrix;
@@ -125,18 +125,22 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
     
                 // Arrays to store the calculated Vector3 and its derivatives
                 float Vector3[3] = {0};  // Surface Vector3 (x,y,z)
-    
+                float du[3] = {0};       // Tangent vector in u direction
+                float dv[3] = {0};       // Tangent vector in v direction        
                 // Calculate surface Vector3 using bicubic Bezier formula with Bernstein polynomials
                 for (int i = 0; i < 4; i++) {
                     float bi = bernstein(i, 3, t_u);       // Bernstein polynomial for u
-                    
+                    float bi_deriv = bernstein_deriv(i, 3, t_u); // Derivative of Bernstein polynomial for u
                     for (int j = 0; j < 4; j++) {
                         float bj = bernstein(j, 3, t_v);       // Bernstein polynomial for v
-    
+                        float bj_deriv = bernstein_deriv(j, 3, t_v); // Derivative of Bernstein polynomial for v
                         // Calculate position and derivatives for x, y, and z
                         for (int k = 0; k < 3; k++) {
                             float cp = control_points[i][j][k];
                             Vector3[k] += bi * bj * cp;      // Surface Vector3
+                            du[k] += bi_deriv * bj * cp;         // Tangent in u direction
+                            dv[k] += bi * bj_deriv * cp;         // Tangent in v direction
+                
                         }
                     }
                 }
@@ -144,6 +148,15 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
                 // Store the calculated vertex position
                 for (int k = 0; k < 3; k++) {
                     vertices.push_back(Vector3[k]);
+                }
+
+                // Calculate the normal vector using the tangents
+                float normal[3];
+                calculate_normal(du, dv, normal);
+
+                // Store the calculated normal
+                for (int k = 0; k < 3; k++) {
+                    normals.push_back(normal[k]);
                 }
             }
         }

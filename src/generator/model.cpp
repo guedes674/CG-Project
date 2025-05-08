@@ -10,7 +10,7 @@ using namespace std;
  * @param indexes   Vector containing the model's index data.
  * @return 0 if successful, 1 if file could not be opened.
  */
-int generate_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes) {
+int generate_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes, vector<float>& normals, vector<float>& textures) {
 
     ofstream file;
     file.open(file_name, ios::out); // Open file in output mode
@@ -36,6 +36,26 @@ int generate_model(string file_name, vector<float>& vertices, vector<unsigned in
         }
         file << "\n"; // New line after index data
 
+        // --- Write normal data ---
+        for (size_t i = 0; i < normals.size(); i++) {
+            file << normals[i];
+
+            // Add delimiter except after last value
+            if (i < normals.size() - 1)
+                file << ";";
+        }
+        file << "\n"; // New line after normal data
+
+        // --- Write textures data ---
+        for (size_t i = 0; i < textures.size(); i++) {
+            file << textures[i];
+
+            // Add delimiter except after last value
+            if (i < textures.size() - 1)
+                file << ";";
+        }
+        file << "\n"; // New line after normal data
+
         file.close(); // Finalize file
         return 0;     // Success
     }
@@ -56,7 +76,7 @@ int generate_model(string file_name, vector<float>& vertices, vector<unsigned in
  * @param indexes   Vector to store the read triangle indexes.
  * @return 0 if successful, 1 if file could not be opened.
  */
-int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes, float* bounding_box, Vector3 center, float radius) {
+int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& indexes,vector<float>& normals, vector<float>& textures, float* bounding_box, Vector3 center, float radius) {
 
     ifstream file;
     file.open(file_name, ios::in); // Open file in input mode
@@ -104,6 +124,24 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         // Process each value and add it to the indexes vector
         for (int i = 0; static_cast<unsigned long>(i) < iv.size(); i++)
             indexes.push_back(stoul(iv[i]));            // Convert string to unsigned long and store as index
+
+        // --- Third Line ---
+        getline(file, line);  
+        vector<string> nv = parse_line(line,delimiter);
+        normals.reserve(nv.size());
+        
+        for (int i = 0; static_cast<unsigned long>(i) < nv.size(); i++)
+            normals.push_back(stoul(nv[i]));            // Convert string to unsigned long and store as index
+
+        // --- Fourth Line ---
+        getline(file, line);  
+        vector<string> tv = parse_line(line,delimiter);
+        normals.reserve(tv.size());
+        
+        for (int i = 0; static_cast<unsigned long>(i) < tv.size(); i++)
+            normals.push_back(stoul(tv[i]));            // Convert string to unsigned long and store as index
+
+
 
         file.close();   // Close the file when done
         return 0;       // Success - file was read correctly

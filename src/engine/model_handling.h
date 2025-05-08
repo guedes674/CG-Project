@@ -33,7 +33,7 @@ extern std::vector<int> position_keys;
  */
 class vbo {
     public:
-        GLuint vertices, total_vertices, indexes, total_indexes;
+        GLuint vertices, total_vertices, indexes, total_indexes,normals,textures;
         float bounding_box[6]; // xmin, xmax, ymin, ymax, zmin, zmax
         Vector3 center;
         float radius;
@@ -46,8 +46,8 @@ class vbo {
          * @param ti Total number of indices
          * @param bounding_box 
          */
-        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti, float* bounding_box, Vector3 c, float r) 
-        : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti), center(c), radius(r) {
+        vbo(GLuint v, unsigned int tv, GLuint i, GLuint ti,GLuint n, GLuint t,float* bounding_box, Vector3 c, float r) 
+        : vertices(v), total_vertices(tv), indexes(i), total_indexes(ti),normals(n), textures(t), center(c), radius(r) {
             for (int j = 0; j < 6; ++j) {
                 this->bounding_box[j] = bounding_box[j];
             }

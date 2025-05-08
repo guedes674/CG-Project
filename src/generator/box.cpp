@@ -25,13 +25,15 @@ void pushback_vertex(vector<float>& vertices, int index, float x, float y, float
  * @param vertices   Output vector for storing vertex positions (x, y, z).
  * @param indexes    Output vector for storing triangle indexes.
  */
-void box(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indexes) {
+void box(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indexes, vector<float>& normals, vector<float>& textures) {
     // Calculate number of vertices per face
     int vertices_per_line = divisions + 1;
     int face_vertices = (vertices_per_line) * (vertices_per_line);
 
     // Pre-allocate memory for all vertices (6 faces × vertices_per_line² vertices × 3 coordinates)
     vertices.resize(6 * face_vertices * 3);
+    normals.resize(6 * face_vertices * 3);
+    textures.resize(6 * face_vertices * 2); // Texture coordinates (u, v)
 
     // Calculate box dimensions
     float half_length = length / 2;
@@ -41,6 +43,7 @@ void box(float length, int divisions, vector<float>& vertices, vector<unsigned i
 
     // Calculate size of each grid cell
     float box_side_size = length / divisions;
+    float texture_step = 1.0f / divisions; // Texture coordinate step
 
     // Y coordinates for top and bottom faces
     float y_t = box_side_size * divisions - half_length;   // Top face y-coordinate
@@ -49,30 +52,48 @@ void box(float length, int divisions, vector<float>& vertices, vector<unsigned i
     // Generate vertices for all six faces
     for(int i = 0; i <= divisions; i++){
         for(int j = 0; j <= divisions; j++){
-
             // --- Bottom face (Y-) ---
             int index = (i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, x, y_b, z);
+            pushback_vertex(normals,index, 0.0f, -1.0f, 0.0f);
+            int texture_index = (i * (divisions + 1) + j) * 2;
+            textures[texture_index] = float(j) * texture_step;
+            textures[texture_index + 1] = float(i) * texture_step;
 
             // --- Front face (Z+) ---
             index = (face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, y_t, x, z);
+            pushback_vertex(normals,index, 1.0f, 0.0f, 0.0f);
+            textures[face_vertices + texture_index] = float(i) * texture_step;
+            textures[face_vertices + texture_index + 1] = float(j) * texture_step;
 
             // --- Left face (X-) ---
             index = (2 * face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, x, z, y_t);
+            pushback_vertex(normals,index, 0.0f, 0.0f, 1.0f);
+            textures[2 * face_vertices + texture_index] = float(j) * texture_step;
+            textures[2 * face_vertices + texture_index + 1] = float(i) * texture_step;
 
             // --- Top face (Y+) ---
             index = (3 * face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, x, y_t, z);
+            pushback_vertex(normals,index, 0.0f, 1.0f, 0.0f);
+            textures[3 * face_vertices + texture_index] = float(j) * texture_step;
+            textures[3 * face_vertices + texture_index + 1] = float(i) * texture_step;
 
             // --- Back face (Z-) ---
             index = (4 * face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices,index, y_b, x, z);
+            pushback_vertex(normals,index, -1.0f, 0.0f, 0.0f);
+            textures[4 * face_vertices + texture_index] = float(i) * texture_step;
+            textures[4 * face_vertices + texture_index + 1] = float(j) * texture_step;
 
             // --- Right face (X+) ---
             index = (5 * face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, x, z, y_b);
+            pushback_vertex(normals,index, 0.0f, 0.0f, -1.0f);
+            textures[5 * face_vertices + texture_index] = float(j) * texture_step;
+            textures[5 * face_vertices + texture_index + 1] = float(i) * texture_step;
 
             // Move to next horizontal position
             x += box_side_size;

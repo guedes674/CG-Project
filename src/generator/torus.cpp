@@ -1,7 +1,7 @@
 #include "torus.h"
 using namespace std;
 
-void torus(float inner_radius, float outer_radius, int slices, int stacks, vector<float>& vertices, vector<unsigned int>& indexes) {
+void torus(float inner_radius, float outer_radius, int slices, int stacks, vector<float>& vertices, vector<unsigned int>& indexes, vector<float>& normals, vector<float>& textures) {
     float radius = inner_radius + outer_radius;
     float slices_ang_inc = 2 * M_PI / slices;
     float stacks_ang_inc = 2 * M_PI / stacks;
@@ -26,6 +26,7 @@ void torus(float inner_radius, float outer_radius, int slices, int stacks, vecto
             vertices.push_back(sin(stacks_ang_inc * j) * inner_radius);
             vertices.push_back(radius_z + aux_radius * sin_B);
 
+            
         }
     }
 

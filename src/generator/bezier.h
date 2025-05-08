@@ -6,6 +6,5 @@
 #include <fstream>
 #include "../aux/point.h"
 
-void bezier(char* patch, int tessellation, std::vector<float>&vertices, std::vector<unsigned int>& indexes);
-
+void bezier(char* patch, int tessellation, std::vector<float>&vertices, std::vector<unsigned int>& indexes, std::vector<float>& normals, std::vector<float>& textures);
 #endif

@@ -262,26 +262,39 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
         if(dict.find(model.file_name) == dict.end()) {
             vector<float> vertices;
             vector<unsigned int> indexes;
+            vector<float> normals;
+            vector<float> textures;
             float bounding_box[6];
             Vector3 center;
             float radius;
-            if(read_model(model.file_name, vertices, indexes,bounding_box,center,radius)) {
+            if(read_model(model.file_name, vertices, indexes,normals,textures,bounding_box,center,radius)) {
                 cerr << "Error loading model: " << model.file_name << endl;
                 return 1;
             }
 
-            GLuint vboID, iboID;
-            glGenBuffers(1, &vboID);
-            glBindBuffer(GL_ARRAY_BUFFER, vboID);
+            GLuint vertices_id, indexes_id, normals_id, textures_id;
+            glGenBuffers(1, &vertices_id);
+            glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
             glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-            glGenBuffers(1, &iboID);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboID);
+            glGenBuffers(1, &indexes_id);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexes_id);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes.size()*sizeof(unsigned int), indexes.data(), GL_STATIC_DRAW);
 
-            dict[model.file_name] = new vbo(vboID, vertices.size()/3, iboID, indexes.size(),bounding_box,center,radius);
+            glGenBuffers(1, &normals_id);
+            glBindBuffer(GL_ARRAY_BUFFER, normals_id);
+            glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
+
+            //Create VBO textura
+            glGenBuffers(1, &textures_id);
+            glBindBuffer(GL_ARRAY_BUFFER, textures_id);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(float) * textures.size(), textures.data(), GL_STATIC_DRAW);
+
+            dict[model.file_name] = new vbo(vertices_id, vertices.size()/3, indexes_id, indexes.size(),normals_id,textures_id,bounding_box,center,radius);
         }
     }
+
+    
 
     for(const auto& subgroup : group.groups)
         if(populate_dict(subgroup, dict)) return 1;

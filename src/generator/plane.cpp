@@ -9,7 +9,7 @@ using namespace std;
  * @param vertices    Output vector for storing vertex positions (x, y, z).
  * @param indexes    Output vector for storing triangle indexes.
  */
-void plane(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indexes) {
+void plane(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indexes, vector<float>& normals, vector<float>& textures) {
 
     // Inicial x value (leftmost point)
     float xi = -length/2;
@@ -31,6 +31,15 @@ void plane(float length, int divisions, vector<float>& vertices, vector<unsigned
             vertices.push_back(x);
             vertices.push_back(y);
             vertices.push_back(z);
+            
+            // --- Normal vector ---
+            normals.push_back(0.0f); // Normal x (pointing up)
+            normals.push_back(1.0f); // Normal y (pointing up)
+            normals.push_back(0.0f); // Normal z (pointing up)
+
+            // --- Texture coordinates ---
+            textures.push_back(float(i) / divisions); // Texture coordinate u
+            textures.push_back(float(j) / divisions); // Texture coordinate v
             
             // Move to next horizontal position
             x += box_side_size;

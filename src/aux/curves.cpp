@@ -96,6 +96,13 @@ void normalize(float *a) {
 	a[2] = a[2]/l;
 }
 
+void calculate_normal(float *u, float * v, float * output){
+    normalize(u);
+    normalize(v);
+    cross(u,v,output);
+    normalize(output);
+}
+
 void generate_catmull_matrix(float *div,float *y,float *m){
 
     float z[4];

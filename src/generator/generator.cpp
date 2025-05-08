@@ -25,6 +25,8 @@ int main(int argc, char** argv){
     // Storage for the generated shape data
     vector<float> vertices;      // Holds all vertex (x,y,z) coordinates
     vector<unsigned int> indexes; // Holds all triangle indexes
+    vector<float> normals;      // Holds all normal (x,y,z) coordinates
+    vector<float> textures;     // Holds all texture coordinates (u,v)
 
     string file_name;           // Output file path
     
@@ -57,7 +59,7 @@ int main(int argc, char** argv){
                 file_name = argv[4];               // Output file
                 
                 // Generate plane geometry
-                plane(length, divisions, vertices, indexes);
+                plane(length, divisions, vertices, indexes, normals, textures);
                 cout << "Plane generated with length: " << length << " and divisions: " << divisions << std::endl;
             }
             else if (strcmp(argv[1],"box")==0){
@@ -67,7 +69,7 @@ int main(int argc, char** argv){
                 file_name = argv[4];               // Output file
                 
                 // Generate box geometry
-                box(length, divisions, vertices, indexes);
+                box(length, divisions, vertices, indexes, normals, textures);
                 cout << "Box generated with length: " << length << " and divisions: " << divisions << std::endl;
             }
             else if (strcmp(argv[1],"patch")==0){
@@ -77,7 +79,7 @@ int main(int argc, char** argv){
                 file_name = argv[4];                // Output file
                 
                 // Generate bezier curve geometry
-                bezier(patch, tessellation, vertices, indexes);
+                bezier(patch, tessellation, vertices, indexes, normals, textures);
                 cout << "Bezier curve generated with patch: " << patch << " and tessellation: " << tessellation << std::endl;
             }
             else {
@@ -96,7 +98,7 @@ int main(int argc, char** argv){
                 file_name = argv[5];               // Output file
                 
                 // Generate sphere geometry
-                sphere(radius, slices, stacks, vertices, indexes);
+                sphere(radius, slices, stacks, vertices, indexes, normals, textures);
                 cout << "Sphere generated with radius: " << radius << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
             }
             else {
@@ -116,7 +118,7 @@ int main(int argc, char** argv){
                 file_name = argv[6];               // Output file
                 
                 // Generate cone geometry
-                cone(base, height, slices, stacks, vertices, indexes);
+                cone(base, height, slices, stacks, vertices, indexes, normals, textures);
                 cout << "Cone generated with base: " << base << ", height: " << height << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
             }
             else if (strcmp(argv[1],"cylinder")==0){
@@ -128,7 +130,7 @@ int main(int argc, char** argv){
                 file_name = argv[6];               // Output file
 
                 // Generate cone geometry
-                cylinder(base, height, slices, stacks, vertices, indexes);
+                cylinder(base, height, slices, stacks, vertices, indexes, normals, textures);
                 cout << "Cylinder generated with base: " << base << ", height: " << height << ", slices: " << slices << ", and stacks: " << stacks << std::endl;
             }
             else if(strcmp(argv[1], "torus") == 0 && atoi(argv[5]) >= 1 && atoi(argv[4]) >= 1){//TORUS GENERATOR
@@ -139,7 +141,7 @@ int main(int argc, char** argv){
                 int stacks = atoi(argv[5]);         // Vertical divisions
                 file_name = argv[6];
                 // Generate torus geometry
-                torus(inner_radius, outer_radius, slices, stacks, vertices, indexes);
+                torus(inner_radius, outer_radius, slices, stacks, vertices, indexes, normals, textures);
                 cout << "Torus created\n";
             }
             else {

@@ -4,6 +4,6 @@
 #include <vector>
 using namespace std;
 
-void plane(float length, int divisions, vector<float>& vertexB, vector<unsigned int>& indexB);
+void plane(float length, int divisions, vector<float>& vertices, vector<unsigned int>& indexes, vector<float>& normals, vector<float>& textures);
 
 #endif

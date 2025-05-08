@@ -4,6 +4,6 @@
 #include <cmath>
 #include <vector>
 
-void torus(float inner_radius, float outer_radius, int slices, int stacks, std::vector<float>& vertices, std::vector<unsigned int>& indexes);
+void torus(float inner_radius, float outer_radius, int slices, int stacks, std::vector<float>& vertices, std::vector<unsigned int>& indexes, std::vector<float>& normals, std::vector<float>& textures);
 
 #endif

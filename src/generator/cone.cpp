@@ -12,7 +12,7 @@ using namespace std;
  * @param vertices   Output vector for storing vertex positions (x, y, z).
  * @param indexes    Output vector for storing triangle indexes.
  */
-void cone(float base, float height, int slices, int stacks, vector<float>& vertices, vector<unsigned int>& indexes) {
+void cone(float base, float height, int slices, int stacks, vector<float>& vertices, vector<unsigned int>& indexes, vector<float>& normals, vector<float>& textures) {
     // Calculate angular increment for base circle
     float base_angle_increment = 2 * M_PI / slices;
     
@@ -30,9 +30,20 @@ void cone(float base, float height, int slices, int stacks, vector<float>& verti
     for(int i = 0; i < slices; i++){
         current_angle = base_angle_increment * i;
         vertices.push_back(current_radius * sin(current_angle)); // x coordinate
-        vertices.push_back(0);                                  // y coordinate (base)
+        vertices.push_back(0);                                   // y coordinate (base)
         vertices.push_back(current_radius * cos(current_angle)); // z coordinate
+
+        normals.push_back(0.0f);  //  Normal x (pointing outwards)
+        normals.push_back(-1.0f); //  Normal y (pointing downwards)
+        normals.push_back(0.0f);  //  Normal z (pointing outwards)
+
+        textures.push_back(float(i) / slices); // Texture coordinate u
+        textures.push_back(0.0f);              // Texture coordinate v (base)
     }
+
+    float normal_xz = M_PI_2 - atan(height/base);
+    float normal_y = sin(normal_xz);
+    normal_xz = cos(normal_xz);
 
     // Generate vertices for cone body (stack rings)
     for(int i = 0; i < stacks; i++){
@@ -44,8 +55,15 @@ void cone(float base, float height, int slices, int stacks, vector<float>& verti
             current_angle = base_angle_increment * j;
             
             vertices.push_back(current_radius * sin(current_angle)); // x coordinate
-            vertices.push_back(current_height);                     // y coordinate
+            vertices.push_back(current_height);                      // y coordinate
             vertices.push_back(current_radius * cos(current_angle)); // z coordinate
+
+            normals.push_back(sin(current_angle)*normal_xz);  // Normal x (pointing outwards)
+            normals.push_back(normal_y);                      // Normal y (pointing outwards)
+            normals.push_back(cos(current_angle)*normal_xz);  // Normal z (pointing outwards)
+
+            textures.push_back(float(j + 1) / float(stacks)); // Texture coordinate u
+            textures.push_back(float(i) / float(slices)); // Texture coordinate v
         }
     }
 
@@ -54,11 +72,25 @@ void cone(float base, float height, int slices, int stacks, vector<float>& verti
     vertices.push_back(0); // y coordinate
     vertices.push_back(0); // z coordinate
 
+    normals.push_back(0.0f);
+    normals.push_back(-1.0f);
+    normals.push_back(0.0f);
+
+    textures.push_back(0.5f);
+    textures.push_back(0.0f);
+
     // Add cone tip vertices (one for each slice segment)
     for(int i = 0; i < slices; i++){
         vertices.push_back(0);      // x coordinate
         vertices.push_back(height); // y coordinate
         vertices.push_back(0);      // z coordinate
+
+        normals.push_back(sin(current_angle)*normal_xz);  // Normal x (pointing outwards)
+        normals.push_back(normal_y);                      // Normal y (pointing outwards)
+        normals.push_back(cos(current_angle)*normal_xz);  // Normal z (pointing outwards)
+
+        textures.push_back(float(i) / float(slices)); // Texture coordinate u
+        textures.push_back(1.0f); // Texture coordinate v (tip)
     }
 
     // Calculate total vertex count for index generation
