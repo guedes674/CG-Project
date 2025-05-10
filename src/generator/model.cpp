@@ -141,8 +141,6 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         for (int i = 0; static_cast<unsigned long>(i) < tv.size(); i++)
             normals.push_back(stoul(tv[i]));            // Convert string to unsigned long and store as index
 
-
-
         file.close();   // Close the file when done
         return 0;       // Success - file was read correctly
     }

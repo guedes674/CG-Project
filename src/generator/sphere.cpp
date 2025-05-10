@@ -69,7 +69,7 @@ void sphere(float radius, int slices, int stacks, vector<float>& vertices, vecto
             // Calculate angle for current longitude position
             angle = vertical_increment * j;
             int index = (i * (slices + 1) + j) * 3;
-
+            int tex_index = (i * (slices + 1) + j) * 2;  // Separate index for textures
             // Compute vertex position using spherical coordinates
             vertices[index] = horizontal_radius * sin(angle);       // x coordinate
             vertices[index + 1] = height;                           // y coordinate 
@@ -81,8 +81,8 @@ void sphere(float radius, int slices, int stacks, vector<float>& vertices, vecto
             normals[index + 2] = normal_xz * cos(angle);
 
             // Set texture coordinates (u, v)
-            textures[index] = (float)j / float(slices); // U coordinate
-            textures[index + 1] = (float)(i + 1) / float(stacks); // V coordinate
+            textures[tex_index] = (float)j / float(slices); // U coordinate
+            textures[tex_index + 1] = (float)(i + 1) / float(stacks); // V coordinate
         }
     }
 

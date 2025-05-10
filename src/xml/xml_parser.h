@@ -28,7 +28,8 @@ class camera {
 
 class model_xml {
     public: 
-        string file_name; // Changed from char* to std::string
+        string file_name; 
+        string texture_name;
 };
 
 class rotation_xml {

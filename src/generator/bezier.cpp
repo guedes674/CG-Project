@@ -158,6 +158,10 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
                 for (int k = 0; k < 3; k++) {
                     normals.push_back(normal[k]);
                 }
+
+                // Store the texture coordinates (u,v)
+                textures.push_back(float((tessellation) - v)/float(tessellation));
+                textures.push_back(float((tessellation) - u)/float(tessellation));
             }
         }
     }

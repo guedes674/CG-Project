@@ -154,6 +154,41 @@ void time_rotation(rotation_xml rotation) {
     glRotatef(angle, rotation.x, rotation.y, rotation.z);
 }
 
+int load_texture(std::string texture_name) {
+
+	unsigned int texture,texture_width,texture_height;
+	unsigned char *texture_data;
+	unsigned int texture_id = 0;
+
+	ilInit();
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	ilGenImages(1,&texture);
+	ilBindImage(texture);
+	if (ilLoadImage((ILstring)texture_name.c_str()) == IL_TRUE){
+		texture_width = ilGetInteger(IL_IMAGE_WIDTH);
+		texture_height = ilGetInteger(IL_IMAGE_HEIGHT);
+		ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+		texture_data = ilGetData();
+
+		glGenTextures(1,&texture_id);
+		
+		glBindTexture(GL_TEXTURE_2D,texture_id);
+		glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_S,		GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_T,		GL_REPEAT);
+
+		glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_MAG_FILTER,   	GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	return texture_id;
+}
+
 /**
  * @brief Recursively draws a group and all its children
  * 
@@ -214,7 +249,7 @@ void recursive_draw(const group_xml& group) {
     glColor3f(1.0f, 1.0f, 1.0f);
     if(!snapshot){
         for(const auto& model : group.models) {
-
+            GLuint texture_id = 0;
             vbo* current_vbo = model_dict[model.file_name];
             // Check here for view frustum culling
             
@@ -225,6 +260,14 @@ void recursive_draw(const group_xml& group) {
                 glVertexPointer(3, GL_FLOAT, 0, 0);
 
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indexes);
+                if ((model.texture_name != "") && texture_dict.find(model.texture_name) != texture_dict.end()){
+                    texture_id = texture_dict[model.texture_name];
+    
+                    glBindTexture(GL_TEXTURE_2D, texture_id);
+    
+                    glBindBuffer(GL_ARRAY_BUFFER,current_vbo->textures);
+                    glTexCoordPointer(2,GL_FLOAT,0,0);
+                }
                 glDrawElements(GL_TRIANGLES, current_vbo->total_indexes, GL_UNSIGNED_INT, 0);
                 if (show_bounding_box)draw_bounding_box(current_vbo->bounding_box);
             }
@@ -269,6 +312,7 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
             float radius;
             if(read_model(model.file_name, vertices, indexes,normals,textures,bounding_box,center,radius)) {
                 cerr << "Error loading model: " << model.file_name << endl;
+                cerr << "Texture file: "<< model.texture_name << endl;
                 return 1;
             }
 
@@ -292,9 +336,13 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
 
             dict[model.file_name] = new vbo(vertices_id, vertices.size()/3, indexes_id, indexes.size(),normals_id,textures_id,bounding_box,center,radius);
         }
-    }
+        if ((model.texture_name!="") && (texture_dict.find(model.texture_name) == texture_dict.end())) {
 
-    
+            GLuint text_id = load_texture(model.texture_name);
+            //inserts pair of file's name and respective VBO information
+            texture_dict.insert(std::make_pair(model.texture_name, text_id));
+        }
+    }
 
     for(const auto& subgroup : group.groups)
         if(populate_dict(subgroup, dict)) return 1;

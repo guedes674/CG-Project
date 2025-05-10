@@ -6,11 +6,11 @@ CXXFLAGS =-std=c++11 -Wall -Wextra -g -fsanitize=address -O3 -I$(PWD)/src
 # OS-specific flags
 ifeq ($(UNAME_S), Darwin) # macOS
 	CXXFLAGS += -DGL_SILENCE_DEPRECATION
-	LDFLAGS = -fsanitize=address -framework OpenGL -framework GLUT
+	LDFLAGS = -fsanitize=address -framework OpenGL -framework GLUT -lIL -lILU -lILUT
 else ifeq ($(UNAME_S), Linux) # Linux
-	LDFLAGS = -fsanitize=address -lGL -lGLU -lglut -lGLEW
+	LDFLAGS = -fsanitize=address -lGL -lGLU -lglut -lGLEW -lIL -lILU -lILUT
 else ifeq ($(findstring MINGW,$(UNAME_S)),MINGW) # Windows MinGW
-	LDFLAGS = -fsanitize=address -lopengl32 -lglu32 -lfreeglut
+	LDFLAGS = -fsanitize=address -lopengl32 -lglu32 -lfreeglut -lIL -lILU -lILUT
 endif
 
 # Directory structure

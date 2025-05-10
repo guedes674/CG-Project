@@ -90,18 +90,31 @@ void cross(float *a, float *b, float *res) {
 
 
 void normalize(float *a) {
-	float l = sqrt(a[0]*a[0] + a[1] * a[1] + a[2] * a[2]);
-	a[0] = a[0]/l;
-	a[1] = a[1]/l;
-	a[2] = a[2]/l;
+    float l = sqrt(a[0]*a[0] + a[1] * a[1] + a[2] * a[2]);
+    if (l > 1e-10) { // Check if length is not too small
+        a[0] = a[0]/l;
+        a[1] = a[1]/l;
+        a[2] = a[2]/l;
+    } else {
+        // Set default normal when vectors are collinear
+        a[0] = 0.0f;
+        a[1] = 0.0f; 
+        a[2] = 1.0f;
+    }
 }
 
-void calculate_normal(float *u, float * v, float * output){
-    normalize(u);
-    normalize(v);
-    cross(u,v,output);
-    normalize(output);
+void calculate_normal(float *u,float *v, float *out) {
+    // 1) compute raw cross product in a temporary
+    float tmp[3];
+    cross(u, v, tmp);
+    // 2) normalize the result
+    normalize(tmp);
+    // 3) write back
+    out[0] = tmp[0];
+    out[1] = tmp[1];
+    out[2] = tmp[2];
 }
+
 
 void generate_catmull_matrix(float *div,float *y,float *m){
 

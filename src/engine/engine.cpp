@@ -48,6 +48,7 @@ int last_time = 0;
 int delta_time = 0;
 float gl_last_matrix[16];
 std::unordered_map<std::string, vbo*> model_dict;
+std::unordered_map<std::string, GLuint> texture_dict;
 
 int xml_id = 1;
 std::unordered_map<int, Vector3> position_dict;
@@ -331,7 +332,8 @@ int main(int argc, char** argv) {
     glutMotionFunc(process_mouse_motion);
     glutMouseFunc(process_mouse_buttons);
     glutTimerFunc(0, timer_func, 0);
-
+    glEnableClientState(GL_VERTEX_ARRAY);
+    //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     camera.update_cursor_mode();
     glutCreateMenu(menu);  
     glutAddMenuEntry("Change Cam Mode",1);
@@ -345,6 +347,7 @@ int main(int argc, char** argv) {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_TEXTURE_2D);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     for (const auto& g : parser.groups) {

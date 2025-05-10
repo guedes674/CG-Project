@@ -50,7 +50,15 @@ group_xml recursive_catch_groups(XMLElement* group) {
         XMLElement* model_element = models_element->FirstChildElement("model");
         while (model_element) {
             model_xml model;
-            model.file_name = get_string_attribute(model_element, "file", "default.3d");
+            model.file_name = get_string_attribute(model_element, "file", "");
+            XMLElement* texture_element = model_element->FirstChildElement("texture");
+            if (texture_element) {
+                model.texture_name = get_string_attribute(texture_element, "file", "");
+            } else {
+                model.texture_name = "";
+            } 
+            cout << "Model file: " << model.file_name << endl;
+            cout << "Texture file: " << model.texture_name << endl;
             new_group.models.push_back(model);
             model_element = model_element->NextSiblingElement("model");
         }

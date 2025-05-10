@@ -158,7 +158,7 @@ int main(int argc, char** argv){
 
     // Save the generated model data to the specified file (if not in help mode)
     if (argc > 2) {
-        generate_model(file_name, vertices, indexes);
+        generate_model(file_name, vertices, indexes,normals,textures);
     }
     return 0;
 }
