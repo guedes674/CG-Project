@@ -56,44 +56,44 @@ void box(float length, int divisions, vector<float>& vertices, vector<unsigned i
             int index = (i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, x, y_b, z);
             pushback_vertex(normals,index, 0.0f, -1.0f, 0.0f);
-            int texture_index = (i * (divisions + 1) + j) * 2;
-            textures[texture_index] = float(j) * texture_step;
-            textures[texture_index + 1] = float(i) * texture_step;
+            int texture_index = (i * (divisions + 1) + j);
+            textures[texture_index * 2] = float(j) * texture_step;
+            textures[texture_index * 2 + 1] = float(i) * texture_step;
 
             // --- Front face (Z+) ---
             index = (face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, y_t, x, z);
             pushback_vertex(normals,index, 1.0f, 0.0f, 0.0f);
-            textures[face_vertices + texture_index] = float(i) * texture_step;
-            textures[face_vertices + texture_index + 1] = float(j) * texture_step;
+            textures[(face_vertices + texture_index)* 2] = float(i) * texture_step;
+            textures[(face_vertices + texture_index)* 2 + 1] = float(j) * texture_step;
 
             // --- Left face (X-) ---
             index = (2 * face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, x, z, y_t);
             pushback_vertex(normals,index, 0.0f, 0.0f, 1.0f);
-            textures[2 * face_vertices + texture_index] = float(j) * texture_step;
-            textures[2 * face_vertices + texture_index + 1] = float(i) * texture_step;
+            textures[(2 * face_vertices + texture_index)* 2] = float(j) * texture_step;
+            textures[(2 * face_vertices + texture_index)* 2 + 1] = float(i) * texture_step;
 
             // --- Top face (Y+) ---
             index = (3 * face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, x, y_t, z);
             pushback_vertex(normals,index, 0.0f, 1.0f, 0.0f);
-            textures[3 * face_vertices + texture_index] = float(j) * texture_step;
-            textures[3 * face_vertices + texture_index + 1] = float(i) * texture_step;
+            textures[(3 * face_vertices + texture_index)* 2] = float(j) * texture_step;
+            textures[(3 * face_vertices + texture_index)* 2 + 1] = float(i) * texture_step;
 
             // --- Back face (Z-) ---
             index = (4 * face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices,index, y_b, x, z);
             pushback_vertex(normals,index, -1.0f, 0.0f, 0.0f);
-            textures[4 * face_vertices + texture_index] = float(i) * texture_step;
-            textures[4 * face_vertices + texture_index + 1] = float(j) * texture_step;
+            textures[(4 * face_vertices + texture_index)* 2] = float(i) * texture_step;
+            textures[(4 * face_vertices + texture_index)* 2 + 1] = float(j) * texture_step;
 
             // --- Right face (X+) ---
             index = (5 * face_vertices + i * (vertices_per_line) + j) * 3;
             pushback_vertex(vertices, index, x, z, y_b);
             pushback_vertex(normals,index, 0.0f, 0.0f, -1.0f);
-            textures[5 * face_vertices + texture_index] = float(j) * texture_step;
-            textures[5 * face_vertices + texture_index + 1] = float(i) * texture_step;
+            textures[(5 * face_vertices + texture_index)* 2] = float(j) * texture_step;
+            textures[(5 * face_vertices + texture_index)* 2 + 1] = float(i) * texture_step;
 
             // Move to next horizontal position
             x += box_side_size;

@@ -336,9 +336,6 @@ int main(int argc, char** argv) {
     glutMotionFunc(process_mouse_motion);
     glutMouseFunc(process_mouse_buttons);
     glutTimerFunc(0, timer_func, 0);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
     camera.update_cursor_mode();
     
@@ -352,6 +349,10 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Wireframe",7); 
     glutAttachMenu(GLUT_RIGHT_BUTTON);  
     glutMenuStatusFunc(menu_status);   
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
     glEnable(GL_RESCALE_NORMAL);
     glEnable(GL_DEPTH_TEST);

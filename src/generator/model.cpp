@@ -131,7 +131,7 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         normals.reserve(nv.size());
         
         for (int i = 0; static_cast<unsigned long>(i) < nv.size(); i++)
-            normals.push_back(stoul(nv[i]));            // Convert string to unsigned long and store as index
+            normals.push_back(stof(nv[i]));            // Convert string to unsigned long and store as index
 
         // --- Fourth Line ---
         getline(file, line);  
@@ -139,7 +139,7 @@ int read_model(string file_name, vector<float>& vertices, vector<unsigned int>& 
         textures.reserve(tv.size());
         
         for (int i = 0; static_cast<unsigned long>(i) < tv.size(); i++)
-            textures.push_back(stoul(tv[i]));            // Convert string to unsigned long and store as index
+            textures.push_back(stof(tv[i]));            // Convert string to unsigned long and store as index
 
         file.close();   // Close the file when done
         return 0;       // Success - file was read correctly
