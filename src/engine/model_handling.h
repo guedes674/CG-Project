@@ -61,7 +61,7 @@ extern std::unordered_map<std::string, vbo*> model_dict;
 extern std::unordered_map<std::string, GLuint> texture_dict;
 extern std::vector<vbo*> snapshot_models;
 
-int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict);
+int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict, unordered_map<string, GLuint>& texture_dict);
 void recursive_draw(const group_xml& group);
 
 #endif

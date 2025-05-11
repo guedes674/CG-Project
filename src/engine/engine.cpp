@@ -184,10 +184,8 @@ void render_scene(void) {
         glEnd();
     }
 
-    glScalef(scale, scale, scale);
     for(const auto& group : parser.groups)
         recursive_draw(group);
-    
 
     frame++;
     time = glutGet(GLUT_ELAPSED_TIME);
@@ -275,6 +273,12 @@ void menu(int value) {
             snapshot = !snapshot;
             if((!time_stop && snapshot)||(time_stop && !snapshot)) time_stop = !time_stop;
             break;
+        case 7:
+            // Toggle between wireframe and filled polygons
+            static bool wireframe_mode = false;
+            wireframe_mode = !wireframe_mode;
+            glPolygonMode(GL_FRONT_AND_BACK, wireframe_mode ? GL_LINE : GL_FILL);
+            break;
         case 9:
             exit(0);
             break;
@@ -333,25 +337,30 @@ int main(int argc, char** argv) {
     glutMouseFunc(process_mouse_buttons);
     glutTimerFunc(0, timer_func, 0);
     glEnableClientState(GL_VERTEX_ARRAY);
-    //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
     camera.update_cursor_mode();
+    
     glutCreateMenu(menu);  
     glutAddMenuEntry("Change Cam Mode",1);
     glutAddMenuEntry("Show/Hide Bounding Boxes",2);
     glutAddMenuEntry("Show/Hide Catmull-Rom Curves",3);
     glutAddMenuEntry("Show/Hide Axes",4);
     glutAddMenuEntry("Time Stop",5);  
-    glutAddMenuEntry("Snapshot",6);  
+    glutAddMenuEntry("Snapshot",6); 
+    glutAddMenuEntry("Wireframe",7); 
     glutAttachMenu(GLUT_RIGHT_BUTTON);  
     glutMenuStatusFunc(menu_status);   
 
+    glEnable(GL_RESCALE_NORMAL);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     for (const auto& g : parser.groups) {
-        if (populate_dict(g, model_dict)) {
+        if (populate_dict(g, model_dict,texture_dict)) {
             cerr << "Failed to load models\n";
             return 1;
         }

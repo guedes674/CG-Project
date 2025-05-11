@@ -174,11 +174,11 @@ int load_texture(std::string texture_name) {
 		glGenTextures(1,&texture_id);
 		
 		glBindTexture(GL_TEXTURE_2D,texture_id);
-		glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_S,		GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_T,		GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_MAG_FILTER,   	GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data);
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -237,54 +237,37 @@ void recursive_draw(const group_xml& group) {
         }
     }
 
-    // set matrix above
-    if (!snapshot){
-        get_mvp_matrix(gl_matrix);
-        for (int i = 0; i < 16; ++i) {
-            gl_last_matrix[i] = gl_matrix[i];
-        }
-    }
-    //get_mvp_matrix(gl_matrix);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    if(!snapshot){
-        for(const auto& model : group.models) {
-            GLuint texture_id = 0;
-            vbo* current_vbo = model_dict[model.file_name];
-            // Check here for view frustum culling
-            
-            if (check_viewfrustum_draw(gl_last_matrix, current_vbo->bounding_box)){
-                current_models++;
-                snapshot_models.push_back(current_vbo);
-                glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
-                glVertexPointer(3, GL_FLOAT, 0, 0);
+    get_mvp_matrix(gl_matrix);
 
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indexes);
-                if ((model.texture_name != "") && texture_dict.find(model.texture_name) != texture_dict.end()){
-                    texture_id = texture_dict[model.texture_name];
-    
-                    glBindTexture(GL_TEXTURE_2D, texture_id);
-    
-                    glBindBuffer(GL_ARRAY_BUFFER,current_vbo->textures);
-                    glTexCoordPointer(2,GL_FLOAT,0,0);
-                }
-                glDrawElements(GL_TRIANGLES, current_vbo->total_indexes, GL_UNSIGNED_INT, 0);
-                if (show_bounding_box)draw_bounding_box(current_vbo->bounding_box);
-            }
-        }
-    }
-    else{
-        for(int i = 0;i<snapshot_models.size();i++){
-            vbo* current_vbo = snapshot_models[i];
+    glColor3f(1.0f, 1.0f, 1.0f);
+    for(const auto& model : group.models) {
+        GLuint texture_id = 0;
+        vbo* current_vbo = model_dict[model.file_name];
+        // Check here for view frustum culling
+        
+        if (check_viewfrustum_draw(gl_matrix, current_vbo->bounding_box)){
+            current_models++;
+
             glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
             glVertexPointer(3, GL_FLOAT, 0, 0);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indexes);
+            glBindBuffer(GL_ARRAY_BUFFER,current_vbo->normals);
+	        glNormalPointer(GL_FLOAT,0,0);
+
+            if ((model.texture_name != "") && (texture_dict.find(model.texture_name) != texture_dict.end())){
+                texture_id = texture_dict[model.texture_name];
+                glBindTexture(GL_TEXTURE_2D, texture_id);
+                glBindBuffer(GL_ARRAY_BUFFER, current_vbo->textures);
+                glTexCoordPointer(2, GL_FLOAT, 0, 0);
+            }
+
             glDrawElements(GL_TRIANGLES, current_vbo->total_indexes, GL_UNSIGNED_INT, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            
             if (show_bounding_box)draw_bounding_box(current_vbo->bounding_box);
         }
     }
-    glDisableClientState(GL_VERTEX_ARRAY);
 
     for(const auto& subgroup : group.groups){
         recursive_draw(subgroup);
@@ -300,7 +283,7 @@ void recursive_draw(const group_xml& group) {
  * @param dict The dictionary to store model VBOs
  * @return int 0 on success, 1 on failure
  */
-int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
+int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict, unordered_map<string, GLuint>& texture_dict) {
     for(const auto& model : group.models) {
         if(dict.find(model.file_name) == dict.end()) {
             vector<float> vertices;
@@ -321,13 +304,13 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
             glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
             glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-            glGenBuffers(1, &indexes_id);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexes_id);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes.size()*sizeof(unsigned int), indexes.data(), GL_STATIC_DRAW);
-
             glGenBuffers(1, &normals_id);
             glBindBuffer(GL_ARRAY_BUFFER, normals_id);
             glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
+
+            glGenBuffers(1, &indexes_id);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexes_id);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes.size()*sizeof(unsigned int), indexes.data(), GL_STATIC_DRAW);
 
             //Create VBO textura
             glGenBuffers(1, &textures_id);
@@ -345,7 +328,7 @@ int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict) {
     }
 
     for(const auto& subgroup : group.groups)
-        if(populate_dict(subgroup, dict)) return 1;
+        if(populate_dict(subgroup, dict, texture_dict)) return 1;
 
     return 0;
 }
