@@ -26,6 +26,12 @@ void torus(float inner_radius, float outer_radius, int slices, int stacks, vecto
             vertices.push_back(sin(stacks_ang_inc * j) * inner_radius);
             vertices.push_back(radius_z + aux_radius * sin_B);
 
+            normals.push_back(cos(stacks_ang_inc * j) * cos_B);
+            normals.push_back(sin(stacks_ang_inc * j));
+            normals.push_back(cos(stacks_ang_inc * j) * sin_B);
+
+            textures.push_back(float(i)/float(slices));
+            textures.push_back(float(j)/float(stacks));
             
         }
     }
