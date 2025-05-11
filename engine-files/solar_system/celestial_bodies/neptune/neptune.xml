@@ -11,14 +11,16 @@
             <rotate angle="0" x="0" y="1" z="0" />
             <rotate time="10" x="0" y="1" z="0" />
         </transform>
-             <models>
+        <models>
             <!-- generator sphere 1 10 10 sphere.3d -->
-            <model file="sphere.3d" />
+            <model file="sphere.3d">
+                <texture file = "engine-files/solar_system/celestial_bodies/neptune/neptune.jpg" />
+            </model>
         </models>
         <!-- TRITON -->
         <group>
             <transform>
-                <translate time="10" align="true">
+                <translate time="10">
                     <point x="3.00"     y="0.00"     z="0.00" />
                     <point x="2.78"     y="1.00"     z="1.15" />
                     <point x="2.12"     y="1.80"     z="2.12" />
@@ -40,7 +42,9 @@
             </transform>
             <models>
                 <!-- generator sphere 1 10 10 sphere.3d -->
-                <model file="sphere.3d" />
+                <model file="sphere.3d">
+                    <texture file = "engine-files/solar_system/celestial_bodies/neptune/triton.png" />
+                </model>
             </models>
         </group>
     </group>
