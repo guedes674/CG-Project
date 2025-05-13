@@ -72,6 +72,7 @@ int last_frame_time = 0;
 // --- TEXT VARIABLES ---
 float emissive_def[4] = {0.0f,0.0f,0.0f,1.0f};
 float emissive_full[4] = {1.0f,1.0f,1.0f,1.0f};
+
 int timebase = 0, frame = 0;
 
 /**
