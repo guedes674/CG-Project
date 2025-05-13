@@ -169,6 +169,7 @@ void render_scene(void) {
     }
 
     // Draw the axes
+    /*
     if (show_axes){
         glBegin(GL_LINES);
             glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
@@ -184,7 +185,7 @@ void render_scene(void) {
             glVertex3f(0.0f, 0.0f, 100.0f);
         glEnd();
     }
-
+    */
     for(const auto& group : parser.groups)
         recursive_draw(group);
 

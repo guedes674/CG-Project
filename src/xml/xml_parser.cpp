@@ -49,16 +49,73 @@ group_xml recursive_catch_groups(XMLElement* group) {
     if (models_element) {
         XMLElement* model_element = models_element->FirstChildElement("model");
         while (model_element) {
+
             model_xml model;
-            model.file_name = get_string_attribute(model_element, "file", "");
+            string file_name;
+            string texture_name;
+
+            file_name = get_string_attribute(model_element, "file", "");
             XMLElement* texture_element = model_element->FirstChildElement("texture");
+
             if (texture_element) {
-                model.texture_name = get_string_attribute(texture_element, "file", "");
+                texture_name = get_string_attribute(texture_element, "file", "");
             } else {
-                model.texture_name = "";
+                texture_name = "";
             } 
-            cout << "Model file: " << model.file_name << endl;
-            cout << "Texture file: " << model.texture_name << endl;
+            XMLElement* color_element = model_element->FirstChildElement("color");
+            if (color_element){
+            //<diffuse R="200" G="200" B="000" />
+            //<ambient R="50" G="50" B="00" />
+            //<specular R="0" G="0" B="0" />
+            //<emissive R="0" G="0" B="0" />
+            //<shininess value="0" />
+
+                XMLElement* diffuse_element = color_element->FirstChildElement("diffuse");
+                int diffuse_r = get_int_attribute(diffuse_element, "R", 0);
+                int diffuse_g = get_int_attribute(diffuse_element, "G", 0);
+                int diffuse_b = get_int_attribute(diffuse_element, "B", 0);
+
+                XMLElement* ambient_element = color_element->FirstChildElement("ambient");
+                int ambient_r = get_int_attribute(ambient_element, "R", 0);
+                int ambient_g = get_int_attribute(ambient_element, "G", 0);
+                int ambient_b = get_int_attribute(ambient_element, "B", 0);
+
+                XMLElement* specular_element = color_element->FirstChildElement("specular");
+                int specular_r = get_int_attribute(specular_element, "R", 0);
+                int specular_g = get_int_attribute(specular_element, "G", 0);
+                int specular_b = get_int_attribute(specular_element, "B", 0);
+
+                XMLElement* emissive_element = color_element->FirstChildElement("emissive");
+                int emissive_r = get_int_attribute(emissive_element, "R", 0);
+                int emissive_g = get_int_attribute(emissive_element, "G", 0);
+                int emissive_b = get_int_attribute(emissive_element, "B", 0);
+
+                XMLElement* shininess_element = color_element->FirstChildElement("shininess");
+                int shininess_value = get_int_attribute(shininess_element, "value", 0);
+
+                color model_color(diffuse_r, diffuse_g, diffuse_b,
+                    ambient_r, ambient_g, ambient_b,
+                    specular_r, specular_g, specular_b,
+                    emissive_r, emissive_g, emissive_b,
+                    shininess_value);
+
+                model = model_xml(file_name, texture_name, model_color);
+            }
+
+
+            else{
+                color model_color;
+                model = model_xml(file_name, texture_name, model_color);
+            }
+            cout << "------------------------" << endl;
+            cout << "Model file: " << file_name << endl;
+            cout << "Texture file: " << texture_name << endl;
+            cout << "Model color: " << model.model_color.diffuse_r << " " << model.model_color.diffuse_g << " " << model.model_color.diffuse_b << endl;
+            cout << "Model color: " << model.model_color.ambient_r << " " << model.model_color.ambient_g << " " << model.model_color.ambient_b << endl;
+            cout << "Model color: " << model.model_color.specular_r << " " << model.model_color.specular_g << " " << model.model_color.specular_b << endl;
+            cout << "Model color: " << model.model_color.emissive_r << " " << model.model_color.emissive_g << " " << model.model_color.emissive_b << endl;
+            cout << "Model color: " << model.model_color.shine << endl;
+            cout << "------------------------" << endl;
             new_group.models.push_back(model);
             model_element = model_element->NextSiblingElement("model");
         }

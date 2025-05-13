@@ -190,6 +190,26 @@ int load_texture(std::string texture_name) {
 	return texture_id;
 }
 
+void apply_color(color model_color){
+        cout << "Applying color: " << model_color.diffuse_r << " " << model_color.diffuse_g << " " << model_color.diffuse_b << endl;
+        cout << "Applying color: " << model_color.ambient_r << " " << model_color.ambient_g << " " << model_color.ambient_b << endl;
+        cout << "Applying color: " << model_color.specular_r << " " << model_color.specular_g << " " << model_color.specular_b << endl;
+        cout << "Applying color: " << model_color.emissive_r << " " << model_color.emissive_g << " " << model_color.emissive_b << endl;
+        cout << "Applying color: " << model_color.shine << endl;
+
+		float diffuse[4] = {(float)model_color.diffuse_r/255,(float)model_color.diffuse_g/255,(float)model_color.diffuse_b/255,1.0f};
+		float ambient[4] = {(float)model_color.ambient_r/255,(float)model_color.ambient_g/255,(float)model_color.ambient_b/255,1.0f};
+		float specular[4] = {(float)model_color.specular_r/255,(float)model_color.specular_g/255,(float)model_color.specular_b/255,1.0f};
+		float emissive[4] = {(float)model_color.emissive_r/255,(float)model_color.emissive_g/255,(float)model_color.emissive_b/255,1.0f};
+
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+		glMaterialfv(GL_FRONT, GL_EMISSION, emissive);
+		glMaterialf(GL_FRONT, GL_SHININESS, (float)model_color.shine);
+
+}
+
 /**
  * @brief Recursively draws a group and all its children
  * 
@@ -248,6 +268,8 @@ void recursive_draw(const group_xml& group) {
         
         if (check_viewfrustum_draw(gl_matrix, current_vbo->bounding_box)){
             current_models++;
+
+            apply_color(model.model_color);
 
             glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
             glVertexPointer(3, GL_FLOAT, 0, 0);
