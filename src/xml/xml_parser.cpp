@@ -60,8 +60,6 @@ lights_xml catch_lights(XMLElement* lights_element){
                 current_light.type = 0;
 
                 lights.lights.push_back(current_light);
-
-                cout << "Light point - x : " << current_light.x << " y : " << current_light.y << " z : " << current_light.z << endl;
             }
             else if (type == "directional"){
                 //<light type="directional" dirx="1" diry="0.7" dirz="0.5"/>
@@ -74,7 +72,6 @@ lights_xml catch_lights(XMLElement* lights_element){
                 current_light.type = 1;
 
                 lights.lights.push_back(current_light);
-                cout << "Light direction - x : " << current_light.x << " y : " << current_light.y << " z : " << current_light.z << endl;
             }
             else if (type == "spot"){
                 //<light type="spot" posx="0" posy="2" posz="4" dirx="0" diry="-2" dirz="-4" cutoff="10"/>

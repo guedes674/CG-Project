@@ -206,7 +206,7 @@ void apply_color(color model_color){
 }
 
 /**
- * @brief Draw normals as lines from vertices
+ * @brief Draw normals as lines from vertices with arrow tips
  * 
  * @param vbo_model Pointer to the VBO containing vertex and normal data
  * @param normal_length Length of the normal lines
@@ -232,16 +232,92 @@ void draw_normals(vbo* vbo_model, float normal_length = 0.1f) {
     float* normals = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
     
     if (vertices && normals) {
+        // Constants for arrow head
+        float arrow_size = normal_length * 0.2f;  // 20% of normal length
+        float arrow_angle = 0.5f;  // ~30 degrees in radians
+        
         glBegin(GL_LINES);
         for (unsigned int i = 0; i < vbo_model->total_vertices; i++) {
-            // Starting point (vertex)
-            glVertex3f(vertices[i*3], vertices[i*3+1], vertices[i*3+2]);
+            // Extract vertex and normal coordinates
+            float vx = vertices[i*3];
+            float vy = vertices[i*3+1];
+            float vz = vertices[i*3+2];
             
-            // Ending point (vertex + scaled normal)
+            float nx = normals[i*3] * normal_length;
+            float ny = normals[i*3+1] * normal_length;
+            float nz = normals[i*3+2] * normal_length;
+            
+            // Normalize the normal vector
+            float length = sqrtf(nx*nx + ny*ny + nz*nz);
+            float norm_x = nx / length;
+            float norm_y = ny / length;
+            float norm_z = nz / length;
+            
+            // Find perpendicular vectors for arrow head
+            float px, py, pz;
+            // First perpendicular vector (using cross product with arbitrary direction)
+            if (fabsf(norm_y) < 0.99f) {
+                // Cross with up vector if normal is not almost vertical
+                px = norm_z;
+                py = 0.0f;
+                pz = -norm_x;
+            } else {
+                // Cross with right vector if normal is almost vertical
+                px = 0.0f;
+                py = -norm_z;
+                pz = norm_y;
+            }
+            
+            // Normalize first perpendicular vector
+            length = sqrtf(px*px + py*py + pz*pz);
+            px /= length;
+            py /= length;
+            pz /= length;
+            
+            // Second perpendicular vector (cross product of normal and first perpendicular)
+            float qx = norm_y * pz - norm_z * py;
+            float qy = norm_z * px - norm_x * pz;
+            float qz = norm_x * py - norm_y * px;
+            
+            // Main normal line
+            glVertex3f(vx, vy, vz);
+            glVertex3f(vx + nx, vy + ny, vz + nz);
+            
+            // Calculate arrow head points
+            float tip_x = vx + nx;
+            float tip_y = vy + ny;
+            float tip_z = vz + nz;
+            
+            // Left arrow head line
+            glVertex3f(tip_x, tip_y, tip_z);
             glVertex3f(
-                vertices[i*3] + normals[i*3] * normal_length,
-                vertices[i*3+1] + normals[i*3+1] * normal_length,
-                vertices[i*3+2] + normals[i*3+2] * normal_length
+                tip_x - arrow_size * (norm_x * cosf(arrow_angle) + px * sinf(arrow_angle)),
+                tip_y - arrow_size * (norm_y * cosf(arrow_angle) + py * sinf(arrow_angle)),
+                tip_z - arrow_size * (norm_z * cosf(arrow_angle) + pz * sinf(arrow_angle))
+            );
+            
+            // Right arrow head line
+            glVertex3f(tip_x, tip_y, tip_z);
+            glVertex3f(
+                tip_x - arrow_size * (norm_x * cosf(arrow_angle) - px * sinf(arrow_angle)),
+                tip_y - arrow_size * (norm_y * cosf(arrow_angle) - py * sinf(arrow_angle)),
+                tip_z - arrow_size * (norm_z * cosf(arrow_angle) - pz * sinf(arrow_angle))
+            );
+            
+            // Top arrow head line
+            glVertex3f(tip_x, tip_y, tip_z);
+            glVertex3f(
+                tip_x - arrow_size * (norm_x * cosf(arrow_angle) + qx * sinf(arrow_angle)),
+                tip_y - arrow_size * (norm_y * cosf(arrow_angle) + qy * sinf(arrow_angle)),
+                tip_z - arrow_size * (norm_z * cosf(arrow_angle) + qz * sinf(arrow_angle))
+            );
+            
+            // Bottom arrow head line
+            glVertex3f(tip_x, tip_y, tip_z);
+            glVertex3f(
+                tip_x - arrow_size * (norm_x * cosf(arrow_angle) - qx * sinf(arrow_angle)),
+                tip_y - arrow_size * (norm_y * cosf(arrow_angle) - qy * sinf(arrow_angle)),
+                tip_z - arrow_size * (norm_z * cosf(arrow_angle) - qz * sinf(arrow_angle))
             );
         }
         glEnd();

@@ -17,9 +17,17 @@ float bernstein(int i, int n, float t) {
 }
 
 float bernstein_deriv(int i, int n, float t) {
-    return n * (bernstein(i-1, n-1, t) - bernstein(i, n-1, t));
+    const float mt = 1.0f - t;
+    
+    // For cubic Bezier (n=3), we can use these pre-calculated derivatives
+    switch(i) {
+        case 0: return -3 * mt * mt;
+        case 1: return 3 * (mt * mt - 2 * t * mt);
+        case 2: return 3 * (2 * t * mt - t * t);
+        case 3: return 3 * t * t;
+        default: return 0.0f;
+    }
 }
-
 void catmullrom_curve(int tessellation, std::vector<Vector3>& points, float* result, float* result_deriv) {
     const int n = points.size();
     const float step = 1.0f / tessellation;
@@ -103,17 +111,18 @@ void normalize(float *a) {
     }
 }
 
-void calculate_normal(float *u,float *v, float *out) {
-    // 1) compute raw cross product in a temporary
+// In curves.cpp
+void calculate_normal(float *u, float *v, float *out) {
     float tmp[3];
+
     normalize(u);
     normalize(v);
-    cross(v,u,tmp);
+    
+    cross(v, u, tmp); 
     out[0] = tmp[0];
     out[1] = tmp[1];
     out[2] = tmp[2];
 }
-
 
 void generate_catmull_matrix(float *div,float *y,float *m){
 

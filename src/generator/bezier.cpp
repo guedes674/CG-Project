@@ -152,7 +152,7 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
 
                 // Calculate the normal vector using the tangents
                 float normal[3];
-                calculate_normal(dv, du, normal);
+                calculate_normal(du, dv, normal);
 
                 // Store the calculated normal
                 for (int k = 0; k < 3; k++) {

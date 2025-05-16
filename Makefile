@@ -1,16 +1,21 @@
 UNAME_S := $(shell uname -s)
 
 CXX = g++ 
-CXXFLAGS =-std=c++11 -Wall -Wextra -g -fsanitize=address -O3 -I$(PWD)/src
+
+# Set compiler flags with warnings enabled and force colored output
+CXXFLAGS := -std=c++11 -g -fsanitize=address -O3 -I$(PWD)/src -Wall -Wextra -fdiagnostics-color=always
+
+# Create a warnings file
+WARNINGS_FILE := .build_warnings.tmp
 
 # OS-specific flags
 ifeq ($(UNAME_S), Darwin) # macOS
-	CXXFLAGS += -DGL_SILENCE_DEPRECATION
-	LDFLAGS = -fsanitize=address -framework OpenGL -framework GLUT -lIL -lILU -lILUT
+    CXXFLAGS += -DGL_SILENCE_DEPRECATION
+    LDFLAGS = -fsanitize=address -framework OpenGL -framework GLUT -lIL -lILU -lILUT
 else ifeq ($(UNAME_S), Linux) # Linux
-	LDFLAGS = -fsanitize=address -lGL -lGLU -lglut -lGLEW -lIL -lILU -lILUT
+    LDFLAGS = -fsanitize=address -lGL -lGLU -lglut -lGLEW -lIL -lILU -lILUT
 else ifeq ($(findstring MINGW,$(UNAME_S)),MINGW) # Windows MinGW
-	LDFLAGS = -fsanitize=address -lopengl32 -lglu32 -lfreeglut -lIL -lILU -lILUT
+    LDFLAGS = -fsanitize=address -lopengl32 -lglu32 -lfreeglut -lIL -lILU -lILUT
 endif
 
 # Directory structure
@@ -35,8 +40,20 @@ TOTAL_FILES := $(words $(sort $(GENERATOR_SRC_FILES) $(ENGINE_SRC_FILES)))
 # Default target
 all: 
 	@echo "Compiling $(TOTAL_FILES) source files...\n"
-	@$(MAKE) --no-print-directory build_with_progress
+	@$(MAKE) --no-print-directory build_with_progress 2> $(WARNINGS_FILE)
 	@echo "Compilation complete!"
+	@echo -n "Show compiler warnings? [y/N] "
+	@read answer; \
+	if [ "$${answer,,}" = "y" ]; then \
+		if [ -s $(WARNINGS_FILE) ]; then \
+			echo -e "\n========== COMPILER WARNINGS ==========\n"; \
+			cat $(WARNINGS_FILE); \
+			echo -e "\n======================================\n"; \
+		else \
+			echo -e "\nNo warnings were generated."; \
+		fi; \
+	fi
+	@rm -f .progress $(WARNINGS_FILE)
 
 build_with_progress: reset_progress $(GENERATOR_EXECUTABLE) $(ENGINE_EXECUTABLE)
 
@@ -82,10 +99,3 @@ clean:
 clean3d:
 	@echo "Cleaning up 3D files..."
 	@rm -f *.3d
-
-# Auto cleanup rule to remove .o files after successful build
-.PHONY: cleanup
-cleanup:
-	@echo "\nCleaning up object files..."
-	@find . -name "*.o" -type f -delete
-	@rm -f .progress
