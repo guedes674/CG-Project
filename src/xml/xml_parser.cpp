@@ -161,12 +161,11 @@ group_xml recursive_catch_groups(XMLElement* group) {
 
                 model = model_xml(file_name, texture_name, model_color);
             }
-
-
             else{
                 color model_color;
                 model = model_xml(file_name, texture_name, model_color);
             }
+            
             new_group.models.push_back(model);
             model_element = model_element->NextSiblingElement("model");
         }

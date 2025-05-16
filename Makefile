@@ -39,8 +39,10 @@ TOTAL_FILES := $(words $(sort $(GENERATOR_SRC_FILES) $(ENGINE_SRC_FILES)))
 
 # Default target
 all: 
-	@echo "Compiling $(TOTAL_FILES) source files...\n"
+	@echo "Compiling $(TOTAL_FILES) source files..."
+	@echo ""
 	@$(MAKE) --no-print-directory build_with_progress 2> $(WARNINGS_FILE)
+	@echo ""
 	@echo "Compilation complete!"
 	@echo -n "Show compiler warnings? [y/N] "
 	@read answer; \

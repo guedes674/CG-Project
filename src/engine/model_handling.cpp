@@ -182,6 +182,15 @@ int load_texture(std::string texture_name) {
 			
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data);
 
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.4f);
+    
+        // Anisotropic filtering if supported
+        if (glewIsSupported("GL_EXT_texture_filter_anisotropic")) {
+            float max_aniso = 0.0f;
+            glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_aniso);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_aniso);
+        }    
+
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -391,7 +400,7 @@ void recursive_draw(const group_xml& group) {
         
         if (check_viewfrustum_draw(gl_matrix, current_vbo->bounding_box)){
             current_models++;
-
+            bool has_texture = (model.texture_name != "") && (texture_dict.find(model.texture_name) != texture_dict.end());
             apply_color(model.model_color);
 
             glBindBuffer(GL_ARRAY_BUFFER, current_vbo->vertices);
@@ -402,7 +411,7 @@ void recursive_draw(const group_xml& group) {
 
 	        glNormalPointer(GL_FLOAT,0,0);
 
-            if ((model.texture_name != "") && (texture_dict.find(model.texture_name) != texture_dict.end())){
+            if (has_texture){
                 texture_id = texture_dict[model.texture_name];
                 glBindTexture(GL_TEXTURE_2D, texture_id);
                 glBindBuffer(GL_ARRAY_BUFFER, current_vbo->textures);

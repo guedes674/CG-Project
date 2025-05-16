@@ -29,8 +29,8 @@ class camera_xml {
 class color{
 
     public:
-        color(double diffuse_r = 200.0, double diffuse_g = 200.0, double diffuse_b = 0.0, 
-            double ambient_r = 50.0, double ambient_g = 50.0, double ambient_b = 0.0,
+        color(double diffuse_r = 200.0, double diffuse_g = 200.0, double diffuse_b = 200.0, 
+            double ambient_r = 50.0, double ambient_g = 50.0, double ambient_b = 50.0,
             double specular_r = 0.0, double specular_g = 0.0, double specular_b = 0.0, 
             double emissive_r = 0.0, double emissive_g = 0.0, double emissive_b = 0.0,
             double shine = 0.0) {

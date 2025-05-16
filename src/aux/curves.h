@@ -10,7 +10,7 @@
 
 float bernstein(int i, int n, float t);
 
-float bernstein_deriv(int i, int n, float t);
+float bernstein_deriv(int i, float t);
 
 void bezier_curve(int tesselation, float points[4][3], float * result);
 

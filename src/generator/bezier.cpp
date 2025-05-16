@@ -130,10 +130,10 @@ void bezier(char* patch, int tessellation, vector<float>&vertices, vector<unsign
                 // Calculate surface Vector3 using bicubic Bezier formula with Bernstein polynomials
                 for (int i = 0; i < 4; i++) {
                     float bi = bernstein(i, 3, t_u);       // Bernstein polynomial for u
-                    float bi_deriv = bernstein_deriv(i, 3, t_u); // Derivative of Bernstein polynomial for u
+                    float bi_deriv = bernstein_deriv(i, t_u); // Derivative of Bernstein polynomial for u
                     for (int j = 0; j < 4; j++) {
                         float bj = bernstein(j, 3, t_v);       // Bernstein polynomial for v
-                        float bj_deriv = bernstein_deriv(j, 3, t_v); // Derivative of Bernstein polynomial for v
+                        float bj_deriv = bernstein_deriv(j, t_v); // Derivative of Bernstein polynomial for v
                         // Calculate position and derivatives for x, y, and z
                         for (int k = 0; k < 3; k++) {
                             float cp = control_points[i][j][k];

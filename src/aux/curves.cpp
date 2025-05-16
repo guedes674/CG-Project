@@ -16,10 +16,9 @@ float bernstein(int i, int n, float t) {
     }
 }
 
-float bernstein_deriv(int i, int n, float t) {
+float bernstein_deriv(int i, float t) {
     const float mt = 1.0f - t;
     
-    // For cubic Bezier (n=3), we can use these pre-calculated derivatives
     switch(i) {
         case 0: return -3 * mt * mt;
         case 1: return 3 * (mt * mt - 2 * t * mt);
@@ -28,6 +27,7 @@ float bernstein_deriv(int i, int n, float t) {
         default: return 0.0f;
     }
 }
+
 void catmullrom_curve(int tessellation, std::vector<Vector3>& points, float* result, float* result_deriv) {
     const int n = points.size();
     const float step = 1.0f / tessellation;
