@@ -43,6 +43,74 @@ group_xml recursive_xml_catch(string file_name){
     return output_group;
 }
 
+lights_xml catch_lights(XMLElement* lights_element){
+    lights_xml lights;
+    XMLElement* light_xml = lights_element->FirstChildElement("light");
+    while (light_xml){
+        string type = get_string_attribute(light_xml, "type", "");
+        if (type != ""){
+            if (type == "point"){
+                //<light type="point" posx="0" posy="0.2" posz="0" />
+
+                light current_light;
+
+                current_light.x = get_float_attribute(light_xml, "posx" ,0.0f);
+                current_light.y = get_float_attribute(light_xml, "posy" ,0.0f);
+                current_light.z = get_float_attribute(light_xml, "posz" ,0.0f);
+                current_light.type = 0;
+
+                lights.lights.push_back(current_light);
+
+                cout << "Light point - x : " << current_light.x << " y : " << current_light.y << " z : " << current_light.z << endl;
+            }
+            else if (type == "directional"){
+                //<light type="directional" dirx="1" diry="0.7" dirz="0.5"/>
+
+                light current_light;
+
+                current_light.x = get_float_attribute(light_xml, "dirx" ,0.0f);
+                current_light.y = get_float_attribute(light_xml, "diry" ,0.0f);
+                current_light.z = get_float_attribute(light_xml, "dirz" ,0.0f);
+                current_light.type = 1;
+
+                lights.lights.push_back(current_light);
+                cout << "Light direction - x : " << current_light.x << " y : " << current_light.y << " z : " << current_light.z << endl;
+            }
+            else if (type == "spot"){
+                //<light type="spot" posx="0" posy="2" posz="4" dirx="0" diry="-2" dirz="-4" cutoff="10"/>
+
+                light_spot current_light_spot;
+
+                light point;
+                
+                point.x = get_float_attribute(light_xml, "posx" ,0.0f);
+                point.y = get_float_attribute(light_xml, "posy" ,0.0f);
+                point.z = get_float_attribute(light_xml, "posz" ,0.0f);
+                point.type = 0;
+
+                light direction;
+
+                direction.x = get_float_attribute(light_xml, "dirx" ,0.0f);
+                direction.y = get_float_attribute(light_xml, "diry" ,0.0f);
+                direction.z = get_float_attribute(light_xml, "dirz" ,0.0f);
+                direction.type = 1;
+
+                current_light_spot.cutoff = get_float_attribute(light_xml, "cutoff" , 0.0f);
+
+                current_light_spot.point = point;
+                current_light_spot.direction = direction;
+
+                lights.light_spots.push_back(current_light_spot);
+            }
+            else{
+                cout << "Invalid light type found : " << type << endl;
+            }
+        }
+        light_xml = light_xml->NextSiblingElement("light");
+    }
+    return lights;
+}
+
 group_xml recursive_catch_groups(XMLElement* group) {
     group_xml new_group;
     XMLElement* models_element = group->FirstChildElement("models");
@@ -64,11 +132,6 @@ group_xml recursive_catch_groups(XMLElement* group) {
             } 
             XMLElement* color_element = model_element->FirstChildElement("color");
             if (color_element){
-            //<diffuse R="200" G="200" B="000" />
-            //<ambient R="50" G="50" B="00" />
-            //<specular R="0" G="0" B="0" />
-            //<emissive R="0" G="0" B="0" />
-            //<shininess value="0" />
 
                 XMLElement* diffuse_element = color_element->FirstChildElement("diffuse");
                 int diffuse_r = get_int_attribute(diffuse_element, "R", 0);
@@ -107,15 +170,6 @@ group_xml recursive_catch_groups(XMLElement* group) {
                 color model_color;
                 model = model_xml(file_name, texture_name, model_color);
             }
-            cout << "------------------------" << endl;
-            cout << "Model file: " << file_name << endl;
-            cout << "Texture file: " << texture_name << endl;
-            cout << "Model color: " << model.model_color.diffuse_r << " " << model.model_color.diffuse_g << " " << model.model_color.diffuse_b << endl;
-            cout << "Model color: " << model.model_color.ambient_r << " " << model.model_color.ambient_g << " " << model.model_color.ambient_b << endl;
-            cout << "Model color: " << model.model_color.specular_r << " " << model.model_color.specular_g << " " << model.model_color.specular_b << endl;
-            cout << "Model color: " << model.model_color.emissive_r << " " << model.model_color.emissive_g << " " << model.model_color.emissive_b << endl;
-            cout << "Model color: " << model.model_color.shine << endl;
-            cout << "------------------------" << endl;
             new_group.models.push_back(model);
             model_element = model_element->NextSiblingElement("model");
         }
@@ -264,6 +318,12 @@ xml_parser read_xml_file(string file_name){
         parser.cam.fov = get_float_attribute(proj, "fov", 45);
         parser.cam.near = get_float_attribute(proj, "near", 45);
         parser.cam.far = get_float_attribute(proj, "far", 45);
+    }
+
+    // Carrega as configurações das luzes
+    XMLElement* lights_element = world->FirstChildElement("lights");
+    if (lights_element){
+        parser.lights = catch_lights(lights_element);
     }
 
     // Load Models from groups

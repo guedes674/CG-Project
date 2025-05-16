@@ -106,10 +106,9 @@ void normalize(float *a) {
 void calculate_normal(float *u,float *v, float *out) {
     // 1) compute raw cross product in a temporary
     float tmp[3];
-    cross(u, v, tmp);
-    // 2) normalize the result
-    normalize(tmp);
-    // 3) write back
+    normalize(u);
+    normalize(v);
+    cross(v,u,tmp);
     out[0] = tmp[0];
     out[1] = tmp[1];
     out[2] = tmp[2];

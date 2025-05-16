@@ -21,6 +21,7 @@
 #include "../generator/model.h"
 
 extern int current_models;
+extern bool show_normals;
 extern bool show_bounding_box;
 extern bool show_catmull_curves;
 extern bool snapshot;

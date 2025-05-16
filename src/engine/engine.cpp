@@ -56,6 +56,7 @@ int current_group = 0;
 std::vector<int> position_keys;
 int current_target_index = -1; // -1 significa olhar para (0,0,0)
 
+bool show_normals = false;
 bool show_bounding_box = false;
 bool show_catmull_curves = true;
 bool show_axes = true;
@@ -135,6 +136,57 @@ void render_text(const std::string text,double posx, double posy) {
     glMaterialfv(GL_FRONT, GL_EMISSION, emissive_def);
 }
 
+void apply_light(light current_light,GLenum light_enum){
+    
+    if (current_light.type == 0) {
+        float light_array[4] = {current_light.x,current_light.y,current_light.z,1.0f};
+        glLightfv(light_enum,GL_POSITION,light_array);
+    }else {
+        float light_array[4] = {current_light.x,current_light.y,current_light.z,0.0f};
+        glLightfv(light_enum,GL_POSITION,light_array);
+    }
+}
+
+void apply_light_spot(light_spot spot, GLenum light_enum){
+    float light_pos[4] = {spot.point.x,spot.point.y,spot.point.z,1.0f};
+    float light_dir[3] = {spot.direction.x,spot.direction.y,spot.direction.z};
+    glLightfv(light_enum,GL_POSITION, light_pos);
+    glLightfv(light_enum,GL_SPOT_DIRECTION, light_dir);
+    glLightf(light_enum,GL_SPOT_CUTOFF,spot.cutoff);
+}
+
+void apply_lights(GLenum light_0){
+
+    long unsigned int total_lights = 0;
+
+    float white[4] = {1.0, 1.0, 1.0, 1.0};
+
+    long unsigned int lights_size = parser.lights.lights.size();
+    long unsigned int light_spots_size = parser.lights.light_spots.size();
+
+    for (; total_lights < lights_size + light_spots_size;total_lights++){
+        glLightfv(light_0 + total_lights, GL_AMBIENT, white);
+        glLightfv(light_0 + total_lights, GL_DIFFUSE, white);
+        glLightfv(light_0 + total_lights, GL_SPECULAR, white);
+        if (total_lights < parser.lights.lights.size()) apply_light(parser.lights.lights[total_lights],light_0 + total_lights);
+        else apply_light_spot(parser.lights.light_spots[total_lights - lights_size],light_0 + total_lights);
+    }
+
+}
+
+void init_lights(GLenum light_0){
+    long unsigned int total_lights = 0;
+
+    glEnable(GL_LIGHTING);
+
+    cout << "Total lights: " << parser.lights.lights.size() + parser.lights.light_spots.size() << endl;
+    cout << "Total light spots: " << parser.lights.light_spots.size() << endl;
+
+    for (; total_lights < parser.lights.lights.size() + parser.lights.light_spots.size();total_lights++) glEnable(light_0 + total_lights);
+
+    if (total_lights == 0) glDisable(GL_LIGHTING);
+}
+
 /**
  * @brief Renders the scene with all models and visual elements
  */
@@ -168,8 +220,8 @@ void render_scene(void) {
                 camera.fps_up.x, camera.fps_up.y, camera.fps_up.z);
     }
 
-    // Draw the axes
-    /*
+    apply_lights(GL_LIGHT0);
+
     if (show_axes){
         glBegin(GL_LINES);
             glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
@@ -185,7 +237,7 @@ void render_scene(void) {
             glVertex3f(0.0f, 0.0f, 100.0f);
         glEnd();
     }
-    */
+    
     for(const auto& group : parser.groups)
         recursive_draw(group);
 
@@ -269,13 +321,16 @@ void menu(int value) {
             show_axes = !show_axes;
             break;
         case 5:
-            time_stop = !time_stop;
+            show_normals = !show_normals;
             break;
         case 6:
+            time_stop = !time_stop;
+            break;
+        case 7:
             snapshot = !snapshot;
             if((!time_stop && snapshot)||(time_stop && !snapshot)) time_stop = !time_stop;
             break;
-        case 7:
+        case 8:
             // Toggle between wireframe and filled polygons
             static bool wireframe_mode = false;
             wireframe_mode = !wireframe_mode;
@@ -346,9 +401,10 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Show/Hide Bounding Boxes",2);
     glutAddMenuEntry("Show/Hide Catmull-Rom Curves",3);
     glutAddMenuEntry("Show/Hide Axes",4);
-    glutAddMenuEntry("Time Stop",5);  
-    glutAddMenuEntry("Snapshot",6); 
-    glutAddMenuEntry("Wireframe",7); 
+    glutAddMenuEntry("Show/Hide Normals",5);
+    glutAddMenuEntry("Time Stop",6);  
+    glutAddMenuEntry("Snapshot",7); 
+    glutAddMenuEntry("Wireframe",8); 
     glutAttachMenu(GLUT_RIGHT_BUTTON);  
     glutMenuStatusFunc(menu_status);   
 
@@ -361,6 +417,11 @@ int main(int argc, char** argv) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    init_lights(GL_LIGHT0);
+
+    float amb[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
 
     for (const auto& g : parser.groups) {
         if (populate_dict(g, model_dict,texture_dict)) {

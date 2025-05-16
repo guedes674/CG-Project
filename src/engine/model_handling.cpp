@@ -191,11 +191,6 @@ int load_texture(std::string texture_name) {
 }
 
 void apply_color(color model_color){
-        cout << "Applying color: " << model_color.diffuse_r << " " << model_color.diffuse_g << " " << model_color.diffuse_b << endl;
-        cout << "Applying color: " << model_color.ambient_r << " " << model_color.ambient_g << " " << model_color.ambient_b << endl;
-        cout << "Applying color: " << model_color.specular_r << " " << model_color.specular_g << " " << model_color.specular_b << endl;
-        cout << "Applying color: " << model_color.emissive_r << " " << model_color.emissive_g << " " << model_color.emissive_b << endl;
-        cout << "Applying color: " << model_color.shine << endl;
 
 		float diffuse[4] = {(float)model_color.diffuse_r/255,(float)model_color.diffuse_g/255,(float)model_color.diffuse_b/255,1.0f};
 		float ambient[4] = {(float)model_color.ambient_r/255,(float)model_color.ambient_g/255,(float)model_color.ambient_b/255,1.0f};
@@ -208,6 +203,58 @@ void apply_color(color model_color){
 		glMaterialfv(GL_FRONT, GL_EMISSION, emissive);
 		glMaterialf(GL_FRONT, GL_SHININESS, (float)model_color.shine);
 
+}
+
+/**
+ * @brief Draw normals as lines from vertices
+ * 
+ * @param vbo_model Pointer to the VBO containing vertex and normal data
+ * @param normal_length Length of the normal lines
+ */
+void draw_normals(vbo* vbo_model, float normal_length = 0.1f) {
+    // Save current OpenGL state
+    glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_LINE_BIT);
+    
+    // Disable lighting and textures for better visibility
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    
+    // Set normal line appearance
+    glColor3f(0.0f, 1.0f, 0.0f); // Green for normals
+    glLineWidth(1.0f);
+    
+    // Get vertex data
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_model->vertices);
+    float* vertices = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+    
+    // Get normal data
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_model->normals);
+    float* normals = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+    
+    if (vertices && normals) {
+        glBegin(GL_LINES);
+        for (unsigned int i = 0; i < vbo_model->total_vertices; i++) {
+            // Starting point (vertex)
+            glVertex3f(vertices[i*3], vertices[i*3+1], vertices[i*3+2]);
+            
+            // Ending point (vertex + scaled normal)
+            glVertex3f(
+                vertices[i*3] + normals[i*3] * normal_length,
+                vertices[i*3+1] + normals[i*3+1] * normal_length,
+                vertices[i*3+2] + normals[i*3+2] * normal_length
+            );
+        }
+        glEnd();
+    }
+    
+    // Clean up
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_model->normals);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_model->vertices);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    
+    // Restore previous OpenGL state
+    glPopAttrib();
 }
 
 /**
@@ -275,7 +322,8 @@ void recursive_draw(const group_xml& group) {
             glVertexPointer(3, GL_FLOAT, 0, 0);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, current_vbo->indexes);
-            glBindBuffer(GL_ARRAY_BUFFER,current_vbo->normals);
+            glBindBuffer(GL_ARRAY_BUFFER, current_vbo->normals);
+
 	        glNormalPointer(GL_FLOAT,0,0);
 
             if ((model.texture_name != "") && (texture_dict.find(model.texture_name) != texture_dict.end())){
@@ -288,6 +336,8 @@ void recursive_draw(const group_xml& group) {
             glDrawElements(GL_TRIANGLES, current_vbo->total_indexes, GL_UNSIGNED_INT, 0);
             glBindTexture(GL_TEXTURE_2D, 0);
             
+            if (show_normals) draw_normals(current_vbo, 0.5f);
+
             if (show_bounding_box)draw_bounding_box(current_vbo->bounding_box);
         }
     }

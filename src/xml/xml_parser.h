@@ -18,7 +18,7 @@ class window {
         int height;
 };
 
-class camera {
+class camera_xml {
     public:
         float px, py, pz; // position
         float lx, ly, lz; // look at
@@ -29,8 +29,8 @@ class camera {
 class color{
 
     public:
-        color(double diffuse_r = 0.8, double diffuse_g = 0.8, double diffuse_b = 0.8, 
-            double ambient_r = 0.2, double ambient_g = 0.2, double ambient_b = 0.2,
+        color(double diffuse_r = 200.0, double diffuse_g = 200.0, double diffuse_b = 0.0, 
+            double ambient_r = 50.0, double ambient_g = 50.0, double ambient_b = 0.0,
             double specular_r = 0.0, double specular_g = 0.0, double specular_b = 0.0, 
             double emissive_r = 0.0, double emissive_g = 0.0, double emissive_b = 0.0,
             double shine = 0.0) {
@@ -99,10 +99,9 @@ class time_transformation_xml {
     public:
         int align = 0;
         vector<Vector3> points;
-        int tracking = 0; // Removed reference
+        int tracking = 0; 
         int tracking_id;
         
-        // Add default constructor
         time_transformation_xml() = default;
         
         time_transformation_xml(int align,int tracking_flag ,std::vector<Vector3> points) {
@@ -136,18 +135,40 @@ class transformations_xml {
         int order;
 };
 
+class light{
+    public :
+        bool type; // 0 - point ; 1 - directional
+        float x;
+        float y;
+        float z;
+};
+
+class light_spot{
+    public : 
+        light point;
+        light direction;
+        float cutoff;
+};
+
+class lights_xml {
+    public :
+        std::vector<light> lights;
+        std::vector<light_spot> light_spots;
+};
+
 class group_xml {
     public:
-        std::vector<model_xml> models; // Removed reference
-        transformations_xml transformations; // Removed reference
-        std::vector<group_xml> groups; // Removed reference
+        std::vector<model_xml> models; 
+        transformations_xml transformations; 
+        std::vector<group_xml> groups; 
 };
 
 class xml_parser {
     public:
         window win;
-        camera cam;
-        std::vector<group_xml> groups; // Removed reference
+        camera_xml cam;
+        lights_xml lights;
+        std::vector<group_xml> groups; 
 };
 
 // Function prototypes
