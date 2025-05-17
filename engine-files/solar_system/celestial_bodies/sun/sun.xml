@@ -16,6 +16,9 @@
             <!-- generator sphere 1 30 30 earth.3d -->
             <model file="sphere.3d">
                 <texture file = "engine-files/solar_system/celestial_bodies/sun/sun.jpg" />
+                <color>
+                    <emissive R="255" G="255" B="255"/>
+                </color>
             </model>
         </models>
     </group>

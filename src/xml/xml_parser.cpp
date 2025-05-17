@@ -129,30 +129,40 @@ group_xml recursive_catch_groups(XMLElement* group) {
             } 
             XMLElement* color_element = model_element->FirstChildElement("color");
             if (color_element){
-
+                double diffuse_r, diffuse_g, diffuse_b;
+                double ambient_r, ambient_g, ambient_b;
+                double specular_r, specular_g, specular_b;
+                double emissive_r, emissive_g, emissive_b;
+                double shininess_value;
+                
                 XMLElement* diffuse_element = color_element->FirstChildElement("diffuse");
-                int diffuse_r = get_int_attribute(diffuse_element, "R", 0);
-                int diffuse_g = get_int_attribute(diffuse_element, "G", 0);
-                int diffuse_b = get_int_attribute(diffuse_element, "B", 0);
-
+                if (diffuse_element){
+                    diffuse_r = get_float_attribute(diffuse_element, "R", 200.0f);
+                    diffuse_g = get_float_attribute(diffuse_element, "G", 200.0f);
+                    diffuse_b = get_float_attribute(diffuse_element, "B", 200.0f);
+                }
                 XMLElement* ambient_element = color_element->FirstChildElement("ambient");
-                int ambient_r = get_int_attribute(ambient_element, "R", 0);
-                int ambient_g = get_int_attribute(ambient_element, "G", 0);
-                int ambient_b = get_int_attribute(ambient_element, "B", 0);
-
+                if (ambient_element){
+                    ambient_r = get_float_attribute(ambient_element, "R", 50.0f);
+                    ambient_g = get_float_attribute(ambient_element, "G", 50.0f);
+                    ambient_b = get_float_attribute(ambient_element, "B", 50.0f);
+                }
                 XMLElement* specular_element = color_element->FirstChildElement("specular");
-                int specular_r = get_int_attribute(specular_element, "R", 0);
-                int specular_g = get_int_attribute(specular_element, "G", 0);
-                int specular_b = get_int_attribute(specular_element, "B", 0);
-
+                if (specular_element){
+                    specular_r = get_float_attribute(specular_element, "R", 0.0f);
+                    specular_g = get_float_attribute(specular_element, "G", 0.0f);
+                    specular_b = get_float_attribute(specular_element, "B", 0.0f);
+                }
                 XMLElement* emissive_element = color_element->FirstChildElement("emissive");
-                int emissive_r = get_int_attribute(emissive_element, "R", 0);
-                int emissive_g = get_int_attribute(emissive_element, "G", 0);
-                int emissive_b = get_int_attribute(emissive_element, "B", 0);
-
+                if (emissive_element){
+                    emissive_r = get_float_attribute(emissive_element, "R", 0.0f);
+                    emissive_g = get_float_attribute(emissive_element, "G", 0.0f);
+                    emissive_b = get_float_attribute(emissive_element, "B", 0.0f);
+                }
                 XMLElement* shininess_element = color_element->FirstChildElement("shininess");
-                int shininess_value = get_int_attribute(shininess_element, "value", 0);
-
+                if(shininess_element){
+                    shininess_value = get_float_attribute(shininess_element, "value", 0.0f);
+                }
                 color model_color(diffuse_r, diffuse_g, diffuse_b,
                     ambient_r, ambient_g, ambient_b,
                     specular_r, specular_g, specular_b,
