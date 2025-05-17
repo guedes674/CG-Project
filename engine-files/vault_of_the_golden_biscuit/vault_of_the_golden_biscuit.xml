@@ -1,0 +1,107 @@
+<world> 
+    <window width="512" height="512" />
+    <camera>  
+        <position x="-13" y="8" z="0" />
+        <lookAt x="0" y="0" z="0" />
+        <up x="0" y="1" z="0" />
+        <projection fov="60" near="1" far="1000" /> 
+    </camera>
+	
+	<lights> 
+		<light type="point" posx="0" posy="0.2" posz="0" />
+		<light type="point" posx="-2" posy="2" posz="2" />
+	</lights>
+
+    <!-- Floor -->
+	<group>
+        <transform> 
+            <scale x="10" y="10" z="10" />
+        </transform>
+        <models> 
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+            <texture file = "engine-files/vault_of_the_golden_biscuit/ground.jpg" />
+            </model>
+        </models>
+    </group>
+
+    <!-- Walls -->
+
+    <group>
+        <transform> 
+            <scale x="10" y="10" z="10" />
+            <rotate angle="90" x="0" y="0" z="1" />
+            <translate x="1" y="-1" z="0" />
+        </transform>
+        <models> 
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+            <texture file = "engine-files/vault_of_the_golden_biscuit/brick_wall.jpg" />
+            </model>
+        </models>
+    </group>
+
+    <group>
+        <transform> 
+            <scale x="10" y="10" z="10" />
+            <rotate angle="90" x="0" y="0" z="-1" />
+            <translate x="-1" y="-1" z="0" />
+        </transform>
+        <models> 
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+            <texture file = "engine-files/vault_of_the_golden_biscuit/brick_wall.jpg" />
+            </model>
+        </models>
+    </group>
+
+    <group>
+        <transform> 
+            <scale x="10" y="10" z="10" />
+            <rotate angle="90" x="-1" y="0" z="0" />
+            <translate x="0" y="-1" z="1" />
+        </transform>
+        <models> 
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+            <texture file = "engine-files/vault_of_the_golden_biscuit/brick_wall.jpg" />
+            </model>
+        </models>
+    </group>
+
+    <group>
+        <transform> 
+            <scale x="10" y="10" z="10" />
+            <rotate angle="90" x="1" y="0" z="0" />
+            <translate x="0" y="-1" z="-1" />
+        </transform>
+        <models> 
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+            <texture file = "engine-files/vault_of_the_golden_biscuit/brick_wall.jpg" />
+            </model>
+        </models>
+    </group>
+
+    <group>
+        <transform> 
+            <scale x="10" y="10" z="10" />
+            <rotate angle="90" x="0" y="0" z="1" />
+            <translate x="1" y="-1" z="0" />
+        </transform>
+        <models> 
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+            <texture file = "engine-files/vault_of_the_golden_biscuit/brick_wall.jpg" />
+            </model>
+        </models>
+    </group>
+
+    <!-- Animals -->
+    <group>
+        <transform>
+            <rotate angle="90" x="0" y="0" z="1" />
+            <translate x="5" y="-9.5" z="0" />
+            <scale x="3" y="3" z="3" />
+        </transform>
+        <models>
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+                <texture file = "engine-files/vault_of_the_golden_biscuit/kika.jpg" />
+            </model>
+        </models>
+    </group>
+</world>
