@@ -256,11 +256,12 @@
     <!-- COMET ORBIT -->
     <group>
         <transform>
-            <translate time="80"  tracking="true">
+            <translate time="80" align="true" tracking="true">
                 <!-- scaled by 1.5 -->
                 <point x="75.00"  y="10" z="0.00" />
-                <point x="0.00"   y="0"  z="45.00" />
-                <point x="-75.00" y="-10" z="0.00" />
+                <point x="0.00"   y="0"  z="40.00" />
+                <point x="0.00"   y="4"  z="30.00" />
+                <point x="-80.00" y="-10" z="0.00" />
                 <point x="0.00"   y="0"  z="-30.00" />
             </translate>
             <rotate angle="-90" x="1" y="0" z="0" />

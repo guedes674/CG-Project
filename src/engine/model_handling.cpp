@@ -93,7 +93,7 @@ void time_translation(translation_xml translation) {
     t /= translation.time;
     t -= floor(t);  // Loop animation
 
-    int tessellation = 100;
+    int tessellation = 400;
     if ((current_target_index> -1) && (translation.time_trans.tracking_id == position_keys[current_target_index])) 
         tessellation = 2000;
     int num_curve_points = (tessellation + 1) * translation.time_trans.points.size();
@@ -101,14 +101,17 @@ void time_translation(translation_xml translation) {
     float* div = new float[num_curve_points * 3];
 
     catmullrom_curve(tessellation, translation.time_trans.points, curve_points, div);
-
+    float emissive_full[4] = {1.0f,1.0f,1.0f,1.0f};
+    float emissive_def[4] = {0.0f,0.0f,0.0f,1.0f};
     if (show_catmull_curves){
+        glMaterialfv(GL_FRONT, GL_EMISSION, emissive_full);
         glBegin(GL_LINE_LOOP);
-        for (int i = 0; i < num_curve_points; ++i) {
-            int idx = i * 3;
-            glVertex3f(curve_points[idx], curve_points[idx + 1], curve_points[idx + 2]);
-        }
+            for (int i = 0; i < num_curve_points; ++i) {
+                int idx = i * 3;
+                glVertex3f(curve_points[idx], curve_points[idx + 1], curve_points[idx + 2]);
+            }
         glEnd();
+        glMaterialfv(GL_FRONT, GL_EMISSION, emissive_def);
         }
 
     int current_index = static_cast<int>(t * num_curve_points);

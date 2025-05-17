@@ -21,11 +21,14 @@
 #include "camera.h"
 #include "model_handling.h"
 #include "input_handling.h"
+#include "post_processing.h"
 #include "../aux/aux.h"
 #include "../aux/point.h"
 #include "../aux/curves.h"
 #include "../xml/xml_parser.h"
 using namespace std;
+
+post_processing post_processor;
 
 xml_parser parser;
 
@@ -99,6 +102,8 @@ void change_size(int w, int h) {
     glViewport(0, 0, w, h);
     gluPerspective(parser.cam.fov, ratio, parser.cam.near, parser.cam.far);
     glMatrixMode(GL_MODELVIEW);
+
+    post_processor.resize(w, h);
 }
 
 /**
@@ -201,6 +206,9 @@ void render_scene(void) {
         delta_time = glutGet(GLUT_ELAPSED_TIME) - last_time;
     }
 
+    // Begin rendering to the framebuffer
+    post_processor.begin_scene_render();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -222,22 +230,34 @@ void render_scene(void) {
 
     apply_lights(GL_LIGHT0);
 
+    float zero[3] = {0.0f,0.0f,0.0f};
+    float red[3] = {1.0f,0.0f,0.0f};
+    float green[3] = {0.0f,1.0f,0.0f};
+    float blue[3] = {0.0f,0.0f,1.0f};
+    float diffuse[3] = {0.8f, 0.8f, 0.8f};
+    float ambient[3] = {0.2f, 0.2f, 0.2f};
+
     if (show_axes){
         glBegin(GL_LINES);
+            glMaterialfv(GL_FRONT, GL_AMBIENT, zero);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, zero);
+            glMaterialfv(GL_FRONT, GL_EMISSION, red);
             glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
             glVertex3f(-100.0f, 0.0f, 0.0f);
             glVertex3f(100.0f, 0.0f, 0.0f);
-
+            glMaterialfv(GL_FRONT, GL_EMISSION, green);
             glColor3f(0.0f, 1.0f, 0.0f);   // y axis in green
             glVertex3f(0.0f, -100.0f, 0.0f);
             glVertex3f(0.0f, 100.0f, 0.0f);
-
+            glMaterialfv(GL_FRONT, GL_EMISSION, blue);
             glColor3f(0.0f, 0.0f, 1.0f);   // z axis in blue
             glVertex3f(0.0f, 0.0f, -100.0f);
             glVertex3f(0.0f, 0.0f, 100.0f);
+            glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
         glEnd();
     }
-    
+    glMaterialfv(GL_FRONT, GL_EMISSION, emissive_def);
     for(const auto& group : parser.groups)
         recursive_draw(group);
 
@@ -284,6 +304,14 @@ void render_scene(void) {
     render_text(text, window_width/40, window_height/35 + 80);
     current_models = 0;
 
+    if (texture_dict.size()>0){
+
+        // End rendering to the framebuffer
+        post_processor.end_scene_render();
+
+        // Apply post-processing effects and render to screen
+        post_processor.render_post_processing();
+    }
     glutSwapBuffers();
 }
 
@@ -337,6 +365,10 @@ void menu(int value) {
             glPolygonMode(GL_FRONT_AND_BACK, wireframe_mode ? GL_LINE : GL_FILL);
             break;
         case 9:
+            // Toggle CRT effect
+            post_processor.toggle_crt_effect();
+            break;
+        case 10:
             exit(0);
             break;
         default:
@@ -405,6 +437,7 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Time Stop",6);  
     glutAddMenuEntry("Snapshot",7); 
     glutAddMenuEntry("Wireframe",8); 
+    glutAddMenuEntry("Toggle CRT Effect",9);
     glutAttachMenu(GLUT_RIGHT_BUTTON);  
     glutMenuStatusFunc(menu_status);   
 
@@ -428,6 +461,12 @@ int main(int argc, char** argv) {
             cerr << "Failed to load models\n";
             return 1;
         }
+    }
+
+    // In main() after GLEW initialization and before glutMainLoop()
+    if ((texture_dict.size()>0) && (!post_processor.init(window_width, window_height))) {
+        cerr << "Failed to initialize post-processing effects\n";
+        return 1;
     }
 
     glutMainLoop();
