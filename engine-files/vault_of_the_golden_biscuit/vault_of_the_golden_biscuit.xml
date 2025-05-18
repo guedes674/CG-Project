@@ -15,7 +15,21 @@
     <!-- Floor -->
 	<group>
         <transform> 
-            <scale x="10" y="10" z="10" />
+            <scale x="100" y="100" z="100" />
+        </transform>
+        <models> 
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+            <texture file = "engine-files/vault_of_the_golden_biscuit/ground.jpg" />
+            </model>
+        </models>
+    </group>
+
+    <!-- Ceiling -->
+	<group>
+        <transform> 
+            <scale x="100" y="100" z="100" />
+            <rotate angle="180" x="1" y="0" z="0" />
+            <translate x="0" y="-0.2" z="0" />
         </transform>
         <models> 
             <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
@@ -25,38 +39,33 @@
     </group>
 
     <!-- Walls -->
-
+        <!-- Back Wall -->
     <group>
         <transform> 
-            <scale x="10" y="10" z="10" />
-            <rotate angle="90" x="0" y="0" z="1" />
-            <translate x="1" y="-1" z="0" />
-        </transform>
-        <models> 
-            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
-            <texture file = "engine-files/vault_of_the_golden_biscuit/brick_wall.jpg" />
-            </model>
-        </models>
-    </group>
-
-    <group>
-        <transform> 
-            <scale x="10" y="10" z="10" />
+            <scale x="30" y="10" z="30" />
             <rotate angle="90" x="0" y="0" z="-1" />
-            <translate x="-1" y="-1" z="0" />
+            <translate x="-1" y="-3" z="0" />
         </transform>
         <models> 
             <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
             <texture file = "engine-files/vault_of_the_golden_biscuit/brick_wall.jpg" />
             </model>
         </models>
+            <!-- Animals -->
+        <group>
+            <models>
+                <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+                    <texture file = "engine-files/vault_of_the_golden_biscuit/kika.jpg" />
+                </model>
+            </models>
+        </group>
     </group>
 
     <group>
         <transform> 
-            <scale x="10" y="10" z="10" />
+            <scale x="100" y="10" z="10" />
             <rotate angle="90" x="-1" y="0" z="0" />
-            <translate x="0" y="-1" z="1" />
+            <translate x="0" y="-2" z="1" />
         </transform>
         <models> 
             <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
@@ -67,9 +76,9 @@
 
     <group>
         <transform> 
-            <scale x="10" y="10" z="10" />
+            <scale x="100" y="10" z="10" />
             <rotate angle="90" x="1" y="0" z="0" />
-            <translate x="0" y="-1" z="-1" />
+            <translate x="0" y="-2" z="-1" />
         </transform>
         <models> 
             <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
@@ -78,11 +87,12 @@
         </models>
     </group>
 
+        <!-- Front Walls -->
     <group>
         <transform> 
-            <scale x="10" y="10" z="10" />
+            <scale x="30" y="10" z="30" />
             <rotate angle="90" x="0" y="0" z="1" />
-            <translate x="1" y="-1" z="0" />
+            <translate x="1" y="-0.335" z="0" />
         </transform>
         <models> 
             <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
@@ -95,12 +105,38 @@
     <group>
         <transform>
             <rotate angle="90" x="0" y="0" z="1" />
-            <translate x="5" y="-9.5" z="0" />
-            <scale x="3" y="3" z="3" />
+            <translate x="8" y="-9.5" z="0" />
+            <scale x="5" y="5" z="5" />
         </transform>
         <models>
             <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
                 <texture file = "engine-files/vault_of_the_golden_biscuit/kika.jpg" />
+            </model>
+        </models>
+    </group>
+
+    <group>
+        <transform>
+            <rotate angle="90" x="0" y="0" z="1" />
+            <translate x="8" y="-9.5" z="-13" />
+            <scale x="5" y="5" z="5" />
+        </transform>
+        <models>
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+                <texture file = "engine-files/vault_of_the_golden_biscuit/joshua.jpeg" />
+            </model>
+        </models>
+    </group>
+
+    <group>
+        <transform>
+            <rotate angle="90" x="0" y="0" z="1" />
+            <translate x="8" y="-9.5" z="13" />
+            <scale x="5" y="5" z="5" />
+        </transform>
+        <models>
+            <model file="plane_2_3.3d" > <!-- generator plane 2 3 plane_2_3.3d -->
+                <texture file = "engine-files/vault_of_the_golden_biscuit/hikari.jpeg" />
             </model>
         </models>
     </group>
