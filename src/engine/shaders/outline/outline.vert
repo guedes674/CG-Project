@@ -1,9 +1,9 @@
 // Simple passthrough vertex shader
 #version 120
 
-varying vec2 texCoord;
+varying vec2 tex_coord;
 
 void main() {
-    texCoord = gl_MultiTexCoord0.st;
+    tex_coord = gl_MultiTexCoord0.st;
     gl_Position = ftransform();
 }

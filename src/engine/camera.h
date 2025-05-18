@@ -26,7 +26,7 @@ struct Camera{
     // Common parameters
     float sensitivity = 0.1f;
     float sensitivity_orbit = 0.005f;
-    float move_speed = 0.25f;
+    float move_speed = 0.20f;
 
     // Orbit mode parameters
     float orbit_azimuth = 0.0f;

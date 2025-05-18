@@ -107,14 +107,14 @@ void post_processing::render_post_processing() {
     // Select which shader to use
     if (crt_enabled) {
         crt_shader.use();
-        crt_shader.set_uniform("screenTexture", 0);
+        crt_shader.set_uniform("screen_texture", 0);
         crt_shader.set_uniform("time", static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f);
     } else if (outline_enabled) {
         outline_shader.use();
-        outline_shader.set_uniform("colorTexture", 0);
-        outline_shader.set_uniform("depthTexture", 1);
-        outline_shader.set_uniform("outlineWidth", 1.0f);  // Adjust as needed
-        outline_shader.set_uniform("outlineColor", 1.0f, 1.0f, 1.0f);  // White
+        outline_shader.set_uniform("color_texture", 0);
+        outline_shader.set_uniform("depth_texture", 1);
+        outline_shader.set_uniform("outline_width", 1.0f);  // Adjust as needed
+        outline_shader.set_uniform("outline_color", 1.0f, 1.0f, 1.0f);  // White
     }
     
     // Draw a full-screen quad

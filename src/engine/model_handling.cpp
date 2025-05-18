@@ -89,7 +89,7 @@ void draw_bounding_box(float * bounding_box){
  * @param translation The translation parameters from XML
  */
 void time_translation(translation_xml translation) {
-    double t = last_time / 1000.0;
+    double t = elapsed_time / 1000.0;
     t /= translation.time;
     t -= floor(t);  // Loop animation
 
@@ -149,7 +149,7 @@ void time_translation(translation_xml translation) {
 }
 
 void time_rotation(rotation_xml rotation) {
-    double t = last_time / 1000.0;
+    double t = elapsed_time / 1000.0;
     t /= rotation.time;
     t -= floor(t);  // Loop animation
 

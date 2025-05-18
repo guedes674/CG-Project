@@ -47,8 +47,9 @@ int current_models      = 0;
 bool snapshot = false;
 std::vector<vbo*> snapshot_models;
 bool time_stop = false;
-int last_time = 0;
+int elapsed_time = 0;
 int delta_time = 0;
+float speed_up = 1;
 float gl_last_matrix[16];
 std::unordered_map<std::string, vbo*> model_dict;
 std::unordered_map<std::string, GLuint> texture_dict;
@@ -187,9 +188,6 @@ void init_lights(GLenum light_0){
 
     glEnable(GL_LIGHTING);
 
-    cout << "Total lights: " << parser.lights.lights.size() + parser.lights.light_spots.size() << endl;
-    cout << "Total light spots: " << parser.lights.light_spots.size() << endl;
-
     for (; total_lights < parser.lights.lights.size() + parser.lights.light_spots.size();total_lights++) glEnable(light_0 + total_lights);
 
     if (total_lights == 0) glDisable(GL_LIGHTING);
@@ -204,9 +202,9 @@ void render_scene(void) {
     static char text_fps[64];
 
     if (!time_stop){
-        last_time = glutGet(GLUT_ELAPSED_TIME) - delta_time;
+        elapsed_time = glutGet(GLUT_ELAPSED_TIME) - delta_time;
     }else {
-        delta_time = glutGet(GLUT_ELAPSED_TIME) - last_time;
+        delta_time = glutGet(GLUT_ELAPSED_TIME) - elapsed_time;
     }
 
     // Begin rendering to the framebuffer
@@ -340,7 +338,7 @@ void timer_func(int value) {
 
     update_camera();
     glutPostRedisplay();
-    glutTimerFunc(16, timer_func, 0); // Use fixed 60fps timing (16ms)
+    glutTimerFunc(4, timer_func, 0); // Use fixed 60fps timing (16ms)
 }
 
 void menu(int value) {
@@ -368,8 +366,7 @@ void menu(int value) {
             time_stop = !time_stop;
             break;
         case 7:
-            snapshot = !snapshot;
-            if((!time_stop && snapshot)||(time_stop && !snapshot)) time_stop = !time_stop;
+            if (speed_up < 4) speed_up++;
             break;
         case 8:
             // Toggle between wireframe and filled polygons
@@ -382,6 +379,10 @@ void menu(int value) {
             break;
         case 10:
             post_processor.toggle_outline();
+            break;
+        case 11:
+            if (speed_up > 1) speed_up--;
+            else if (speed_up > 0.25f) speed_up = speed_up - 0.25f;
             break;
         default:
             break;
@@ -447,7 +448,8 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Show/Hide Axes",4);
     glutAddMenuEntry("Show/Hide Normals",5);
     glutAddMenuEntry("Time Stop",6);  
-    glutAddMenuEntry("Snapshot",7); 
+    //glutAddMenuEntry("Speed up",7);
+    //glutAddMenuEntry("Speed down",11); 
     glutAddMenuEntry("Wireframe",8); 
     glutAddMenuEntry("Toggle CRT Effect",9);
     glutAddMenuEntry("Toggle Outline Effect",10);

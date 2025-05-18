@@ -25,7 +25,7 @@ extern bool show_normals;
 extern bool show_bounding_box;
 extern bool show_catmull_curves;
 extern bool snapshot;
-extern int last_time;
+extern int elapsed_time;
 extern int current_target_index;
 extern float gl_last_matrix[16];
 extern std::unordered_map<int, Vector3> position_dict;

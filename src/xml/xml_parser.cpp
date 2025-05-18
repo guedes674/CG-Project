@@ -17,7 +17,6 @@ string get_string_attribute(XMLElement* element, const char* attribute_name, str
 
 group_xml recursive_xml_catch(string file_name){
     group_xml output_group;
-    cout << "Reading file :" << file_name << endl;
     XMLDocument doc;
     XMLError eResult = doc.LoadFile(file_name.c_str());
 
