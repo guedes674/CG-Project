@@ -44,8 +44,6 @@ int last_mouse_y  = 0;
 int global_id = 0;
 
 int current_models      = 0;
-bool snapshot = false;
-std::vector<vbo*> snapshot_models;
 bool time_stop = false;
 int elapsed_time = 0;
 int delta_time = 0;

@@ -24,7 +24,6 @@ extern int current_models;
 extern bool show_normals;
 extern bool show_bounding_box;
 extern bool show_catmull_curves;
-extern bool snapshot;
 extern int elapsed_time;
 extern int current_target_index;
 extern float gl_last_matrix[16];
@@ -60,7 +59,6 @@ class vbo {
 
 extern std::unordered_map<std::string, vbo*> model_dict;
 extern std::unordered_map<std::string, GLuint> texture_dict;
-extern std::vector<vbo*> snapshot_models;
 
 int populate_dict(const group_xml& group, unordered_map<string, vbo*>& dict, unordered_map<string, GLuint>& texture_dict);
 void recursive_draw(const group_xml& group);
