@@ -1,4 +1,4 @@
-<img src='uminho_eng.png' width="30%"/>
+<img src='media/uminho_eng.png' width="30%"/>
 
 <h3 align="center">Licenciatura em Engenharia Informática <br> Trabalho prático de Computação Gráfica <br> 2024/2025 </h3>
 
@@ -18,3 +18,16 @@
 # CG2425-Grupo-33
 
 Nota : ??
+
+## Sistema Solar
+<img src='media/solar_system.png'/>
+
+## Vault of the Golden Biscuit
+
+<img src='media/vault_of_the_golden_biscuit.png'/>
+
+## Shaders
+
+<div style="text-align: center">
+<img src='media/crt_shader.png' width="45%"/>  <img src='media/outline_shader.png' width="45%"/>
+</div>
