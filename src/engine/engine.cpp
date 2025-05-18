@@ -63,6 +63,9 @@ bool show_normals = false;
 bool show_bounding_box = false;
 bool show_catmull_curves = true;
 bool show_axes = true;
+
+static bool wireframe_mode = false;
+
 // --- INPUT HANDLING VARIABLES ---
 bool mouse_dragging = false;
 
@@ -207,7 +210,10 @@ void render_scene(void) {
     }
 
     // Begin rendering to the framebuffer
-    post_processor.begin_scene_render();
+    if (!wireframe_mode && texture_dict.size() > 0) {
+        // Begin rendering to framebuffer ONLY if not in wireframe mode
+        post_processor.begin_scene_render();
+    }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -230,33 +236,43 @@ void render_scene(void) {
 
     apply_lights(GL_LIGHT0);
 
-    float zero[3] = {0.0f,0.0f,0.0f};
-    float red[3] = {1.0f,0.0f,0.0f};
-    float green[3] = {0.0f,1.0f,0.0f};
-    float blue[3] = {0.0f,0.0f,1.0f};
-    float diffuse[3] = {0.8f, 0.8f, 0.8f};
-    float ambient[3] = {0.2f, 0.2f, 0.2f};
-
-    if (show_axes){
+    if (show_axes) {
+        // Save all relevant OpenGL states
+        glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_LINE_BIT | GL_COLOR_BUFFER_BIT);
+        
+        // Disable everything that could interfere with direct color rendering
+        glDisable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_COLOR_MATERIAL);
+        
+        // Make lines more visible
+        glLineWidth(2.0f);
+        
+        // Set the color mode
+        glShadeModel(GL_FLAT);
+        
+        // Draw the axes
         glBegin(GL_LINES);
-            glMaterialfv(GL_FRONT, GL_AMBIENT, zero);
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, zero);
-            glMaterialfv(GL_FRONT, GL_EMISSION, red);
-            glColor3f(1.0f, 0.0f, 0.0f);   // x axis in red
+            // X axis (red)
+            glColor3f(1.0f, 0.0f, 0.0f);
             glVertex3f(-100.0f, 0.0f, 0.0f);
             glVertex3f(100.0f, 0.0f, 0.0f);
-            glMaterialfv(GL_FRONT, GL_EMISSION, green);
-            glColor3f(0.0f, 1.0f, 0.0f);   // y axis in green
+            
+            // Y axis (green)
+            glColor3f(0.0f, 1.0f, 0.0f);
             glVertex3f(0.0f, -100.0f, 0.0f);
             glVertex3f(0.0f, 100.0f, 0.0f);
-            glMaterialfv(GL_FRONT, GL_EMISSION, blue);
-            glColor3f(0.0f, 0.0f, 1.0f);   // z axis in blue
+            
+            // Z axis (blue)
+            glColor3f(0.0f, 0.0f, 1.0f);
             glVertex3f(0.0f, 0.0f, -100.0f);
             glVertex3f(0.0f, 0.0f, 100.0f);
-            glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
         glEnd();
+        
+        // Restore all previous OpenGL states
+        glPopAttrib();
     }
+    
     glMaterialfv(GL_FRONT, GL_EMISSION, emissive_def);
     for(const auto& group : parser.groups)
         recursive_draw(group);
@@ -304,12 +320,9 @@ void render_scene(void) {
     render_text(text, window_width/40, window_height/35 + 80);
     current_models = 0;
 
-    if (texture_dict.size()>0){
-
-        // End rendering to the framebuffer
+    if (!wireframe_mode && texture_dict.size() > 0) {
+        // End framebuffer rendering and apply post-processing
         post_processor.end_scene_render();
-
-        // Apply post-processing effects and render to screen
         post_processor.render_post_processing();
     }
     glutSwapBuffers();
@@ -360,7 +373,6 @@ void menu(int value) {
             break;
         case 8:
             // Toggle between wireframe and filled polygons
-            static bool wireframe_mode = false;
             wireframe_mode = !wireframe_mode;
             glPolygonMode(GL_FRONT_AND_BACK, wireframe_mode ? GL_LINE : GL_FILL);
             break;
@@ -369,7 +381,7 @@ void menu(int value) {
             post_processor.toggle_crt_effect();
             break;
         case 10:
-            exit(0);
+            post_processor.toggle_outline();
             break;
         default:
             break;
@@ -438,6 +450,7 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Snapshot",7); 
     glutAddMenuEntry("Wireframe",8); 
     glutAddMenuEntry("Toggle CRT Effect",9);
+    glutAddMenuEntry("Toggle Outline Effect",10);
     glutAttachMenu(GLUT_RIGHT_BUTTON);  
     glutMenuStatusFunc(menu_status);   
 
