@@ -15,18 +15,29 @@
 | Tiago Guedes     | A97369  |
 
 </div>
-# CG2425-Grupo-33
+# CG2425-Grupo-33 , CG , Uminho 
 
 Nota : ??
 
-## Sistema Solar
+## Features
+
+Este projecto apresenta as seguintes funcionalidades : 
+
+ - Gerar primitivas (planos, cubos, esferas, cones, cilindros, torus e superfícies de Bezier).
+ - Câmara com modo First Person e Orbital.
+ - Texturas de alta qualidade e luzes (pontos de luz, luzes direcionais e focos de luz).
+ - View Frustum Culling com bounding boxes.
+
+## Demos
+
+### Sistema Solar
 <img src='media/solar_system.png'/>
 
-## Vault of the Golden Biscuit
+### Vault of the Golden Biscuit
 
 <img src='media/vault_of_the_golden_biscuit.png'/>
 
-## Shaders
+### Shaders
 
 <div style="text-align: center">
 <img src='media/crt_shader.png' width="45%"/>  <img src='media/outline_shader.png' width="45%"/>
