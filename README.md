@@ -10,7 +10,6 @@
 
 | Nome             | Número  |
 | ---------------- | ------- |
-| Adélio Fernandes | A78778  |
 | Tiago Carneiro   | A93207  |
 | Tiago Guedes     | A97369  |
 
