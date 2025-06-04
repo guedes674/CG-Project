@@ -238,8 +238,6 @@ Win32/*
 .idea/
 *.3d
 .vscode
-generator 
-engine
 
 *.DS_Store
 *.tmp
