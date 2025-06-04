@@ -1,0 +1,283 @@
+<world>
+    <window width="800" height="600" />
+    <camera>
+        <position x="0" y="30" z="50" />
+        <lookAt   x="0" y="0"  z="0"  />
+        <up       x="0" y="1"  z="0"  />
+        <projection fov="60" near="0.1" far="1000" />
+    </camera>
+
+    <lights> 
+		<light type="point" posX="0" posY="0" posZ="0" />
+	</lights>
+
+    <!-- SUN -->
+    <group>
+        <transform>
+            <scale x="4.5" y="4.5" z="4.5" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/sun/sun.xml" />
+        </xmls>
+    </group>
+
+    <!-- MERCURY ORBIT -->
+    <group>
+        <transform>
+            <translate time="30" >
+                <!-- radius 15 -->
+                <point x="15.00" y="0" z="0.00" />
+                <point x="13.86" y="0" z="5.75" />
+                <point x="10.61" y="0" z="10.61" />
+                <point x="5.75"  y="0" z="13.86" />
+                <point x="0.00"  y="0" z="15.00" />
+                <point x="-5.75" y="0" z="13.86" />
+                <point x="-10.61" y="0" z="10.61" />
+                <point x="-13.86" y="0" z="5.75" />
+                <point x="-15.00" y="0" z="0.00" />
+                <point x="-13.86" y="0" z="-5.75"/>
+                <point x="-10.61" y="0" z="-10.61"/>
+                <point x="-5.75"  y="0" z="-13.86"/>
+                <point x="0.00"  y="0" z="-15.00"/>
+                <point x="5.75"  y="0" z="-13.86"/>
+                <point x="10.61" y="0" z="-10.61"/>
+                <point x="13.86" y="0" z="-5.75"/>
+            </translate>
+            <scale x="1" y="1" z="1" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/mercury/mercury.xml" />
+        </xmls>
+    </group>
+
+    <!-- VENUS ORBIT -->
+    <group>
+        <transform>
+            <translate time="40" >
+                <!-- radius 26.25 -->
+                <point x="26.25" y="0" z="0.00" />
+                <point x="24.26" y="0" z="10.05" />
+                <point x="18.56" y="0" z="18.56" />
+                <point x="10.05" y="0" z="24.26" />
+                <point x="0.00"  y="0" z="26.25" />
+                <point x="-10.05" y="0" z="24.26"/>
+                <point x="-18.56" y="0" z="18.56"/>
+                <point x="-24.26" y="0" z="10.05"/>
+                <point x="-26.25" y="0" z="0.00" />
+                <point x="-24.26" y="0" z="-10.05"/>
+                <point x="-18.56" y="0" z="-18.56"/>
+                <point x="-10.05" y="0" z="-24.26"/>
+                <point x="0.00"  y="0" z="-26.25"/>
+                <point x="10.05" y="0" z="-24.26"/>
+                <point x="18.56" y="0" z="-18.56"/>
+                <point x="24.26" y="0" z="-10.05"/>
+            </translate>
+            <scale x="1" y="1" z="1" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/venus/venus.xml" />
+        </xmls>
+    </group>
+
+    <!-- EARTH ORBIT -->
+    <group>
+        <transform>
+            <translate time="60" >
+                <!-- radius 37.5 -->
+                <point x="37.50" y="0" z="0.00" />
+                <point x="34.55" y="0" z="14.36" />
+                <point x="26.52" y="0" z="26.52" />
+                <point x="14.36" y="0" z="34.55" />
+                <point x="0.00"  y="0" z="37.50" />
+                <point x="-14.36" y="0" z="34.55"/>
+                <point x="-26.52" y="0" z="26.52"/>
+                <point x="-34.55" y="0" z="14.36"/>
+                <point x="-37.50" y="0" z="0.00" />
+                <point x="-34.55" y="0" z="-14.36"/>
+                <point x="-26.52" y="0" z="-26.52"/>
+                <point x="-14.36" y="0" z="-34.55"/>
+                <point x="0.00"  y="0" z="-37.50"/>
+                <point x="14.36" y="0" z="-34.55"/>
+                <point x="26.52" y="0" z="-26.52"/>
+                <point x="34.55" y="0" z="-14.36"/>
+            </translate>
+            <rotate angle="23.5" x="0" y="0" z="1" />
+            <scale x="3" y="3" z="3" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/earth/earth.xml" />
+        </xmls>
+    </group>
+
+    <!-- MARS ORBIT -->
+    <group>
+        <transform>
+            <translate time="54" >
+                <!-- radius 60 -->
+                <point x="60.00" y="0" z="0.00" />
+                <point x="55.46" y="0" z="22.99" />
+                <point x="42.42" y="0" z="42.42" />
+                <point x="22.99" y="0" z="55.46" />
+                <point x="0.00"  y="0" z="60.00" />
+                <point x="-22.99" y="0" z="55.46"/>
+                <point x="-42.42" y="0" z="42.42"/>
+                <point x="-55.46" y="0" z="22.99"/>
+                <point x="-60.00" y="0" z="0.00" />
+                <point x="-55.46" y="0" z="-22.99"/>
+                <point x="-42.42" y="0" z="-42.42"/>
+                <point x="-22.99" y="0" z="-55.46"/>
+                <point x="0.00"  y="0" z="-60.00"/>
+                <point x="22.99" y="0" z="-55.46"/>
+                <point x="42.42" y="0" z="-42.42"/>
+                <point x="55.46" y="0" z="-22.99"/>
+            </translate>
+            <scale x="2" y="2" z="2" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/mars/mars.xml" />
+        </xmls>
+    </group>
+
+    <!-- JUPITER ORBIT -->
+    <group>
+        <transform>
+            <translate time="45"  tracking="true">
+                <!-- radius 97.5 -->
+                <point x="97.50" y="0" z="0.00" />
+                <point x="90.62" y="0" z="37.38" />
+                <point x="68.94" y="0" z="68.94" />
+                <point x="37.38" y="0" z="90.62" />
+                <point x="0.00"  y="0" z="97.50" />
+                <point x="-37.38" y="0" z="90.62"/>
+                <point x="-68.94" y="0" z="68.94"/>
+                <point x="-90.62" y="0" z="37.38"/>
+                <point x="-97.50" y="0" z="0.00" />
+                <point x="-90.62" y="0" z="-37.38"/>
+                <point x="-68.94" y="0" z="-68.94"/>
+                <point x="-37.38" y="0" z="-90.62"/>
+                <point x="0.00"  y="0" z="-97.50"/>
+                <point x="37.38" y="0" z="-90.62"/>
+                <point x="68.94" y="0" z="-68.94"/>
+                <point x="90.62" y="0" z="-37.38"/>
+            </translate>
+            <scale x="3" y="3" z="3" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/jupiter/jupiter.xml" />
+        </xmls>
+    </group>
+
+    <!-- SATURN ORBIT -->
+    <group>
+        <transform>
+            <translate time="55"  tracking="true">
+                <!-- radius 120 -->
+                <point x="120.00" y="0" z="0.00"  />
+                <point x="110.87" y="0" z="45.92" />
+                <point x="84.86"  y="0" z="84.86" />
+                <point x="45.92"  y="0" z="110.87"/>
+                <point x="0.00"   y="0" z="120.00"/>
+                <point x="-45.92" y="0" z="110.87"/>
+                <point x="-84.86" y="0" z="84.86" />
+                <point x="-110.87" y="0" z="45.92"/>
+                <point x="-120.00" y="0" z="0.00" />
+                <point x="-110.87" y="0" z="-45.92"/>
+                <point x="-84.86"  y="0" z="-84.86"/>
+                <point x="-45.92" y="0" z="-110.87"/>
+                <point x="0.00"   y="0" z="-120.00"/>
+                <point x="45.92"  y="0" z="-110.87"/>
+                <point x="84.86"  y="0" z="-84.86"/>
+                <point x="110.87" y="0" z="-45.92"/>
+            </translate>
+            <scale x="2" y="2" z="2" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/saturn/saturn.xml" />
+        </xmls>
+    </group>
+
+    <!-- URANUS ORBIT -->
+    <group>
+        <transform>
+            <translate time="67" >
+                <!-- radius 150 -->
+                <point x="150.00" y="0" z="0.00" />
+                <point x="138.59" y="0" z="57.41" />
+                <point x="106.07" y="0" z="106.07" />
+                <point x="57.41"  y="0" z="138.59"/>
+                <point x="0.00"   y="0" z="150.00"/>
+                <point x="-57.41" y="0" z="138.59"/>
+                <point x="-106.07" y="0" z="106.07"/>
+                <point x="-138.59" y="0" z="57.41"/>
+                <point x="-150.00" y="0" z="0.00"/>
+                <point x="-138.59" y="0" z="-57.41"/>
+                <point x="-106.07" y="0" z="-106.07"/>
+                <point x="-57.41"  y="0" z="-138.59"/>
+                <point x="0.00"   y="0" z="-150.00"/>
+                <point x="57.41"  y="0" z="-138.59"/>
+                <point x="106.07" y="0" z="-106.07"/>
+                <point x="138.59" y="0" z="-57.41"/>
+            </translate>
+            <scale x="2.5" y="2.5" z="2.5" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/uranus/uranus.xml" />
+        </xmls>
+    </group>
+
+    <!-- NEPTUNE ORBIT -->
+    <group>
+        <transform>
+            <translate time="34" >
+                <point x="172.50" y="0" z="0.00" />
+                <point x="159.37" y="0" z="66.01" />
+                <point x="121.98" y="0" z="121.98" />
+                <point x="66.01"  y="0" z="159.37" />
+                <point x="0.00"   y="0" z="172.50" />
+                <point x="-66.01" y="0" z="159.37" />
+                <point x="-121.98" y="0" z="121.98" />
+                <point x="-159.37" y="0" z="66.01" />
+                <point x="-172.50" y="0" z="0.00" />
+                <point x="-159.37" y="0" z="-66.01" />
+                <point x="-121.98" y="0" z="-121.98" />
+                <point x="-66.01" y="0" z="-159.37" />
+                <point x="-0.00"  y="0" z="-172.50" />
+                <point x="66.01"  y="0" z="-159.37" />
+                <point x="121.98" y="0" z="-121.98" />
+                <point x="159.37" y="0" z="-66.01" />
+            </translate>
+            <scale x="2.7" y="2.7" z="2.7" />
+        </transform>
+        <xmls>
+            <xml file="engine-files/solar_system/celestial_bodies/neptune/neptune.xml" />
+        </xmls>
+    </group>
+
+    <!-- COMET ORBIT -->
+    <group>
+        <transform>
+            <translate time="80" align="true" tracking="true">
+                <!-- scaled by 1.5 -->
+                <point x="75.00"  y="10" z="0.00" />
+                <point x="0.00"   y="0"  z="40.00" />
+                <point x="0.00"   y="4"  z="30.00" />
+                <point x="-80.00" y="-10" z="0.00" />
+                <point x="0.00"   y="0"  z="-30.00" />
+            </translate>
+            <rotate angle="-90" x="1" y="0" z="0" />
+            <scale x="0.5" y="0.5" z="0.5" />
+        </transform>
+        <models>
+            <model file="bezier_10.3d">
+                <texture file="engine-files/solar_system/teapot.png" />
+            </model>
+        </models>
+    </group>
+
+    <!-- SKYBOX -->
+    <group>
+        <xmls>
+            <xml file="engine-files/solar_system/skybox/skybox.xml" />
+        </xmls>
+    </group>
+</world>
