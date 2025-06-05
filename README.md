@@ -38,6 +38,6 @@ Este projecto apresenta as seguintes funcionalidades :
 
 ### Shaders
 
-<div style="text-align: center">
-<img src='media/crt_shader.png' width="45%" style="margin-right: 2%;"/>  <img src='media/outline_shader.png' width="45%" style="margin-left: 2%;"/>
+<div align="center">
+<img src='media/crt_shader.png' width="45%"/> &nbsp;&nbsp;&nbsp;&nbsp; <img src='media/outline_shader.png' width="45%"/>
 </div>
