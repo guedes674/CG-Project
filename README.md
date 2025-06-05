@@ -32,12 +32,13 @@ Este projecto apresenta as seguintes funcionalidades :
 ### Sistema Solar
 <img src='media/solar_system.png'/>
 
-### Vault of the Golden Biscuit
-
-<img src='media/vault_of_the_golden_biscuit.png'/>
-
 ### Shaders
 
 <div align="center">
 <img src='media/crt_shader.png' width="45%"/> &nbsp;&nbsp;&nbsp;&nbsp; <img src='media/outline_shader.png' width="45%"/>
 </div>
+
+### Vault of the Golden Biscuit
+
+<img src='media/vault_of_the_golden_biscuit.png'/>
+
