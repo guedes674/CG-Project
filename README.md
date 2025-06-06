@@ -16,7 +16,7 @@
 </div>
 # CG2425-Grupo-33 , CG , Uminho 
 
-Nota : ??
+Nota : 20 ⭐
 
 ## Features
 
