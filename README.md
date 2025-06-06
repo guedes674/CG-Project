@@ -13,10 +13,10 @@
 | Tiago Carneiro   | A93207  |
 | Tiago Guedes     | A97369  |
 
+Nota : 20 ⭐
+
 </div>
 # CG2425-Grupo-33 , CG , Uminho 
-
-Nota : 20 ⭐
 
 ## Features
 
